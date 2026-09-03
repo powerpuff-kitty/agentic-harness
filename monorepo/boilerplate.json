@@ -1,0 +1,9 @@
+{
+  "name": "monorepo",
+  "version": "0.2.0",
+  "format_version": 1,
+  "extends": "base",
+  "description": "Multi-app/package repository harness",
+  "default_packs": [],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "implementation-plan"]
+}

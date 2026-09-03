@@ -1,6 +1,11 @@
 * @powerpuff-kitty
-/Cargo.toml @powerpuff-kitty
-/crates/ @powerpuff-kitty
-/packages/ @powerpuff-kitty
+/base/ @powerpuff-kitty
+/web-app/ @powerpuff-kitty
+/backend-api/ @powerpuff-kitty
+/saas/ @powerpuff-kitty
+/monorepo/ @powerpuff-kitty
+/library-sdk/ @powerpuff-kitty
+/modules/ @powerpuff-kitty
+/presets/ @powerpuff-kitty
 /schema/ @powerpuff-kitty
-/.github/workflows/ @powerpuff-kitty
+/.github/ @powerpuff-kitty

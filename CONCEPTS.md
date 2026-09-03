@@ -1,28 +1,31 @@
 # Concepts
 
 ## Boilerplate
-A canonical initial repository starting point, such as `web-app`, `backend-api`, `saas`, or `monorepo`. A boilerplate defines coherent project shape and durable harness structure. It is intended to be browsable and usable directly by humans, agents, and tooling.
+A canonical initial repository starting point. Boilerplates live directly at the repository root (`base`, `web-app`, `backend-api`, `saas`, `monorepo`, `library-sdk`) and contain `boilerplate.json` metadata.
 
-## Preset
-A machine-readable named composition that selects a boilerplate plus useful packs and other modules. Presets reduce setup choices without creating a separate boilerplate for every stack combination.
+## Module
+A reusable cross-boilerplate building block. The canonical module families are packs, policies, and profiles under `modules/`.
 
 ## Pack
-Reusable knowledge and constraints. A pack describes what agents need to know about a technical or product domain.
+Reusable knowledge and technical/product constraints. Packs describe what agents need to know about a domain.
+
+## Policy
+A mandatory organizational or project rule suitable for review-time or deterministic enforcement.
+
+## Profile
+A coherent set of organization/team/project defaults, such as startup, enterprise, agency, or open source.
+
+## Preset
+A machine-readable named composition that selects a boilerplate plus useful modules and skills. Presets reduce setup choices without multiplying boilerplates.
 
 ## Skill
 A repeatable agent procedure. Skills are maintained in `agentic-harness-agents`, not here.
 
-## Policy
-A mandatory organizational or project rule suitable for deterministic or review-time enforcement.
-
-## Profile
-A coherent set of defaults for an organization/team/project posture, such as startup, enterprise, agency, or open source.
-
 ## Schema
-A machine-readable contract for manifests, audit output, configuration, or package metadata.
+A machine-readable public contract for boilerplate metadata, presets, profiles, manifests, or audit output.
 
 ## Eval
-A test or rubric for whether an outcome satisfies a desired behavior or quality bar. Agent-facing eval procedures belong primarily in `agentic-harness-agents`; deterministic enforcement belongs in `agentic-harness-cli`.
+A test or rubric for whether an outcome satisfies a quality bar. Agent-facing eval procedures belong primarily in `agentic-harness-agents`; deterministic checks belong in `agentic-harness-cli`.
 
 ## Example applications
-Complete demo/reference applications are not part of this canonical repository. If maintained later, they should live in a dedicated examples repository so this repo remains a focused boilerplate catalog and source of truth.
+Complete demo/reference applications are intentionally outside this repository so the canonical catalog stays small and readable.

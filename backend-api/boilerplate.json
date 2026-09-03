@@ -1,0 +1,9 @@
+{
+  "name": "backend-api",
+  "version": "0.2.0",
+  "format_version": 1,
+  "extends": "base",
+  "description": "API/service-first repository harness",
+  "default_packs": ["backend-api"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "implementation-plan"]
+}

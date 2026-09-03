@@ -5,9 +5,8 @@ Agentic Harness separates canonical project knowledge, agent behavior, and deter
 ```text
 ┌──────────────────────────────────────────┐
 │ agentic-harness                          │
-│ canonical static source                  │
-│ templates · packs · policies · profiles  │
-│ presets · schemas · examples · docs      │
+│ canonical catalog                        │
+│ root boilerplates · modules · schemas    │
 └───────────────────┬──────────────────────┘
                     │ source of truth
           ┌─────────┴─────────┐
@@ -16,31 +15,53 @@ Agentic Harness separates canonical project knowledge, agent behavior, and deter
 │ harness-agents   │  │ harness-cli        │
 │ skills/prompts   │  │ Rust `ah`          │
 │ adapters         │  │ audit/validation   │
-│ agent workflows  │  │ composition/gates │
+│ workflows        │  │ composition/gates │
 └──────────────────┘  └────────────────────┘
 ```
 
+## Repository role
+
+This repository is deliberately static and easy to browse. Its root directories are the canonical boilerplates:
+
+```text
+base/
+web-app/
+backend-api/
+saas/
+monorepo/
+library-sdk/
+```
+
+Shared cross-boilerplate material lives under `modules/`:
+
+```text
+modules/
+├── packs/
+├── policies/
+└── profiles/
+```
+
+`presets/` provides named compositions and `schema/` defines machine-readable contracts. `docs/` explains decisions and compatibility without becoming another source of project structure.
+
 ## Authority
 
-1. This repository owns durable architecture and project-shape truth.
+1. `agentic-harness` owns durable architecture, boilerplates, modules, presets, and schemas.
 2. `agentic-harness-agents` owns procedures for agents using that truth.
-3. `agentic-harness-cli` owns deterministic mechanics and enforcement.
+3. `agentic-harness-cli` owns deterministic mechanics, composition, audits, and enforcement.
 
-Prompts are never allowed to silently redefine canonical architecture. CLI implementation details are never the canonical explanation of a template or policy.
+Prompts must not silently redefine canonical architecture, and CLI implementation details are not the canonical explanation of a boilerplate or policy.
 
 ## Project overlay model
 
-Agentic Harness sits on top of an application rather than replacing its framework or source tree:
-
 ```text
 project
-+ template
++ boilerplate
 + packs
 + policies
 + profile
 + selected skills
-+ deterministic evals / audit
++ deterministic checks
 = agent-native governed project
 ```
 
-Generated repositories should be self-contained. External Agentic Harness repositories are authoring/distribution sources, not runtime dependencies of the resulting application.
+Generated repositories are self-contained. These three repositories are authoring and distribution sources, not runtime dependencies of the generated application.

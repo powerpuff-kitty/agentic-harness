@@ -1,9 +1,18 @@
 # Boilerplate Catalog Model
 
-`agentic-harness` is a catalog of canonical project starting points, not a single boilerplate and not a demo-application repository.
+`agentic-harness` is the catalog itself: boilerplates are first-class root directories rather than children of another wrapper folder.
 
-The public unit is a **boilerplate**. Boilerplates are directly browsable under `boilerplates/` and define coherent initial repository shape plus durable Agentic Harness structure.
+```text
+base/
+web-app/
+backend-api/
+saas/
+monorepo/
+library-sdk/
+```
 
-Presets are smaller machine-readable compositions that select a boilerplate and modules. Packs, policies, and profiles remain reusable cross-boilerplate layers.
+Each entry contains `boilerplate.json` metadata and the canonical project shape for that starting point. Shared reusable layers live under `modules/`; presets select a root boilerplate plus modules and skills.
 
-Complete reference applications, showcases, or generated examples should not be stored here. If maintained later, they belong in a separate examples repository.
+This layout is intentionally optimized for GitHub browsing and agent retrieval: a visitor can see the available project starting points without first learning internal package structure.
+
+Complete reference applications, showcases, generated examples, runtime code, and agent prompts are outside the scope of this repository.

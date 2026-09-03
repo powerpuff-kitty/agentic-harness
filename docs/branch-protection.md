@@ -1,5 +1,5 @@
 # Recommended Branch Protection
 
-For `main` require pull requests, at least one approving review, conversation resolution, and successful `Agentic harness audit` and `Security baseline` checks. Disallow force pushes and branch deletion. Prefer signed commits/tags for releases.
+For `main`, require pull requests, at least one approving review, conversation resolution, and the successful **Catalog validation** check. Disallow force pushes and branch deletion. Prefer signed commits/tags for tagged releases.
 
-This is a repository-host setting rather than a file-level control; it must be enabled in GitHub repository rules/branch protection. The audit should flag when it is absent.
+This is a GitHub repository setting rather than a file-level control and must be configured in repository rules or branch protection.

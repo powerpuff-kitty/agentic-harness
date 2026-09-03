@@ -1,1 +1,5 @@
-{"template":"saas","packs":["web-app","saas","design-system","postgres"],"skills":["agentic-app","codebase-audit","security-review","product-design"]}
+{
+  "boilerplate": "saas",
+  "packs": ["web-app", "saas", "design-system", "postgres"],
+  "skills": ["agentic-app", "codebase-audit", "security-review", "product-design"]
+}
