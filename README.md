@@ -1,62 +1,51 @@
 # Agentic Repo Harness
 
-A framework-neutral, composable development harness for making software repositories agent-native, governable, auditable, and secure across Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and other filesystem/tool-using agents.
-
-**The repository is durable institutional memory; agents are interchangeable workers.**
-
-The source repository is split into `templates/` (generated project shape), `skills/` (repeatable agent procedures), `packs/` (knowledge/constraints), `schema/` (machine contracts), `scripts/` (deterministic tooling), and `tests/`.
+A composable development harness for making software repositories agent-native, governable, auditable, and secure.
 
 ## CLI
 
-The command name is `arh` (Agentic Repo Harness):
-
 ```bash
-./arh init ./my-app --name my-app --maturity production --pack web-app --pack postgres
-./arh upgrade ./existing-app --pack design-system --skill codebase-audit
-./arh audit ./existing-app > audit.json
+./arh init ./app --template web-app
+./arh init ./saas --preset vue-saas --name my-saas --maturity production
+./arh init ./api --template backend-api --pack postgres
+./arh upgrade ./existing --template monorepo
+./arh audit ./existing > audit.json
 ./arh compare before.json after.json
 ./arh gate audit.json --min-overall 80 --min-score security=80
 ```
 
-For environments that do not preserve executable bits, the equivalent fallback is `python3 scripts/agentic.py ...`.
+## Composition model
 
-`INIT` refuses a non-empty target unless explicitly allowed. `UPGRADE` preserves existing files and only fills missing template files, while explicitly selected packs/skills are installed into `.agentic/packs/` and `.agents/skills/` so the target remains self-contained.
+```text
+template   = initial repository shape
+preset     = named template + packs + skills composition
+pack       = knowledge and constraints
+skill      = repeatable procedure
+example    = accepted outcome
+eval       = success measurement
+schema     = machine contract
+script     = deterministic enforcement
+```
 
-## Agentic-app skill
+Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`, and `library-sdk`. Templates inherit from `base` (or another template) and add focused overlays, avoiding duplicated boilerplate. Presets currently include `vue-saas`, `api-postgres`, and `secure-saas`.
 
-Use `skills/agentic-app/SKILL.md` for guided `INIT`, `UPGRADE`, and agent-driven `AUDIT`. It inspects first, asks only unresolved high-impact questions, resolves maturity/packs/permissions, and preserves project-specific truth.
-
-## Codebase audit
-
-Use `skills/codebase-audit/SKILL.md` for QUICK/STANDARD/DEEP/COMPARE/GATE review. The deterministic baseline is `scripts/codebase_audit.py`; machine output follows `schema/codebase-audit.schema.json`. Scores are evidence-backed and explicitly separate performed checks from unverified areas.
-
-## Design systems
-
-The design-system pack/skill organizes evidence into primitive → semantic → component tokens, then foundations, layouts, components, patterns, examples, anti-patterns, and visual/accessibility checks.
-
-## Security
-
-Security covers both application and agent threats: prompt injection, excessive tool permissions, secret exfiltration, confused-deputy behavior, unsafe generated code, untrusted retrieval, agent memory, destructive actions, least privilege, and supply-chain review. See root `SECURITY.md`, `templates/base/SECURITY.md`, `skills/agentic-app/references/security-for-agents.md`, and `packs/security-critical/`.
-
-CI compiles tooling, runs unit tests, validates module/template shape, audits the base template, and performs a scheduled high-signal secret scan. The repository still benefits from GitHub branch protection/rules requiring these checks; see `docs/branch-protection.md`.
-
-## Versioning
-
-Framework releases use semantic versioning. Template, skill, and pack module versions are indexed in `templates/base/template.json`, `skills/manifest.json`, and `packs/manifest.json`. See `VERSIONING.md` and `docs/compatibility.md`.
+`INIT` may apply template overlays because it creates a new repository. `UPGRADE` preserves existing files and only fills missing template content. Explicitly selected packs and skills are installed into `.agentic/packs/` and `.agents/skills/`.
 
 ## Repository shape
 
 ```text
 .
 ├── arh
-├── README.md
-├── SECURITY.md
-├── CONTRIBUTING.md
-├── CHANGELOG.md
-├── VERSIONING.md
-├── templates/base/
-├── skills/
+├── templates/
+│   ├── base/
+│   ├── web-app/
+│   ├── backend-api/
+│   ├── saas/
+│   ├── monorepo/
+│   └── library-sdk/
+├── presets/
 ├── packs/
+├── skills/
 ├── schema/
 ├── scripts/
 ├── tests/
@@ -64,6 +53,4 @@ Framework releases use semantic versioning. Template, skill, and pack module ver
 └── .github/workflows/
 ```
 
-## Principle
-
-Do not turn `AGENTS.md`, `CLAUDE.md`, or one giant prompt into the knowledge base. Keep entry points short and route agents to small, version-controlled sources of truth. Generated repositories must be self-contained and must not silently replace project-specific decisions with boilerplate.
+Use `skills/agentic-app/SKILL.md` for guided INIT/UPGRADE and `skills/codebase-audit/SKILL.md` for evidence-backed repository audits. Security covers both conventional application risks and agent-specific risks such as prompt injection, excessive tool permissions, data exfiltration, unsafe generated code, untrusted retrieval, and destructive actions.
