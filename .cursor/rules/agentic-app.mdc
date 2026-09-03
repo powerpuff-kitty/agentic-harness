@@ -1,0 +1,10 @@
+---
+description: Apply the repository's canonical agent-native architecture when initializing, upgrading, or auditing agent instructions and project knowledge.
+alwaysApply: false
+---
+
+Read `skill/SKILL.md` before making agent-architecture changes.
+
+For audits, also read `skill/references/audit-checklist.md`.
+
+Do not duplicate canonical rules into Cursor-specific files. Keep repository truth in the shared documents and use this rule only as an adapter.
