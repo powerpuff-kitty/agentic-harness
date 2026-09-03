@@ -1,7 +1,15 @@
 # Compatibility Policy
 
-Compatibility is tracked across the Agentic Harness canonical content revision, base boilerplate, packs, policies, profiles, presets, schemas, agent skills, and CLI release.
+Compatibility is tracked across the canonical content revision, root boilerplates, reusable modules, presets, schemas, agent skills, and CLI release.
 
-`boilerplates/base/template.json`, `packs/manifest.json`, and the schemas in `schema/` are canonical indexes/contracts in this repository. Agent skill versions are maintained in `agentic-harness-agents`.
+Canonical compatibility surfaces in this repository include:
 
-An upgrade must preserve existing source-of-truth content and report incompatible changes before applying them. Agent adapters should remain thin and may evolve independently as agent products change. Deprecated modules should remain available for at least one minor release when practical, with a replacement and migration note.
+- each root `boilerplate.json`;
+- `modules/packs/manifest.json`;
+- `modules/profiles/*/profile.json`;
+- `presets/*.json`;
+- public contracts under `schema/`.
+
+Agent skill versions are maintained in `agentic-harness-agents`. CLI releases pin exact revisions of both authoring repositories.
+
+An upgrade must preserve existing project-specific truth and report incompatible changes before applying them. Deprecated fields or modules should remain supported for at least one minor compatibility window when practical, with a documented replacement and migration path.
