@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Agentic Repo Harness deterministic CLI."""
+"""Agentic Harness deterministic CLI."""
 from __future__ import annotations
-import argparse, json, shutil, sys
+import argparse, json, os, shutil, sys
 from pathlib import Path
 SOURCE_ROOT=Path(__file__).resolve().parents[1]; TEMPLATES=SOURCE_ROOT/"templates"; PACKS=SOURCE_ROOT/"packs"; SKILLS=SOURCE_ROOT/"skills"; PRESETS=SOURCE_ROOT/"presets"
 
@@ -31,7 +31,6 @@ def template_chain(name):
   if not meta.exists(): raise SystemExit(f"unknown template: {name}")
   data=json.loads(meta.read_text()); chain.append((name,root,data)); name=data.get("extends")
  return list(reversed(chain))
-
 def resolve(template,preset,packs,skills):
  if preset:
   path=PRESETS/f"{preset}.json"
@@ -39,7 +38,6 @@ def resolve(template,preset,packs,skills):
   data=json.loads(path.read_text()); template=data.get("template",template); packs=packs or data.get("packs",[]); skills=skills or data.get("skills",[])
  chain=template_chain(template); leaf=chain[-1][2]
  return chain, packs or leaf.get("default_packs",[]), skills or leaf.get("default_skills",[])
-
 def patch_manifest(path,name,maturity,packs):
  if not path.exists(): return
  text=path.read_text(); lines=text.splitlines()
@@ -58,7 +56,6 @@ def patch_manifest(path,name,maturity,packs):
    out.append(line)
   text="\n".join(out)+"\n"
  path.write_text(text)
-
 def install_modules(target,packs,skills):
  for kind,names,root,dstdir in [("pack",packs,PACKS,target/".agentic/packs"),("skill",skills,SKILLS,target/".agents/skills")]:
   for name in names:
@@ -67,7 +64,6 @@ def install_modules(target,packs,skills):
    dst=dstdir/name
    if dst.exists(): shutil.rmtree(dst)
    dst.parent.mkdir(parents=True,exist_ok=True); shutil.copytree(src,dst)
-
 def compose(target,template,preset,packs,skills,preserve):
  chain,packs,skills=resolve(template,preset,packs,skills); created=[]; overlaid=[]
  created+=copy_missing(TEMPLATES/"base",target)
@@ -76,7 +72,6 @@ def compose(target,template,preset,packs,skills,preserve):
   if preserve: created+=copy_missing(root/"overlay",target)
   else: overlaid+=copy_overlay(root/"overlay",target)
  install_modules(target,packs,skills); return [x[0] for x in chain],packs,skills,created,overlaid
-
 def cmd_init(a):
  target=Path(a.target).resolve(); target.mkdir(parents=True,exist_ok=True)
  if any(target.iterdir()) and not a.allow_existing: raise SystemExit("target is not empty; use --allow-existing or upgrade")
@@ -103,7 +98,9 @@ def cmd_gate(a):
   if actual is None or actual<float(v): failures.append(f"{n} {actual} < {v}")
  print(json.dumps({"passed":not failures,"failures":failures},indent=2)); return 1 if failures else 0
 def parser():
- p=argparse.ArgumentParser(prog="arh",description="Agentic Repo Harness"); s=p.add_subparsers(dest="command",required=True)
+ invoked=os.environ.get("AGENTIC_HARNESS_INVOKED_AS") or Path(sys.argv[0]).name or "ah"
+ if invoked in {"python","python3","agentic.py"}: invoked="ah"
+ p=argparse.ArgumentParser(prog=invoked,description="Agentic Harness"); s=p.add_subparsers(dest="command",required=True)
  for n,f in [("init",cmd_init),("upgrade",cmd_upgrade)]:
   q=s.add_parser(n); q.add_argument("target"); q.add_argument("--template",default="base",choices=[p.name for p in TEMPLATES.iterdir() if p.is_dir()]); q.add_argument("--preset"); q.add_argument("--name"); q.add_argument("--maturity",choices=["prototype","startup","production","critical"]); q.add_argument("--pack",action="append",default=[]); q.add_argument("--skill",action="append",default=[]); q.set_defaults(func=f)
   if n=="init": q.add_argument("--allow-existing",action="store_true")

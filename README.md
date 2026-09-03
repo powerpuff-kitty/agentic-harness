@@ -1,18 +1,36 @@
-# Agentic Repo Harness
+# Agentic Harness
 
-A composable development harness for making software repositories agent-native, governable, auditable, and secure.
+A composable framework for designing, generating, governing, auditing, and maintaining agent-native software projects.
 
 ## CLI
 
+The default local command is `ah`:
+
 ```bash
-./arh init ./app --template web-app
-./arh init ./saas --preset vue-saas --name my-saas --maturity production
-./arh init ./api --template backend-api --pack postgres
-./arh upgrade ./existing --template monorepo
-./arh audit ./existing > audit.json
-./arh compare before.json after.json
-./arh gate audit.json --min-overall 80 --min-score security=80
+./ah init ./app --template web-app
+./ah init ./saas --preset vue-saas --name my-saas --maturity production
+./ah init ./api --template backend-api --pack postgres
+./ah upgrade ./existing --template monorepo
+./ah audit ./existing > audit.json
+./ah compare before.json after.json
+./ah gate audit.json --min-overall 80 --min-score security=80
 ```
+
+Install a global command with:
+
+```bash
+./install.sh
+```
+
+If `ah` is already used on the machine, choose any safe alias:
+
+```bash
+./install.sh --command agentic
+./install.sh --command agh
+AGENTIC_HARNESS_COMMAND=my-ah ./install.sh
+```
+
+The executable name is intentionally configurable. The CLI derives its displayed program name from the executable that launched it, so `ah --help` shows `ah ...`, while an installed alias such as `agentic --help` shows `agentic ...`.
 
 ## Composition model
 
@@ -35,14 +53,9 @@ Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`
 
 ```text
 .
-├── arh
+├── ah
+├── install.sh
 ├── templates/
-│   ├── base/
-│   ├── web-app/
-│   ├── backend-api/
-│   ├── saas/
-│   ├── monorepo/
-│   └── library-sdk/
 ├── presets/
 ├── packs/
 ├── skills/
