@@ -1,15 +1,15 @@
 # Contributing
 
-Changes should preserve the repository boundaries: templates are generated project shape, packs are knowledge, skills are procedures, schemas are machine contracts, and the Rust CLI is deterministic enforcement.
+Preserve the repository boundaries: Rust crates are deterministic engine code; `packages/` contains official distributable templates, packs, skills, policies, profiles, and presets; `schema/` contains public machine contracts.
 
 Before opening a PR run:
 
 ```bash
-cargo check --all-targets
-cargo test --all-targets
+cargo check --workspace --all-targets
+cargo test --workspace --all-targets
 cargo run --quiet -- validate .
-cargo run --quiet -- harness-audit templates/base
+cargo run --quiet -- harness-audit packages/templates/base
 cargo run --quiet -- audit .
 ```
 
-New skills require `skills/<name>/SKILL.md`; new packs require `packs/<name>/PACK.md` and a manifest entry. Runtime behavior belongs in Rust. New third-party crates should be justified by capability, maintenance, security, and binary-size tradeoffs.
+New skills require `packages/skills/<name>/SKILL.md`; new packs require `packages/packs/<name>/PACK.md` and a manifest entry. Runtime behavior belongs in Rust crates. Keep package content framework-neutral unless the package explicitly declares a narrower scope. New third-party crates should be justified by capability, maintenance, security, and binary-size tradeoffs.
