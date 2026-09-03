@@ -1,6 +1,6 @@
 # Agentic Harness
 
-Canonical architecture, templates, boilerplates, packs, policies, profiles, schemas, examples, and project guidance for agent-native software repositories.
+A canonical catalog of agent-native **boilerplates**, reusable packs, policies, profiles, presets, schemas, and architecture guidance.
 
 This repository is the **source of truth** for what Agentic Harness projects are and how they should be structured. Agent behavior lives in [`agentic-harness-agents`](https://github.com/powerpuff-kitty/agentic-harness-agents); deterministic tooling lives in [`agentic-harness-cli`](https://github.com/powerpuff-kitty/agentic-harness-cli).
 
@@ -9,51 +9,47 @@ This repository is the **source of truth** for what Agentic Harness projects are
 ```text
 agentic-harness/
 ├── ARCHITECTURE.md       ecosystem and repository model
-├── CONCEPTS.md           template/pack/policy/profile vocabulary
-├── templates/            canonical project shapes
-├── boilerplates/         opinionated starter compositions
+├── CONCEPTS.md           boilerplate/pack/policy/profile vocabulary
+├── boilerplates/         canonical project starting points
 ├── presets/              machine-readable compositions
 ├── packs/                reusable knowledge and constraints
 ├── policies/             mandatory rules
 ├── profiles/             organization/team defaults
 ├── schema/               machine-readable contracts
-├── examples/             reference outcomes and examples
 ├── docs/                 deeper architecture guidance
 └── marketing/            Agentic Harness product messaging
 ```
 
-## Templates
+## Boilerplate catalog
 
-Current canonical templates:
+Current canonical boilerplates:
 
-- `templates/base`
-- `templates/web-app`
-- `templates/backend-api`
-- `templates/saas`
-- `templates/monorepo`
-- `templates/library-sdk`
+- [`boilerplates/base`](boilerplates/base)
+- [`boilerplates/web-app`](boilerplates/web-app)
+- [`boilerplates/backend-api`](boilerplates/backend-api)
+- [`boilerplates/saas`](boilerplates/saas)
+- [`boilerplates/monorepo`](boilerplates/monorepo)
+- [`boilerplates/library-sdk`](boilerplates/library-sdk)
 
-Templates define repository shape. They are deliberately easy to browse and are not hidden behind runtime implementation details.
+Each boilerplate is a real project starting point rather than a demo application. It defines a coherent initial repository shape and may be composed with packs, policies, profiles, presets, and agent skills.
 
-## Boilerplates and presets
+There is intentionally no generic `examples/` directory here. Full demonstration applications belong in a separate examples repository if they become useful later.
 
-A **template** is a structural shape. A **boilerplate** is a documented, opinionated starting configuration built from a template plus packs, policies, profiles, and agent skills. Machine-readable preset definitions live in `presets/`.
+## Presets
 
-See [`boilerplates/README.md`](boilerplates/README.md).
+Presets are machine-readable named compositions that select a boilerplate and useful modules. They reduce configuration without creating a separate boilerplate for every stack variation.
 
 ## Canonical-source rule
 
-The other Agentic Harness repositories consume this repository rather than redefine its architecture:
-
 ```text
-agentic-harness (canonical truth)
+agentic-harness (canonical truth + boilerplates)
         ↓
 agentic-harness-agents (skills / prompts / adapters)
         ↓
 agentic-harness-cli (deterministic application / audit / validation)
 ```
 
-If architecture, templates, packs, policies, profiles, or schemas change, change them here first. Agent prompts and CLI behavior should then adapt to that accepted source.
+If boilerplates, packs, policies, profiles, presets, or schemas change, change them here first. Agent prompts and CLI behavior should then adapt to the accepted source.
 
 ## Design systems
 

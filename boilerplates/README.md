@@ -1,20 +1,14 @@
-# Boilerplates
+# Boilerplate Catalog
 
-Boilerplates are human-readable recipes that combine canonical templates with common packs, profiles, policies, and agent skills.
+Each directory is a canonical Agentic Harness project starting point.
 
-Current machine-readable compositions in `../presets/` include:
+- `base` — minimal agent-native repository foundation.
+- `web-app` — browser-facing application structure.
+- `backend-api` — service/API structure.
+- `saas` — SaaS-oriented application structure.
+- `monorepo` — multi-application/package repository structure.
+- `library-sdk` — reusable library or SDK structure.
 
-- `vue-saas` — SaaS-oriented Vue composition.
-- `api-postgres` — backend API with PostgreSQL knowledge.
-- `secure-saas` — SaaS composition with stronger security posture.
+Boilerplates define initial repository shape and durable harness files. They should remain understandable without the CLI and consumable by humans, agents, and tooling.
 
-A boilerplate should document:
-
-1. intended product shape;
-2. base template;
-3. recommended packs and policies;
-4. recommended agent skills from `agentic-harness-agents`;
-5. expected deployment/data assumptions;
-6. what is intentionally not included.
-
-Do not duplicate full template files here. Keep template truth in `templates/` and use boilerplates as understandable compositions.
+Use `presets/` to express machine-readable compositions that select a boilerplate plus packs and other modules. Do not place full demonstration applications here; this catalog contains starting structures, not showcases.

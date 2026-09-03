@@ -6,7 +6,7 @@ Please report suspected vulnerabilities privately through GitHub's private vulne
 
 ## Scope
 
-Security includes the source repository, composition CLI, audit tooling, bundled templates, reusable skills, packs, schemas, and agent/tool permission guidance.
+Security includes the canonical boilerplates, reusable packs, policies, profiles, presets, schemas, and architecture guidance in this repository, plus dependent agent and CLI implementations in their respective repositories.
 
 ## Baseline
 
@@ -16,4 +16,4 @@ Security includes the source repository, composition CLI, audit tooling, bundled
 - Do not weaken tests/security checks merely to pass CI.
 - Review third-party actions, skills and dependencies as supply-chain inputs.
 
-The bundled target-project security baseline lives in `templates/base/SECURITY.md`.
+The canonical target-project security baseline lives in `boilerplates/base/SECURITY.md`.

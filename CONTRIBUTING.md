@@ -4,14 +4,15 @@
 
 Repository boundaries:
 
-- `templates/` — canonical project shapes.
-- `boilerplates/` — human-readable starter compositions.
+- `boilerplates/` — canonical project starting points.
 - `packs/` — reusable knowledge and constraints.
 - `policies/` — mandatory rules.
 - `profiles/` — team/organization defaults.
-- `presets/` — machine-readable compositions.
-- `schema/` — contracts.
-- `examples/` — accepted compact examples.
+- `presets/` — machine-readable compositions selecting boilerplates and modules.
+- `schema/` — public contracts.
+- `docs/` — architecture and compatibility guidance.
+
+Do not add a generic examples directory or demo applications to this repository. If full reference applications become useful, maintain them separately so the canonical catalog stays focused.
 
 Agent procedures belong in `powerpuff-kitty/agentic-harness-agents`. Rust implementation and deterministic tooling belong in `powerpuff-kitty/agentic-harness-cli`.
 
