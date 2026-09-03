@@ -1,12 +1,17 @@
+[workspace]
+members = [".", "crates/ah-core", "crates/ah-audit", "crates/ah-registry"]
+resolver = "3"
+
 [package]
 name = "agentic-harness"
 version = "0.1.0"
 edition = "2024"
 description = "Agentic Harness CLI"
+license = "MIT OR Apache-2.0"
 
 [[bin]]
 name = "ah"
-path = "src/main.rs"
+path = "crates/ah-cli/src/main.rs"
 
 [dependencies]
 include_dir = "0.7"
