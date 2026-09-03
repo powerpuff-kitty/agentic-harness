@@ -1,8 +1,0 @@
-#!/usr/bin/env sh
-set -eu
-ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-if [ -x "$ROOT/target/release/ah" ]; then exec "$ROOT/target/release/ah" "$@"; fi
-if [ -x "$ROOT/target/debug/ah" ]; then exec "$ROOT/target/debug/ah" "$@"; fi
-if command -v cargo >/dev/null 2>&1; then exec cargo run --quiet --manifest-path "$ROOT/Cargo.toml" -- "$@"; fi
-echo "Agentic Harness Rust binary is not built. Install a release binary or build with cargo build --release." >&2
-exit 127

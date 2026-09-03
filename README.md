@@ -1,93 +1,65 @@
 # Agentic Harness
 
-A composable framework for designing, generating, governing, auditing, and maintaining agent-native software projects.
+Canonical architecture, templates, boilerplates, packs, policies, profiles, schemas, examples, and project guidance for agent-native software repositories.
 
-## Native Rust CLI
+This repository is the **source of truth** for what Agentic Harness projects are and how they should be structured. Agent behavior lives in [`agentic-harness-agents`](https://github.com/powerpuff-kitty/agentic-harness-agents); deterministic tooling lives in [`agentic-harness-cli`](https://github.com/powerpuff-kitty/agentic-harness-cli).
 
-Agentic Harness ships as the native `ah` binary. Precompiled releases require no Python, Node.js, or Rust runtime.
-
-```bash
-ah init ./app --template web-app
-ah init ./saas --preset vue-saas --profile startup --name my-saas
-ah init ./api --template backend-api --pack postgres --policy security
-ah upgrade ./existing --profile enterprise
-ah audit ./existing > audit.json
-ah design-system-components ./existing --write
-ah gate audit.json --min-overall 80 --min-score security=80 --min-score design_system=85
-ah validate .
-ah security-scan .
-```
-
-## Architecture
-
-The repository is a monorepo with two different kinds of units:
+## Start here
 
 ```text
-crates/    deterministic Rust engine boundaries
-packages/  distributable agent knowledge, procedures and project overlays
+agentic-harness/
+├── ARCHITECTURE.md       ecosystem and repository model
+├── CONCEPTS.md           template/pack/policy/profile vocabulary
+├── templates/            canonical project shapes
+├── boilerplates/         opinionated starter compositions
+├── presets/              machine-readable compositions
+├── packs/                reusable knowledge and constraints
+├── policies/             mandatory rules
+├── profiles/             organization/team defaults
+├── schema/               machine-readable contracts
+├── examples/             reference outcomes and examples
+├── docs/                 deeper architecture guidance
+└── marketing/            Agentic Harness product messaging
 ```
 
-The package model is analogous to a development-time package ecosystem, not application runtime dependencies.
+## Templates
+
+Current canonical templates:
+
+- `templates/base`
+- `templates/web-app`
+- `templates/backend-api`
+- `templates/saas`
+- `templates/monorepo`
+- `templates/library-sdk`
+
+Templates define repository shape. They are deliberately easy to browse and are not hidden behind runtime implementation details.
+
+## Boilerplates and presets
+
+A **template** is a structural shape. A **boilerplate** is a documented, opinionated starting configuration built from a template plus packs, policies, profiles, and agent skills. Machine-readable preset definitions live in `presets/`.
+
+See [`boilerplates/README.md`](boilerplates/README.md).
+
+## Canonical-source rule
+
+The other Agentic Harness repositories consume this repository rather than redefine its architecture:
 
 ```text
-project source / framework
-        +
-template   repository shape
-preset     project-type composition
-profile    organization/team defaults
-packs      knowledge + constraints
-skills     procedures
-policies   mandatory rules
-examples   accepted outcomes
-evals      success criteria
-schemas    machine contracts
-        +
-ah         deterministic composition + audits + gates
+agentic-harness (canonical truth)
+        ↓
+agentic-harness-agents (skills / prompts / adapters)
+        ↓
+agentic-harness-cli (deterministic application / audit / validation)
 ```
 
-Official packages remain bundled into release binaries for zero-runtime-dependency installs. Their layout is now isolated so they can later be versioned or distributed independently without changing project-local paths.
+If architecture, templates, packs, policies, profiles, or schemas change, change them here first. Agent prompts and CLI behavior should then adapt to that accepted source.
 
-## Repository shape
+## Design systems
 
-```text
-.
-├── Cargo.toml                  # workspace + ah binary package
-├── crates/
-│   ├── ah-cli/
-│   │   └── src/               # command orchestration
-│   ├── ah-core/               # package model and shared contracts
-│   ├── ah-audit/              # reusable audit primitives
-│   └── ah-registry/           # package-source/reference model
-├── packages/
-│   ├── core/                  # official package-set contract
-│   ├── templates/
-│   ├── presets/
-│   ├── profiles/
-│   ├── packs/
-│   ├── skills/
-│   └── policies/
-├── schema/                    # machine-readable public contracts
-├── marketing/                 # Agentic Harness product messaging
-├── docs/
-└── .github/workflows/
-```
+The design-system pack defines canonical design-system knowledge. Agent procedures should infer required components from product surfaces, prefer existing design-system components/tokens, and surface design-system compliance during audits when a design system is active.
 
-The CLI source is physically under `crates/ah-cli/`; the root Cargo package owns the `ah` binary so release/install behavior remains stable while the internal workspace is decomposed.
+## Related repositories
 
-## Package boundaries
-
-`packages/core/package.json` declares the official package-set contract. The Rust `ah-core` crate exposes stable package kinds and paths, while `ah-registry` establishes a source-reference model for future official and third-party packages such as `official:observability` or `github:acme/harness#packs/security`.
-
-For now, official packages are compiled into `ah`. A future registry can make them independently installable without forcing a multi-repository split today.
-
-## Profiles and policies
-
-Profiles currently include `startup`, `enterprise`, `agency`, and `open-source`. Policies cover dependencies, licensing, security, AI permissions, and quality gates.
-
-Specialist packs include accessibility, analytics, auth, compliance, localization, observability, payments, performance, privacy, SEO, design-system, marketing, and application/data/security packs. Specialist skills include threat modeling, migrations, dependency upgrades, API/database design, accessibility/performance audits, incident reviews, releases, documentation, competitive research, marketing, and design-system compliance.
-
-## Design-system enforcement
-
-When a project has or wants a design system, Agentic Harness treats it as an implementation constraint. `ah design-system-components` infers the likely component inventory from project evidence and `--write` creates `DESIGN_SYSTEM_COMPONENTS.md` for review. `ah audit` adds a `design_system` score when a design system is active and checks structural evidence such as raw-control bypasses, hard-coded visual values, and missing inferred components.
-
-Templates, presets, packs, skills, policies, and profiles are embedded into release binaries at compile time. Generated repositories are self-contained and do not depend on the Agentic Harness source checkout.
+- **Agents:** https://github.com/powerpuff-kitty/agentic-harness-agents
+- **CLI:** https://github.com/powerpuff-kitty/agentic-harness-cli

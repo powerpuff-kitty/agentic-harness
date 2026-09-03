@@ -1,15 +1,18 @@
 # Contributing
 
-Preserve the repository boundaries: Rust crates are deterministic engine code; `packages/` contains official distributable templates, packs, skills, policies, profiles, and presets; `schema/` contains public machine contracts.
+`agentic-harness` is the canonical static source for Agentic Harness architecture and project content.
 
-Before opening a PR run:
+Repository boundaries:
 
-```bash
-cargo check --workspace --all-targets
-cargo test --workspace --all-targets
-cargo run --quiet -- validate .
-cargo run --quiet -- harness-audit packages/templates/base
-cargo run --quiet -- audit .
-```
+- `templates/` — canonical project shapes.
+- `boilerplates/` — human-readable starter compositions.
+- `packs/` — reusable knowledge and constraints.
+- `policies/` — mandatory rules.
+- `profiles/` — team/organization defaults.
+- `presets/` — machine-readable compositions.
+- `schema/` — contracts.
+- `examples/` — accepted compact examples.
 
-New skills require `packages/skills/<name>/SKILL.md`; new packs require `packages/packs/<name>/PACK.md` and a manifest entry. Runtime behavior belongs in Rust crates. Keep package content framework-neutral unless the package explicitly declares a narrower scope. New third-party crates should be justified by capability, maintenance, security, and binary-size tradeoffs.
+Agent procedures belong in `powerpuff-kitty/agentic-harness-agents`. Rust implementation and deterministic tooling belong in `powerpuff-kitty/agentic-harness-cli`.
+
+Architecture/content changes should land here before dependent prompt or CLI changes. Avoid duplicating canonical truth into prompts.

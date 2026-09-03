@@ -1,8 +1,0 @@
-{
-  "format_version": 1,
-  "name": "official-core",
-  "type": "core",
-  "description": "Compatibility contract for the official Agentic Harness package set.",
-  "schema_root": "../../schema",
-  "collections": ["templates", "presets", "packs", "skills", "policies", "profiles"]
-}
