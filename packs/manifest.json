@@ -1,0 +1,7 @@
+{
+  "manifest_version": 1,
+  "framework_compatibility": ">=0.2.0 <1.0.0",
+  "modules": {
+    "ai-app":{"version":"0.1.0"},"backend-api":{"version":"0.1.0"},"data-platform":{"version":"0.1.0"},"design-system":{"version":"0.1.0"},"library-sdk":{"version":"0.1.0"},"mobile":{"version":"0.1.0"},"postgres":{"version":"0.1.0"},"realtime":{"version":"0.1.0"},"saas":{"version":"0.1.0"},"security-critical":{"version":"0.1.0"},"web-app":{"version":"0.1.0"}
+  }
+}
