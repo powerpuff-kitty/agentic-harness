@@ -15,10 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
+      - uses: dtolnay/rust-toolchain@stable
       - name: High-signal secret scan
-        run: python3 scripts/security_scan.py .
+        run: cargo run --quiet -- security-scan .
       - name: Repository validation
-        run: python3 scripts/validate_repo.py .
+        run: cargo run --quiet -- validate .
