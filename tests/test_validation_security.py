@@ -10,6 +10,7 @@ class ValidationTests(unittest.TestCase):
    r=subprocess.run([sys.executable,str(ROOT/"scripts/security_scan.py"),td],capture_output=True); self.assertEqual(r.returncode,0)
  def test_secret_scanner_detects_private_key_header(self):
   with tempfile.TemporaryDirectory() as td:
-   Path(td,"x.txt").write_text("-----BEGIN PRIVATE KEY-----")
+   marker="-----BEGIN " + "PRIVATE KEY-----"
+   Path(td,"x.txt").write_text(marker)
    r=subprocess.run([sys.executable,str(ROOT/"scripts/security_scan.py"),td],capture_output=True); self.assertEqual(r.returncode,1)
 if __name__=="__main__": unittest.main()
