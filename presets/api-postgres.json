@@ -1,1 +1,5 @@
-{"template":"backend-api","packs":["backend-api","postgres"],"skills":["agentic-app","codebase-audit","security-review","implementation-plan"]}
+{
+  "boilerplate": "backend-api",
+  "packs": ["backend-api", "postgres"],
+  "skills": ["agentic-app", "codebase-audit", "security-review", "implementation-plan"]
+}
