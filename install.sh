@@ -44,7 +44,7 @@ ROOT=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 mkdir -p "$BIN_DIR"
 cat > "$TARGET" <<EOF
 #!/usr/bin/env sh
-exec python3 "$ROOT/scripts/agentic.py" "\$@"
+AGENTIC_HARNESS_INVOKED_AS="$COMMAND" exec python3 "$ROOT/scripts/agentic.py" "\$@"
 EOF
 chmod +x "$TARGET"
 
