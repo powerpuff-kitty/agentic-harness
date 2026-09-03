@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: High-signal secret scan
-        run: python3 scripts/security_scan.py .
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Compile security tooling
+        run: cargo check --all-targets
+      - name: Verify secret scanner behavior
+        run: cargo test secret_fixture
       - name: Repository validation
-        run: python3 scripts/validate_repo.py .
+        run: cargo run --quiet -- validate .

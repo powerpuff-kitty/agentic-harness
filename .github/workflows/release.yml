@@ -1,0 +1,51 @@
+name: Release native binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: ah-linux-x86_64
+            binary: target/release/ah
+          - os: macos-latest
+            artifact: ah-macos
+            binary: target/release/ah
+          - os: windows-latest
+            artifact: ah-windows-x86_64.exe
+            binary: target/release/ah.exe
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --all-targets
+      - run: cargo build --release
+      - shell: bash
+        run: cp '${{ matrix.binary }}' '${{ matrix.artifact }}'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}
+          if-no-files-found: error
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish GitHub release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create '${{ github.ref_name }}' dist/* --generate-notes --verify-tag

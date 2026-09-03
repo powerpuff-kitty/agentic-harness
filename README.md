@@ -2,35 +2,51 @@
 
 A composable framework for designing, generating, governing, auditing, and maintaining agent-native software projects.
 
-## CLI
+## Native Rust CLI
 
-The default local command is `ah`:
+Agentic Harness is implemented as a Rust CLI and ships as the `ah` binary. End users do not need Python, Node.js, or a Rust runtime when using a precompiled release binary.
 
 ```bash
-./ah init ./app --template web-app
-./ah init ./saas --preset vue-saas --name my-saas --maturity production
-./ah init ./api --template backend-api --pack postgres
-./ah upgrade ./existing --template monorepo
-./ah audit ./existing > audit.json
-./ah compare before.json after.json
-./ah gate audit.json --min-overall 80 --min-score security=80
+ah init ./app --template web-app
+ah init ./saas --preset vue-saas --name my-saas --maturity production
+ah init ./api --template backend-api --pack postgres
+ah upgrade ./existing --template monorepo
+ah audit ./existing > audit.json
+ah compare before.json after.json
+ah gate audit.json --min-overall 80 --min-score security=80
+ah validate .
+ah security-scan .
+ah harness-audit templates/base
 ```
 
-Install a global command with:
+The binary embeds templates, presets, packs, and skills at compile time, so generated repositories do not depend on a Python runtime or on source-repository paths.
+
+## Installation
+
+Precompiled release binaries are the preferred distribution mechanism. From a source checkout, `./ah` runs an existing Rust build or falls back to `cargo run` when Cargo is available.
+
+To install an existing binary globally:
 
 ```bash
+./install.sh --binary /path/to/ah
+```
+
+If `ah` is already used on the machine, choose another command name:
+
+```bash
+./install.sh --binary /path/to/ah --command agentic
+./install.sh --binary /path/to/ah --command agh
+AGENTIC_HARNESS_COMMAND=my-ah ./install.sh --binary /path/to/ah
+```
+
+When building from source:
+
+```bash
+cargo build --release
 ./install.sh
 ```
 
-If `ah` is already used on the machine, choose any safe alias:
-
-```bash
-./install.sh --command agentic
-./install.sh --command agh
-AGENTIC_HARNESS_COMMAND=my-ah ./install.sh
-```
-
-The executable name is intentionally configurable. The CLI derives its displayed program name from the executable that launched it, so `ah --help` shows `ah ...`, while an installed alias such as `agentic --help` shows `agentic ...`.
+Rust is required only to build from source, not to run a precompiled binary.
 
 ## Composition model
 
@@ -42,7 +58,7 @@ skill      = repeatable procedure
 example    = accepted outcome
 eval       = success measurement
 schema     = machine contract
-script     = deterministic enforcement
+Rust CLI   = deterministic composition, audits, validation and gates
 ```
 
 Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`, and `library-sdk`. Templates inherit from `base` (or another template) and add focused overlays, avoiding duplicated boilerplate. Presets currently include `vue-saas`, `api-postgres`, and `secure-saas`.
@@ -53,6 +69,9 @@ Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`
 
 ```text
 .
+├── Cargo.toml
+├── src/
+│   └── main.rs
 ├── ah
 ├── install.sh
 ├── templates/
@@ -60,10 +79,10 @@ Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`
 ├── packs/
 ├── skills/
 ├── schema/
-├── scripts/
-├── tests/
 ├── docs/
 └── .github/workflows/
 ```
+
+The former Python implementation and Python test suite have been removed. `cargo test` is the canonical deterministic test command.
 
 Use `skills/agentic-app/SKILL.md` for guided INIT/UPGRADE and `skills/codebase-audit/SKILL.md` for evidence-backed repository audits. Security covers both conventional application risks and agent-specific risks such as prompt injection, excessive tool permissions, data exfiltration, unsafe generated code, untrusted retrieval, and destructive actions.
