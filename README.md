@@ -50,20 +50,52 @@ Rust is required only to build from source, not to run a precompiled binary.
 
 ## Composition model
 
+Agentic Harness sits on top of a new or existing software project. It does not replace the application framework, package manager, source tree, or CI system.
+
 ```text
-template   = initial repository shape
-preset     = named template + packs + skills composition
-pack       = knowledge and constraints
-skill      = repeatable procedure
-example    = accepted outcome
-eval       = success measurement
-schema     = machine contract
-Rust CLI   = deterministic composition, audits, validation and gates
+project
+  + template      initial repository shape
+  + packs         reusable domain/technical knowledge and constraints
+  + skills        repeatable agent procedures
+  + presets       useful template + pack + skill compositions
+  + project truth product / architecture / design / security / decisions
+  + evals/tests   deterministic quality criteria
+  + Rust CLI      composition, audits, validation and gates
+  = agent-native governed project
 ```
+
+Modules are package-like because they are reusable, versionable and composable, but they are not runtime dependencies. They are better understood as development-policy/context packages and project overlays. See `docs/composition-layers.md`.
 
 Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`, and `library-sdk`. Templates inherit from `base` (or another template) and add focused overlays, avoiding duplicated boilerplate. Presets currently include `vue-saas`, `api-postgres`, and `secure-saas`.
 
 `INIT` may apply template overlays because it creates a new repository. `UPGRADE` preserves existing files and only fills missing template content. Explicitly selected packs and skills are installed into `.agentic/packs/` and `.agents/skills/`.
+
+## Marketing layer
+
+Marketing is deliberately separated from product and implementation truth. Agentic Harness now includes a reusable `marketing` pack and `marketing` skill, plus its own project marketing knowledge under `marketing/`.
+
+A project using the marketing layer can maintain:
+
+```text
+marketing/
+├── POSITIONING.md
+├── MESSAGING.md
+├── AUDIENCES.md
+├── COMPETITORS.md
+├── PRICING.md
+├── LAUNCH.md
+├── CHANNELS.md
+├── CONTENT.md
+└── FAQ.md
+```
+
+Use:
+
+```bash
+ah init ./product --template web-app --pack marketing --skill marketing
+```
+
+The marketing skill treats `PRODUCT.md` and other canonical product docs as authoritative for actual product behavior; marketing files control how that truth is positioned, communicated, launched and sold.
 
 ## Repository shape
 
@@ -79,10 +111,11 @@ Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`
 ├── packs/
 ├── skills/
 ├── schema/
+├── marketing/
 ├── docs/
 └── .github/workflows/
 ```
 
 The former Python implementation and Python test suite have been removed. `cargo test` is the canonical deterministic test command.
 
-Use `skills/agentic-app/SKILL.md` for guided INIT/UPGRADE and `skills/codebase-audit/SKILL.md` for evidence-backed repository audits. Security covers both conventional application risks and agent-specific risks such as prompt injection, excessive tool permissions, data exfiltration, unsafe generated code, untrusted retrieval, and destructive actions.
+Use `skills/agentic-app/SKILL.md` for guided INIT/UPGRADE, `skills/codebase-audit/SKILL.md` for evidence-backed repository audits, and `skills/marketing/SKILL.md` for evidence-aware positioning and go-to-market work. Security covers both conventional application risks and agent-specific risks such as prompt injection, excessive tool permissions, data exfiltration, unsafe generated code, untrusted retrieval, and destructive actions.
