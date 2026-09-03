@@ -1,0 +1,1 @@
+{"format_version":1,"name":"enterprise","maturity":"production","packs":["security-critical","observability","compliance","privacy","accessibility","analytics"],"skills":["agentic-app","codebase-audit","security-review","threat-model","release","incident-review","documentation"],"policies":["dependencies","licensing","security","ai-permissions","quality-gates"]}
