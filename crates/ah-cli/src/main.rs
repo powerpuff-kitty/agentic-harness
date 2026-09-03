@@ -8,12 +8,12 @@ use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
 
-static TEMPLATES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/templates");
-static PACKS: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packs");
-static SKILLS: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/skills");
-static PRESETS: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/presets");
-static POLICIES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/policies");
-static PROFILES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/profiles");
+static TEMPLATES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packages/templates");
+static PACKS: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packages/packs");
+static SKILLS: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packages/skills");
+static PRESETS: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packages/presets");
+static POLICIES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packages/policies");
+static PROFILES: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/packages/profiles");
 
 const SKIP: &[&str] = &[".git", "node_modules", "vendor", "dist", "build", ".next", ".nuxt", "target", ".venv", "venv", "coverage"];
 const CODE_EXT: &[&str] = &["py","js","mjs","cjs","ts","tsx","jsx","vue","rs","go","java","kt","swift","rb","php","cs","c","cc","cpp","h","hpp"];
@@ -21,7 +21,7 @@ const MANIFESTS: &[&str] = &["package.json","pyproject.toml","requirements.txt",
 const LOCKFILES: &[&str] = &["package-lock.json","pnpm-lock.yaml","yarn.lock","bun.lock","bun.lockb","uv.lock","poetry.lock","Cargo.lock","go.sum","Gemfile.lock","composer.lock"];
 
 fn die(msg: impl AsRef<str>) -> ! { eprintln!("{}", msg.as_ref()); std::process::exit(2) }
-fn pretty(v: Value) { println!("{}", serde_json::to_string_pretty(&v).unwrap()) }
+fn pretty(value: Value) { println!("{}", serde_json::to_string_pretty(&value).unwrap()) }
 fn embedded_text(dir: &Dir<'_>, path: &str) -> Option<String> { dir.get_file(path).and_then(|f| f.contents_utf8()).map(str::to_string) }
 fn embedded_dir<'a>(dir: &'a Dir<'a>, path: &str) -> Option<&'a Dir<'a>> { dir.get_dir(path) }
 
@@ -29,13 +29,13 @@ fn copy_embedded(dir: &Dir<'_>, dst: &Path, preserve: bool) -> io::Result<Vec<St
     fn walk(dir: &Dir<'_>, root: &Path, dst: &Path, preserve: bool, out: &mut Vec<String>) -> io::Result<()> {
         for entry in dir.entries() {
             match entry {
-                DirEntry::Dir(d) => walk(d, root, dst, preserve, out)?,
-                DirEntry::File(f) => {
-                    let rel = f.path().strip_prefix(root).unwrap_or(f.path());
+                DirEntry::Dir(child) => walk(child, root, dst, preserve, out)?,
+                DirEntry::File(file) => {
+                    let rel = file.path().strip_prefix(root).unwrap_or(file.path());
                     let target = dst.join(rel);
                     if preserve && target.exists() { continue; }
                     if let Some(parent) = target.parent() { fs::create_dir_all(parent)?; }
-                    fs::write(&target, f.contents())?;
+                    fs::write(&target, file.contents())?;
                     out.push(rel.to_string_lossy().into_owned());
                 }
             }
@@ -104,7 +104,7 @@ fn resolve(mut o: ComposeOpts) -> (Vec<String>, ComposeOpts) {
         let path = format!("{preset}.json");
         let data: Value = serde_json::from_str(&embedded_text(&PRESETS, &path).unwrap_or_else(|| die(format!("unknown preset: {preset}"))))
             .unwrap_or_else(|e| die(format!("invalid preset {preset}: {e}")));
-        if let Some(t) = data.get("template").and_then(Value::as_str) { o.template = t.to_string(); }
+        if let Some(template) = data.get("template").and_then(Value::as_str) { o.template = template.to_string(); }
         o.packs.extend(strings(data.get("packs")));
         o.skills.extend(strings(data.get("skills")));
     }
@@ -135,7 +135,8 @@ fn patch_manifest(path: &Path, name: Option<&str>, maturity: Option<&str>, packs
         }
     }
     if !packs.is_empty() {
-        let mut out = Vec::new(); let mut inside = false;
+        let mut out = Vec::new();
+        let mut inside = false;
         for line in text.lines() {
             if line == "packs:" { out.push("packs:".to_string()); out.extend(packs.iter().map(|p| format!("  - {p}"))); inside = true; continue; }
             if inside && line.starts_with("  - ") { continue; }
@@ -227,7 +228,9 @@ fn codebase_audit(root: &Path) -> Value {
             }
         }
     }
-    let ci = workflows > 0; let has_tests = tests > 0; let has_docs = docs > 0 || root.join("README.md").exists() || root.join("docs").exists();
+    let ci = workflows > 0;
+    let has_tests = tests > 0;
+    let has_docs = docs > 0 || root.join("README.md").exists() || root.join("docs").exists();
     let has_lock = manifests.is_empty() || !locks.is_empty();
     let mut scores = BTreeMap::new();
     scores.insert("code_quality", clamp(75 - 5 * large.len() as i64 - todos.min(15)));
@@ -374,21 +377,22 @@ fn main() {
         }
         "security-scan" => { let path = PathBuf::from(argv.get(2).map(String::as_str).unwrap_or(".")); let r = secret_scan(&path); let pass = r["passed"].as_bool().unwrap_or(false); pretty(r); if pass { 0 } else { 1 } }
         "validate" => { let path = PathBuf::from(argv.get(2).map(String::as_str).unwrap_or(".")); let r = validate_repo(&path); let pass = r["valid"].as_bool().unwrap_or(false); pretty(r); if pass { 0 } else { 1 } }
-        "harness-audit" => { let path = PathBuf::from(argv.get(2).map(String::as_str).unwrap_or("templates/base")); let r = harness_audit(&path); let fail = !r["missing"].as_array().unwrap().is_empty(); pretty(r); if fail { 1 } else { 0 } }
+        "harness-audit" => { let path = PathBuf::from(argv.get(2).map(String::as_str).unwrap_or("packages/templates/base")); let r = harness_audit(&path); let fail = !r["missing"].as_array().unwrap().is_empty(); pretty(r); if fail { 1 } else { 0 } }
         "compare" => {
             if argv.len() < 4 { die("compare requires before and after JSON"); }
-            let b: Value = serde_json::from_str(&fs::read_to_string(&argv[2]).unwrap()).unwrap(); let a: Value = serde_json::from_str(&fs::read_to_string(&argv[3]).unwrap()).unwrap();
+            let before: Value = serde_json::from_str(&fs::read_to_string(&argv[2]).unwrap()).unwrap();
+            let after: Value = serde_json::from_str(&fs::read_to_string(&argv[3]).unwrap()).unwrap();
             let mut scores = serde_json::Map::new();
-            let keys: BTreeSet<_> = b["scores"].as_object().into_iter().flat_map(|m| m.keys().cloned()).chain(a["scores"].as_object().into_iter().flat_map(|m| m.keys().cloned())).collect();
-            for k in keys { let x = b["scores"][&k].as_i64(); let y = a["scores"][&k].as_i64(); scores.insert(k, json!({"before":x,"after":y,"delta":match(x,y){(Some(x),Some(y))=>Some(y-x),_=>None}})); }
-            pretty(json!({"overall":{"before":b["overall"],"after":a["overall"],"delta":a["overall"].as_i64().unwrap_or(0)-b["overall"].as_i64().unwrap_or(0)},"scores":scores})); 0
+            let keys: BTreeSet<_> = before["scores"].as_object().into_iter().flat_map(|m| m.keys().cloned()).chain(after["scores"].as_object().into_iter().flat_map(|m| m.keys().cloned())).collect();
+            for key in keys { let x = before["scores"][&key].as_i64(); let y = after["scores"][&key].as_i64(); scores.insert(key, json!({"before":x,"after":y,"delta":match(x,y){(Some(x),Some(y))=>Some(y-x),_=>None}})); }
+            pretty(json!({"overall":{"before":before["overall"],"after":after["overall"],"delta":after["overall"].as_i64().unwrap_or(0)-before["overall"].as_i64().unwrap_or(0)},"scores":scores})); 0
         }
         "gate" => {
             if argv.len() < 3 { die("gate requires audit JSON"); }
-            let d: Value = serde_json::from_str(&fs::read_to_string(&argv[2]).unwrap()).unwrap(); let mut min = 0f64; let mut req = Vec::new(); let mut i = 3;
+            let data: Value = serde_json::from_str(&fs::read_to_string(&argv[2]).unwrap()).unwrap(); let mut min = 0f64; let mut req = Vec::new(); let mut i = 3;
             while i < argv.len() { match argv[i].as_str() { "--min-overall" => { i += 1; min = argv[i].parse().unwrap_or(0.0); }, "--min-score" => { i += 1; req.push(argv[i].clone()); }, x => die(format!("unknown option: {x}")) } i += 1; }
-            let mut failures = Vec::new(); if d["overall"].as_f64().unwrap_or(0.0) < min { failures.push(format!("overall {} < {min}", d["overall"])); }
-            for x in req { if let Some((name, value)) = x.split_once('=') { let value: f64 = value.parse().unwrap_or(0.0); let actual = d["scores"][name].as_f64(); if actual.map(|a| a < value).unwrap_or(true) { failures.push(format!("{name} {:?} < {value}", actual)); } } }
+            let mut failures = Vec::new(); if data["overall"].as_f64().unwrap_or(0.0) < min { failures.push(format!("overall {} < {min}", data["overall"])); }
+            for item in req { if let Some((name, value)) = item.split_once('=') { let value: f64 = value.parse().unwrap_or(0.0); let actual = data["scores"][name].as_f64(); if actual.map(|a| a < value).unwrap_or(true) { failures.push(format!("{name} {:?} < {value}", actual)); } } }
             let ok = failures.is_empty(); pretty(json!({"passed":ok,"failures":failures})); if ok { 0 } else { 1 }
         }
         _ => { usage(prog); 2 }

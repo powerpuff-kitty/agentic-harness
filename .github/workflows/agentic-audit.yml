@@ -14,13 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Compile
-        run: cargo check --all-targets
-      - name: Run Rust tests
-        run: cargo test --all-targets
+      - name: Compile workspace
+        run: cargo check --workspace --all-targets
+      - name: Run workspace tests
+        run: cargo test --workspace --all-targets
       - name: Validate manifests and modules
         run: cargo run --quiet -- validate .
       - name: Audit bundled base template
-        run: cargo run --quiet -- harness-audit templates/base
+        run: cargo run --quiet -- harness-audit packages/templates/base
       - name: Baseline audit source repository
         run: cargo run --quiet -- audit . > /tmp/audit.json || test $? -eq 1

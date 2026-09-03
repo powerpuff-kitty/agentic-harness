@@ -1,7 +1,6 @@
 * @powerpuff-kitty
-/src/ @powerpuff-kitty
 /Cargo.toml @powerpuff-kitty
-/skills/ @powerpuff-kitty
-/packs/ @powerpuff-kitty
-/templates/ @powerpuff-kitty
+/crates/ @powerpuff-kitty
+/packages/ @powerpuff-kitty
 /schema/ @powerpuff-kitty
+/.github/workflows/ @powerpuff-kitty

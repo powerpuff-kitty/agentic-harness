@@ -16,9 +16,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Compile security tooling
-        run: cargo check --all-targets
+      - name: Compile workspace
+        run: cargo check --workspace --all-targets
       - name: Verify secret scanner behavior
-        run: cargo test secret_fixture
+        run: cargo test --workspace secret_fixture
       - name: Repository validation
         run: cargo run --quiet -- validate .
