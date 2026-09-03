@@ -13,6 +13,7 @@ The source repository is intentionally split into clean building blocks:
 │   └── base/
 ├── skills/                 reusable agent procedures
 │   ├── agentic-app/
+│   ├── codebase-audit/
 │   ├── design-system/
 │   ├── implementation-plan/
 │   ├── product-design/
@@ -21,6 +22,7 @@ The source repository is intentionally split into clean building blocks:
 ├── packs/                  composable technical/domain knowledge
 ├── schema/                 machine-readable contracts
 ├── scripts/                deterministic tooling/audits
+├── tests/                  tests for deterministic tooling
 └── .github/workflows/      CI for this source repository
 ```
 
@@ -71,6 +73,7 @@ The target project should be self-contained. The generated files must not depend
 ## Skills
 
 - `agentic-app` — INIT / UPGRADE / AUDIT orchestration, guided setup, maturity, permissions, security, provenance and pack resolution.
+- `codebase-audit` — QUICK / STANDARD / DEEP / COMPARE / GATE audits with evidence-backed scores for code quality, maintainability, architecture, tests, security, performance, dependencies, documentation, agent docs, operations, and production readiness.
 - `design-system` — extract and organize design evidence, tokens, foundations, layouts, components, patterns and checks.
 - `implementation-plan` — durable execution planning for larger changes.
 - `product-design` — product/UI design procedure.
@@ -111,21 +114,23 @@ Security is part of the core harness, including prompt injection, indirect promp
 
 See `templates/base/SECURITY.md`, `skills/agentic-app/references/security-for-agents.md`, the `security-review` skill, and the `security-critical` pack.
 
-## Audit
+## Audits
 
-Audit the bundled base template:
+Structural agent-harness audit:
 
 ```bash
 python3 scripts/agentic_audit.py templates/base
 ```
 
-Audit another composed repository:
+Baseline codebase-quality audit of any local repository:
 
 ```bash
-python3 scripts/agentic_audit.py /path/to/project
+python3 scripts/codebase_audit.py /path/to/project
 ```
 
-The deterministic script checks structural basics. Agent-driven AUDIT mode goes further by assessing content quality, contradictions, stale knowledge, pack fit, examples, permissions and security boundaries.
+For deeper evidence-backed review, use `skills/codebase-audit/SKILL.md`. Its modes include QUICK, STANDARD, DEEP, COMPARE and GATE. Machine-readable results use `schema/codebase-audit.schema.json`.
+
+The baseline scripts intentionally do not pretend to have executed tests, vulnerability scanners, coverage, benchmarks, or deployment checks when those checks were not actually run.
 
 ## Principle
 
