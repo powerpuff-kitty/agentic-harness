@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic CLI for composing and auditing agent-native repositories."""
+"""Agentic Repo Harness deterministic CLI."""
 from __future__ import annotations
 import argparse, json, shutil, sys
 from pathlib import Path
@@ -107,7 +107,7 @@ def cmd_gate(a):
 
 
 def parser():
-    p=argparse.ArgumentParser(prog="agentic",description="Compose and audit agent-native repositories")
+    p=argparse.ArgumentParser(prog="arh",description="Agentic Repo Harness: compose, upgrade, audit, compare, and gate agent-native repositories")
     s=p.add_subparsers(dest="command",required=True)
     for name,func in [("init",cmd_init),("upgrade",cmd_upgrade)]:
         q=s.add_parser(name); q.add_argument("target"); q.add_argument("--name"); q.add_argument("--maturity",choices=["prototype","startup","production","critical"]); q.add_argument("--pack",action="append",default=[]); q.add_argument("--skill",action="append",default=[]); q.set_defaults(func=func)
