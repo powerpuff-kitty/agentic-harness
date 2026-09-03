@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/codebase-audit.schema.json",
+  "title": "Codebase Audit Result",
+  "type": "object",
+  "required": ["overall", "scores", "readiness", "findings", "checks"],
+  "properties": {
+    "overall": {"type": "number", "minimum": 0, "maximum": 100},
+    "target_maturity": {"type": "string", "enum": ["prototype", "startup", "production", "critical", "unknown"]},
+    "scores": {
+      "type": "object",
+      "additionalProperties": {"type": ["number", "null"], "minimum": 0, "maximum": 100}
+    },
+    "readiness": {
+      "type": "object",
+      "properties": {
+        "prototype": {"type": "number", "minimum": 0, "maximum": 100},
+        "startup": {"type": "number", "minimum": 0, "maximum": 100},
+        "production": {"type": "number", "minimum": 0, "maximum": 100},
+        "critical": {"type": "number", "minimum": 0, "maximum": 100}
+      },
+      "required": ["prototype", "startup", "production", "critical"]
+    },
+    "profile": {"type": "object"},
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["severity", "dimension", "message"],
+        "properties": {
+          "severity": {"type": "string", "enum": ["critical", "high", "medium", "low", "info"]},
+          "dimension": {"type": "string"},
+          "message": {"type": "string"},
+          "evidence": {"type": "array", "items": {"type": "string"}},
+          "recommendation": {"type": "string"}
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "properties": {
+        "performed": {"type": "array", "items": {"type": "string"}},
+        "not_checked": {"type": "array", "items": {"type": "string"}}
+      },
+      "required": ["performed", "not_checked"]
+    }
+  }
+}
