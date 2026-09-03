@@ -1,6 +1,6 @@
-# Agentic App Boilerplate
+# Agentic Repo Harness
 
-A framework-neutral, composable development harness for coding agents such as Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and other filesystem/tool-using agents.
+A framework-neutral, composable development harness for making software repositories agent-native, governable, auditable, and secure across Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and other filesystem/tool-using agents.
 
 **The repository is durable institutional memory; agents are interchangeable workers.**
 
@@ -8,15 +8,17 @@ The source repository is split into `templates/` (generated project shape), `ski
 
 ## CLI
 
-The repository now includes a deterministic composition/audit CLI:
+The command name is `arh` (Agentic Repo Harness):
 
 ```bash
-python3 scripts/agentic.py init ./my-app --name my-app --maturity production --pack web-app --pack postgres
-python3 scripts/agentic.py upgrade ./existing-app --pack design-system --skill codebase-audit
-python3 scripts/agentic.py audit ./existing-app > audit.json
-python3 scripts/agentic.py compare before.json after.json
-python3 scripts/agentic.py gate audit.json --min-overall 80 --min-score security=80
+./arh init ./my-app --name my-app --maturity production --pack web-app --pack postgres
+./arh upgrade ./existing-app --pack design-system --skill codebase-audit
+./arh audit ./existing-app > audit.json
+./arh compare before.json after.json
+./arh gate audit.json --min-overall 80 --min-score security=80
 ```
+
+For environments that do not preserve executable bits, the equivalent fallback is `python3 scripts/agentic.py ...`.
 
 `INIT` refuses a non-empty target unless explicitly allowed. `UPGRADE` preserves existing files and only fills missing template files, while explicitly selected packs/skills are installed into `.agentic/packs/` and `.agents/skills/` so the target remains self-contained.
 
@@ -46,6 +48,7 @@ Framework releases use semantic versioning. Template, skill, and pack module ver
 
 ```text
 .
+├── arh
 ├── README.md
 ├── SECURITY.md
 ├── CONTRIBUTING.md
