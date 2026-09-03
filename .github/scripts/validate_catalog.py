@@ -10,7 +10,6 @@ ROOT = Path(__file__).resolve().parents[2]
 EXPECTED_BOILERPLATES = {"base", "web-app", "backend-api", "saas", "monorepo", "library-sdk"}
 FORBIDDEN_ROOTS = {"boilerplates", "templates", "packs", "policies", "profiles", "examples", "marketing", "crates", "packages"}
 SEMVER = re.compile(r"^\d+\.\d+\.\d+$")
-
 errors: list[str] = []
 
 
@@ -34,10 +33,13 @@ for required in ["README.md", "ARCHITECTURE.md", "CONCEPTS.md", "modules", "pres
     if not (ROOT / required).exists():
         fail(f"missing required root path: {required}")
 
+for schema in ["boilerplate.schema.json", "preset.schema.json", "profile.schema.json", "agentic.schema.json", "codebase-audit.schema.json"]:
+    if not (ROOT / "schema" / schema).is_file():
+        fail(f"missing public schema: schema/{schema}")
+
 pack_root = ROOT / "modules" / "packs"
 policy_root = ROOT / "modules" / "policies"
 profile_root = ROOT / "modules" / "profiles"
-
 for path in [pack_root, policy_root, profile_root]:
     if not path.is_dir():
         fail(f"missing module family: {path.relative_to(ROOT)}/")
@@ -67,6 +69,10 @@ for name in sorted(EXPECTED_BOILERPLATES):
     if not directory.is_dir():
         fail(f"missing boilerplate directory: {name}/")
         continue
+    if (directory / "overlay").exists():
+        fail(f"boilerplate must be materialized, not an overlay: {name}/overlay")
+    if (directory / "template.json").exists():
+        fail(f"deprecated metadata exists: {name}/template.json")
     if not metadata_path.is_file():
         fail(f"missing boilerplate metadata: {name}/boilerplate.json")
         continue
@@ -100,15 +106,18 @@ for start in boilerplates:
         seen.add(current)
         current = boilerplates[current]["extends"]
 
-base = boilerplates.get("base", {})
-for rel in base.get("required_core", []):
-    if not (ROOT / "base" / rel).exists():
-        fail(f"base required_core missing: base/{rel}")
+required_core = boilerplates.get("base", {}).get("required_core", [])
+for name in sorted(boilerplates):
+    for rel in required_core:
+        if not (ROOT / name / rel).exists():
+            fail(f"materialized boilerplate missing core file: {name}/{rel}")
 
 for preset_path in sorted((ROOT / "presets").glob("*.json")):
     data = load_json(preset_path)
     if not isinstance(data, dict):
         continue
+    if "template" in data:
+        fail(f"deprecated preset field `template`: {preset_path.relative_to(ROOT)}")
     boilerplate = data.get("boilerplate")
     if boilerplate not in boilerplates:
         fail(f"{preset_path.relative_to(ROOT)} references unknown boilerplate: {boilerplate}")
@@ -146,4 +155,4 @@ if errors:
         print(f"- {error}", file=sys.stderr)
     raise SystemExit(1)
 
-print(f"Catalog valid: {len(boilerplates)} boilerplates, {len(packs)} packs, {len(policies)} policies, {len(profiles)} profiles")
+print(f"Catalog valid: {len(boilerplates)} complete boilerplates, {len(packs)} packs, {len(policies)} policies, {len(profiles)} profiles")
