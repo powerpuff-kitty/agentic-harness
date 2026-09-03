@@ -1,0 +1,1 @@
+{"name":"library-sdk","version":"0.1.0","extends":"base","description":"Public library or SDK harness","default_packs":["library-sdk"],"default_skills":["agentic-app","codebase-audit","security-review","release-review"]}
