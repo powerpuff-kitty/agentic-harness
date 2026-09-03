@@ -4,98 +4,50 @@ A composable framework for designing, generating, governing, auditing, and maint
 
 ## Native Rust CLI
 
-Agentic Harness is implemented as a Rust CLI and ships as the `ah` binary. End users do not need Python, Node.js, or a Rust runtime when using a precompiled release binary.
+Agentic Harness ships as the native `ah` binary. Precompiled releases require no Python, Node.js, or Rust runtime.
 
 ```bash
 ah init ./app --template web-app
-ah init ./saas --preset vue-saas --name my-saas --maturity production
-ah init ./api --template backend-api --pack postgres
-ah upgrade ./existing --template monorepo
+ah init ./saas --preset vue-saas --profile startup --name my-saas
+ah init ./api --template backend-api --pack postgres --policy security
+ah upgrade ./existing --profile enterprise
 ah audit ./existing > audit.json
-ah compare before.json after.json
-ah gate audit.json --min-overall 80 --min-score security=80
+ah design-system-components ./existing
+ah design-system-components ./existing --write
+ah gate audit.json --min-overall 80 --min-score security=80 --min-score design_system=85
 ah validate .
 ah security-scan .
-ah harness-audit templates/base
 ```
 
-The binary embeds templates, presets, packs, and skills at compile time, so generated repositories do not depend on a Python runtime or on source-repository paths.
+## Layer model
 
-## Installation
-
-Precompiled release binaries are the preferred distribution mechanism. From a source checkout, `./ah` runs an existing Rust build or falls back to `cargo run` when Cargo is available.
-
-To install an existing binary globally:
-
-```bash
-./install.sh --binary /path/to/ah
-```
-
-If `ah` is already used on the machine, choose another command name:
-
-```bash
-./install.sh --binary /path/to/ah --command agentic
-./install.sh --binary /path/to/ah --command agh
-AGENTIC_HARNESS_COMMAND=my-ah ./install.sh --binary /path/to/ah
-```
-
-When building from source:
-
-```bash
-cargo build --release
-./install.sh
-```
-
-Rust is required only to build from source, not to run a precompiled binary.
-
-## Composition model
-
-Agentic Harness sits on top of a new or existing software project. It does not replace the application framework, package manager, source tree, or CI system.
+Agentic Harness behaves like a package ecosystem layered onto an existing project, but the installed layers are development context and governance rather than application runtime dependencies.
 
 ```text
-project
-  + template      initial repository shape
-  + packs         reusable domain/technical knowledge and constraints
-  + skills        repeatable agent procedures
-  + presets       useful template + pack + skill compositions
-  + project truth product / architecture / design / security / decisions
-  + evals/tests   deterministic quality criteria
-  + Rust CLI      composition, audits, validation and gates
-  = agent-native governed project
+project source / framework
+        +
+template   repository shape
+preset     project-type composition
+profile    organization/team defaults
+packs      knowledge + constraints
+skills     procedures
+policies   mandatory rules
+examples   accepted outcomes
+evals      success criteria
+schemas    machine contracts
+        +
+ah         deterministic composition + audits + gates
 ```
 
-Modules are package-like because they are reusable, versionable and composable, but they are not runtime dependencies. They are better understood as development-policy/context packages and project overlays. See `docs/composition-layers.md`.
+Profiles currently include `startup`, `enterprise`, `agency`, and `open-source`. Policies cover dependencies, licensing, security, AI permissions, and quality gates.
 
-Templates currently include `base`, `web-app`, `backend-api`, `saas`, `monorepo`, and `library-sdk`. Templates inherit from `base` (or another template) and add focused overlays, avoiding duplicated boilerplate. Presets currently include `vue-saas`, `api-postgres`, and `secure-saas`.
+Specialist packs include accessibility, analytics, auth, compliance, localization, observability, payments, performance, privacy, SEO, design-system, marketing, and the existing application/data/security packs. Specialist skills include threat modeling, migrations, dependency upgrades, API/database design, accessibility/performance audits, incident reviews, releases, documentation, competitive research, marketing, and design-system compliance.
 
-`INIT` may apply template overlays because it creates a new repository. `UPGRADE` preserves existing files and only fills missing template content. Explicitly selected packs and skills are installed into `.agentic/packs/` and `.agents/skills/`.
+## Design-system enforcement
 
-## Marketing layer
+When a project has or wants a design system, Agentic Harness treats it as an implementation constraint. `ah design-system-components` infers the likely component inventory from project evidence and `--write` creates `DESIGN_SYSTEM_COMPONENTS.md` for review. `ah audit` adds a `design_system` section and score when a design system is active, checking likely raw-control bypasses, hard-coded visual values outside component-library paths, and missing inferred components.
 
-Marketing is deliberately separated from product and implementation truth. Agentic Harness now includes a reusable `marketing` pack and `marketing` skill, plus its own project marketing knowledge under `marketing/`.
-
-A project using the marketing layer can maintain:
-
-```text
-marketing/
-├── POSITIONING.md
-├── MESSAGING.md
-├── AUDIENCES.md
-├── COMPETITORS.md
-├── PRICING.md
-├── LAUNCH.md
-├── CHANNELS.md
-├── CONTENT.md
-└── FAQ.md
-```
-
-Use:
-
-```bash
-ah init ./product --template web-app --pack marketing --skill marketing
-```
-
-The marketing skill treats `PRODUCT.md` and other canonical product docs as authoritative for actual product behavior; marketing files control how that truth is positioned, communicated, launched and sold.
+The deterministic compliance check complements visual regression, accessibility testing, Storybook/examples, and human design review; projects without a design system are not penalized.
 
 ## Repository shape
 
@@ -103,19 +55,18 @@ The marketing skill treats `PRODUCT.md` and other canonical product docs as auth
 .
 ├── Cargo.toml
 ├── src/
-│   └── main.rs
-├── ah
-├── install.sh
+│   ├── main.rs
+│   └── design_system.rs
 ├── templates/
 ├── presets/
+├── profiles/
 ├── packs/
 ├── skills/
+├── policies/
 ├── schema/
 ├── marketing/
 ├── docs/
 └── .github/workflows/
 ```
 
-The former Python implementation and Python test suite have been removed. `cargo test` is the canonical deterministic test command.
-
-Use `skills/agentic-app/SKILL.md` for guided INIT/UPGRADE, `skills/codebase-audit/SKILL.md` for evidence-backed repository audits, and `skills/marketing/SKILL.md` for evidence-aware positioning and go-to-market work. Security covers both conventional application risks and agent-specific risks such as prompt injection, excessive tool permissions, data exfiltration, unsafe generated code, untrusted retrieval, and destructive actions.
+Templates, presets, packs, skills, policies, and profiles are embedded into release binaries at compile time. Generated repositories are self-contained and do not depend on paths in the Agentic Harness source repository.
