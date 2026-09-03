@@ -1,0 +1,9 @@
+[package]
+name = "ah-core"
+version = "0.1.0"
+edition = "2024"
+description = "Core package model for Agentic Harness"
+license = "MIT OR Apache-2.0"
+
+[lib]
+path = "src/lib.rs"
