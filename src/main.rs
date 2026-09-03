@@ -287,15 +287,18 @@ fn secret_scan(root: &Path) -> Value {
     json!({"passed":findings.is_empty(),"findings":findings,"note":"high-signal baseline only; use platform secret scanning/gitleaks for production"})
 }
 
+fn dir_has_file(dir: &Dir<'_>, name: &str) -> bool {
+    dir.files().any(|file| file.path().file_name().and_then(|x| x.to_str()) == Some(name))
+}
+
 fn validate_repo(root: &Path) -> Value {
     let mut errors = Vec::new();
     for file in ["AGENTS.md","agentic.yaml","PRODUCT.md","ARCHITECTURE.md","DESIGN.md","REFERENCE.md","SECURITY.md"] {
         if !root.join(file).exists() && TEMPLATES.get_file(format!("base/{file}")).is_none() { errors.push(format!("base template missing {file}")); }
     }
-    for (folder, entry) in [(&PACKS, "PACK.md"), (&SKILLS, "SKILL.md")] {
-        for child in folder.dirs() { if child.get_file(entry).is_none() { errors.push(format!("{} missing {entry}", child.path().display())); } }
-    }
-    for profile in PROFILES.dirs() { if profile.get_file("profile.json").is_none() { errors.push(format!("{} missing profile.json", profile.path().display())); } }
+    for child in PACKS.dirs() { if !dir_has_file(child, "PACK.md") { errors.push(format!("{} missing PACK.md", child.path().display())); } }
+    for child in SKILLS.dirs() { if !dir_has_file(child, "SKILL.md") { errors.push(format!("{} missing SKILL.md", child.path().display())); } }
+    for child in PROFILES.dirs() { if !dir_has_file(child, "profile.json") { errors.push(format!("{} missing profile.json", child.path().display())); } }
     let manifest = if root.join("agentic.yaml").exists() { fs::read_to_string(root.join("agentic.yaml")).unwrap_or_default() } else { embedded_text(&TEMPLATES,"base/agentic.yaml").unwrap_or_default() };
     for token in ["version:","project:","maturity:","packs:","agent:","forbidden:"] { if !manifest.contains(token) { errors.push(format!("agentic manifest missing {token}")); } }
     json!({"valid":errors.is_empty(),"errors":errors,"target":root})
