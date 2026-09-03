@@ -23,4 +23,4 @@ This is the compact design-system index. Put detailed rules under `docs/design/`
 - `docs/design/decisions.md` — accepted design decisions
 - `examples/` — accepted outcomes
 
-Agents doing design-system work must use `.agents/skills/design-system/SKILL.md` and `skill/references/design-system-ontology.md`.
+Agents doing design-system work should use the installed `.agents/skills/design-system/SKILL.md` when available. The source boilerplate keeps the reusable skill under `skills/design-system/`.

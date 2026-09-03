@@ -1,0 +1,6 @@
+---
+description: Agentic repository initialization, upgrade, and audit adapter
+alwaysApply: false
+---
+
+Use the canonical procedure in `../../SKILL.md` for agent-architecture work. Keep repository truth in shared project documents and do not duplicate the methodology into Cursor-specific rules.

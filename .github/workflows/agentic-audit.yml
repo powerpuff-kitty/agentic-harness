@@ -13,5 +13,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Audit agentic repository structure
-        run: python3 scripts/agentic_audit.py
+      - name: Audit bundled base template
+        run: python3 scripts/agentic_audit.py templates/base

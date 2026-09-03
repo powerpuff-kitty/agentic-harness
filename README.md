@@ -4,15 +4,31 @@ A framework-neutral, composable development harness for coding agents such as Co
 
 **The repository is durable institutional memory; agents are interchangeable workers.**
 
-This repo can be used in three ways:
+The source repository is intentionally split into clean building blocks:
 
-- **Template** — start a new agent-native project.
-- **Skill** — teach an agent to initialize, upgrade, or audit another repository.
-- **Pack library** — compose domain/technical knowledge such as web, design system, SaaS, realtime, AI, mobile, PostgreSQL, and security-critical behavior.
+```text
+.
+├── README.md
+├── templates/              project skeletons
+│   └── base/
+├── skills/                 reusable agent procedures
+│   ├── agentic-app/
+│   ├── design-system/
+│   ├── implementation-plan/
+│   ├── product-design/
+│   ├── release-review/
+│   └── security-review/
+├── packs/                  composable technical/domain knowledge
+├── schema/                 machine-readable contracts
+├── scripts/                deterministic tooling/audits
+└── .github/workflows/      CI for this source repository
+```
 
-## Skill modes
+This separation is deliberate: **templates are files to compose into a target project; skills are procedures an agent can install/use; packs are knowledge and constraints.**
 
-Ask an agent to use `skill/SKILL.md`.
+## Agentic-app skill
+
+Use `skills/agentic-app/SKILL.md`.
 
 ```text
 INIT    create the right harness for a new project
@@ -20,102 +36,58 @@ UPGRADE inspect an existing project and add only what is missing
 AUDIT   read-only audit with score, gaps, conflicts, and recommended packs
 ```
 
-INIT/UPGRADE are intentionally guided. The agent first inspects the repository, infers what it safely can, then asks only the unresolved high-impact questions. It should show the proposed configuration before applying policy/permission changes.
+INIT/UPGRADE first inspect the repository, infer what they safely can, ask only unresolved high-impact questions, resolve maturity/packs/permissions, show the proposed setup when appropriate, then compose the target repository.
 
 Example:
 
 ```text
-Use the agentic-app skill in UPGRADE mode.
+Use skills/agentic-app/SKILL.md in UPGRADE mode.
 Inspect this repository first. Ask me only for decisions you cannot infer safely.
 Propose the packs and permissions before modifying the harness.
 ```
 
-## Architecture
+## Composition model
 
 ```text
-                         agentic-app
-                             │
-          ┌──────────────────┼──────────────────┐
-          │                  │                  │
-        CORE               PACKS              SKILLS
-          │                  │                  │
-  source-of-truth docs   knowledge modules   procedures
-          │                  │                  │
-          └──────────────────┼──────────────────┘
-                             ↓
-                           AGENT
-                    inspect → ask → plan
-                             ↓
-                     implement / review
-                             ↓
-                   tests + evals + audit
-                             ↓
-                  decisions/docs/examples
-                             ↓
-                    repository memory
+templates/base/
+      +
+selected packs/
+      +
+selected skills/
+      +
+project-specific answers
+      ↓
+resolved target repository
+      ↓
+AGENTS.md + agentic.yaml + docs + installed skills + examples + evals
 ```
 
-## Core files
+The target project should be self-contained. The generated files must not depend on paths back into this source repository unless a linked installation was explicitly requested.
 
-```text
-AGENTS.md                 compact router and global rules
-agentic.yaml              machine-readable resolved configuration
-PRODUCT.md                product intent and constraints
-ARCHITECTURE.md           system architecture index
-DESIGN.md                 design source-of-truth index
-REFERENCE.md              observed evidence / source material index
-SECURITY.md               application + agent security baseline
-docs/decisions/           ADRs / durable decisions
-docs/plans/               implementation plans
-docs/tasks/               persistent task state
-docs/research/            source provenance
-docs/data/                schemas and invariants
-docs/testing/             test strategy
-docs/operations/          deployment/runbooks/operations
-.agents/skills/           reusable procedures
-examples/                 accepted exemplars
-evals/                    agent-output evaluation
-packs/                    composable knowledge modules
-skill/                    canonical portable skill
-```
+## Base template
+
+`templates/base/` contains the framework-neutral project structure: `AGENTS.md`, `agentic.yaml`, product/architecture/design/security sources of truth, evidence/reference docs, detailed `docs/`, examples, evals, and agent entry-point adapters. `templates/base/skills.manifest.yaml` declares default and optional reusable skills; the setup skill chooses what to install based on the actual project.
+
+## Skills
+
+- `agentic-app` — INIT / UPGRADE / AUDIT orchestration, guided setup, maturity, permissions, security, provenance and pack resolution.
+- `design-system` — extract and organize design evidence, tokens, foundations, layouts, components, patterns and checks.
+- `implementation-plan` — durable execution planning for larger changes.
+- `product-design` — product/UI design procedure.
+- `release-review` — completion/release review.
+- `security-review` — security-sensitive change review.
+
+Agent-specific adapters for the portable agentic-app skill live under `skills/agentic-app/adapters/` rather than polluting the repository root.
 
 ## Packs
 
-Starter packs:
+Starter packs include `web-app`, `design-system`, `backend-api`, `saas`, `mobile`, `ai-app`, `data-platform`, `realtime`, `security-critical`, `library-sdk`, and `postgres`.
 
-`web-app`, `design-system`, `backend-api`, `saas`, `mobile`, `ai-app`, `data-platform`, `realtime`, `security-critical`, `library-sdk`, `postgres`.
-
-A pack is **knowledge and constraints**. A skill is **a repeatable procedure**. A template is **initial structure**. An exemplar is **what good looks like**. An eval is **how success is measured**.
-
-The resolved pack set is stored in `agentic.yaml`.
-
-## Guided setup
-
-The skill follows:
-
-```text
-inspect repository
-      ↓
-detect stack / structure / docs / CI / design / tests
-      ↓
-separate detected facts from unresolved decisions
-      ↓
-ask minimal targeted questions
-      ↓
-recommend packs + maturity + permissions
-      ↓
-show proposed configuration
-      ↓
-apply after required approval
-      ↓
-audit generated harness
-```
-
-It must not ask "which framework?" when the repository already answers that question.
+A pack is **what the agent needs to know**. A skill is **how the agent performs a repeatable task**. A template is **initial shape**. An exemplar is **what good looks like**. An eval is **how success is measured**.
 
 ## Design systems
 
-The design-system pack and skill organize UI knowledge as:
+The design-system pack/skill use:
 
 ```text
 evidence
@@ -131,40 +103,30 @@ foundations / layouts / components / patterns
 examples + visual/a11y validation
 ```
 
-See `skill/references/design-system-ontology.md` and `docs/design/README.md`.
+See `skills/agentic-app/references/design-system-ontology.md` and the design docs under `templates/base/docs/design/`.
 
-## Maturity
+## Security
 
-`prototype` → lightweight guardrails.
+Security is part of the core harness, including prompt injection, indirect prompt injection, tool permissions, secret handling, data exfiltration, unsafe generated-code execution, untrusted retrieval, destructive-action approval, agent memory, confused-deputy risks, least privilege and security-sensitive review gates.
 
-`startup` → ADRs, CI, migrations, observability/security basics.
-
-`production` → runbooks, rollback, compatibility, performance/accessibility budgets, stronger security.
-
-`critical` → threat models, recovery, auditability, strict permissions and review gates.
-
-## Agent adapters
-
-The canonical methodology lives in `skill/SKILL.md`. Agent-specific files should remain thin adapters:
-
-- Codex/shared agents: `.agents/skills/agentic-app/SKILL.md` and `AGENTS.md`
-- Claude Code: `CLAUDE.md` and `.claude/skills/agentic-app/SKILL.md`
-- Cursor: `.cursor/rules/agentic-app.mdc`
-- GitHub Copilot: `.github/copilot-instructions.md`
-- Gemini CLI: `GEMINI.md`
-
-Do not fork the methodology into contradictory agent-specific copies.
+See `templates/base/SECURITY.md`, `skills/agentic-app/references/security-for-agents.md`, the `security-review` skill, and the `security-critical` pack.
 
 ## Audit
 
-Run locally:
+Audit the bundled base template:
 
 ```bash
-python3 scripts/agentic_audit.py
+python3 scripts/agentic_audit.py templates/base
 ```
 
-The script emits a basic machine-readable audit and CI runs it on pushes/PRs. Agent-driven AUDIT mode goes further by evaluating content quality, contradictions, pack fit, stale docs, examples, security boundaries, and repository-specific gaps.
+Audit another composed repository:
+
+```bash
+python3 scripts/agentic_audit.py /path/to/project
+```
+
+The deterministic script checks structural basics. Agent-driven AUDIT mode goes further by assessing content quality, contradictions, stale knowledge, pack fit, examples, permissions and security boundaries.
 
 ## Principle
 
-Do not turn `AGENTS.md`, `CLAUDE.md`, or a giant prompt into the whole knowledge base. Keep entry points short and route agents to small, version-controlled sources of truth.
+Do not turn `AGENTS.md`, `CLAUDE.md`, or one giant prompt into the knowledge base. Keep entry points short and route agents to small, version-controlled sources of truth.

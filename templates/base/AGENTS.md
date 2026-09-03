@@ -27,9 +27,9 @@ Architecture: `ARCHITECTURE.md`, `docs/architecture/`, `docs/decisions/`
 
 Design/UI: `DESIGN.md`, `REFERENCE.md`, `docs/design/`, `.agents/skills/product-design/SKILL.md`, `.agents/skills/design-system/SKILL.md`, `examples/`
 
-Security: `SECURITY.md`, `skill/references/security-for-agents.md`, `.agents/skills/security-review/SKILL.md`
+Security: `SECURITY.md`, `.agents/skills/security-review/SKILL.md`
 
-Data/API: `docs/data/`, `docs/api/`, relevant packs
+Data/API: `docs/data/`, `docs/api/`, relevant installed packs
 
 Testing/review: `docs/testing/`, `evals/`, `.agents/skills/release-review/SKILL.md`
 
@@ -38,8 +38,6 @@ Operations: `docs/operations/`, `docs/observability.md`, `docs/performance.md`
 Planning/task state: `docs/plans/`, `docs/tasks/`, `.agents/skills/implementation-plan/SKILL.md`
 
 Research/provenance: `docs/research/`
-
-Initialize/upgrade/audit the harness: `skill/SKILL.md` and `skill/references/`
 
 ## Definition of done
 

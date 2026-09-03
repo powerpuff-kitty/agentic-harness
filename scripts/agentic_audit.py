@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
-"""Lightweight structural audit for the agentic-app harness. Stdlib only."""
+"""Lightweight structural audit for a composed agentic-app repository. Stdlib only."""
 from __future__ import annotations
 import json
+import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+SOURCE_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_TARGET = SOURCE_ROOT / "templates" / "base"
+ROOT = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else DEFAULT_TARGET
 
 CORE = [
     "AGENTS.md", "agentic.yaml", "PRODUCT.md", "ARCHITECTURE.md",
-    "DESIGN.md", "REFERENCE.md", "SECURITY.md", "skill/SKILL.md",
-    "docs/decisions", "docs/plans", "evals", "examples", "packs",
+    "DESIGN.md", "REFERENCE.md", "SECURITY.md",
+    "docs/decisions", "docs/plans", "evals", "examples",
 ]
 
 RECOMMENDED = [
     "docs/testing", "docs/operations", "docs/research", "docs/tasks",
-    "skill/references/repository-discovery.md",
-    "skill/references/setup-questionnaire.md",
-    "skill/references/security-for-agents.md",
 ]
 
 
@@ -25,6 +25,10 @@ def exists(path: str) -> bool:
 
 
 def main() -> int:
+    if not ROOT.exists():
+        print(json.dumps({"error": f"target does not exist: {ROOT}"}, indent=2))
+        return 2
+
     present = [p for p in CORE if exists(p)]
     missing = [p for p in CORE if not exists(p)]
     weak = [p for p in RECOMMENDED if not exists(p)]
@@ -38,6 +42,7 @@ def main() -> int:
 
     score = max(0, round(100 * (len(present) / len(CORE)) - min(20, len(weak) * 2) - min(20, len(conflicts) * 5)))
     result = {
+        "target": str(ROOT),
         "score": score,
         "present": present,
         "weak": weak,
