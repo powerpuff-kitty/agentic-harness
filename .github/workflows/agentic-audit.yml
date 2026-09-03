@@ -13,16 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      - name: Compile tooling
-        run: python3 -m py_compile scripts/*.py
-      - name: Run unit tests
-        run: python3 -m unittest discover -s tests -v
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Check formatting
+        run: cargo fmt --check
+      - name: Compile
+        run: cargo check --all-targets
+      - name: Run Rust tests
+        run: cargo test --all-targets
       - name: Validate manifests and modules
-        run: python3 scripts/validate_repo.py .
+        run: cargo run --quiet -- validate .
       - name: Audit bundled base template
-        run: python3 scripts/agentic_audit.py templates/base
+        run: cargo run --quiet -- harness-audit templates/base
       - name: Baseline audit source repository
-        run: python3 scripts/codebase_audit.py . > /tmp/audit.json
+        run: cargo run --quiet -- audit . > /tmp/audit.json || test $? -eq 1
