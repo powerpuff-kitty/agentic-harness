@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Agentic Harness deterministic CLI."""
 from __future__ import annotations
-import argparse, json, shutil, sys
+import argparse, json, os, shutil, sys
 from pathlib import Path
 SOURCE_ROOT=Path(__file__).resolve().parents[1]; TEMPLATES=SOURCE_ROOT/"templates"; PACKS=SOURCE_ROOT/"packs"; SKILLS=SOURCE_ROOT/"skills"; PRESETS=SOURCE_ROOT/"presets"
 
@@ -98,7 +98,7 @@ def cmd_gate(a):
   if actual is None or actual<float(v): failures.append(f"{n} {actual} < {v}")
  print(json.dumps({"passed":not failures,"failures":failures},indent=2)); return 1 if failures else 0
 def parser():
- invoked=Path(sys.argv[0]).name or "ah"
+ invoked=os.environ.get("AGENTIC_HARNESS_INVOKED_AS") or Path(sys.argv[0]).name or "ah"
  if invoked in {"python","python3","agentic.py"}: invoked="ah"
  p=argparse.ArgumentParser(prog=invoked,description="Agentic Harness"); s=p.add_subparsers(dest="command",required=True)
  for n,f in [("init",cmd_init),("upgrade",cmd_upgrade)]:
