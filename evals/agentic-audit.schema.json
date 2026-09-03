@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentic Repository Audit",
+  "type": "object",
+  "required": ["score", "present", "weak", "missing", "conflicting", "recommendations"],
+  "properties": {
+    "score": {"type": "integer", "minimum": 0, "maximum": 100},
+    "present": {"type": "array", "items": {"type": "string"}},
+    "weak": {"type": "array", "items": {"type": "string"}},
+    "missing": {"type": "array", "items": {"type": "string"}},
+    "conflicting": {"type": "array", "items": {"type": "string"}},
+    "recommendations": {"type": "array", "items": {"type": "string"}},
+    "detected_stack": {"type": "object"},
+    "recommended_packs": {"type": "array", "items": {"type": "string"}},
+    "unresolved_questions": {"type": "array", "items": {"type": "string"}}
+  }
+}

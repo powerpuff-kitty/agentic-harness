@@ -1,131 +1,170 @@
 # Agentic App Boilerplate
 
-A framework-neutral starter **and portable skill pack** for building software with coding agents such as Codex, Claude Code, Cursor, GitHub Copilot, Gemini, and other agentic tools.
+A framework-neutral, composable development harness for coding agents such as Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and other filesystem/tool-using agents.
 
-The core idea is simple: **the repository is the durable source of truth; the agent is an interchangeable worker.**
+**The repository is durable institutional memory; agents are interchangeable workers.**
 
-## What this repository can do
+This repo can be used in three ways:
 
-It supports three modes:
+- **Template** — start a new agent-native project.
+- **Skill** — teach an agent to initialize, upgrade, or audit another repository.
+- **Pack library** — compose domain/technical knowledge such as web, design system, SaaS, realtime, AI, mobile, PostgreSQL, and security-critical behavior.
 
-- **INIT** — bootstrap a new agent-native repository.
-- **UPGRADE** — adapt an existing application without erasing its existing knowledge or conventions.
-- **AUDIT** — review an existing repository's agent architecture and identify missing, duplicated, stale, or conflicting guidance.
+## Skill modes
 
-The canonical reusable procedure lives in `skill/SKILL.md`.
-
-## Principles
-
-1. Keep root agent instructions short and navigational.
-2. Separate durable knowledge from task procedures.
-3. Record architecture and product decisions explicitly.
-4. Store examples of accepted work so agents can imitate real quality.
-5. Convert deterministic rules into tests, linters, schemas, and CI checks.
-6. Update repository knowledge when a decision changes.
-7. Ask rather than invent when the source of truth is missing.
-8. Keep vendor-specific files as thin adapters around shared project truth.
-
-## Repository map
+Ask an agent to use `skill/SKILL.md`.
 
 ```text
-.
-├── AGENTS.md                 # Shared agent router / global instructions
-├── CLAUDE.md                 # Claude entry point
-├── GEMINI.md                 # Gemini entry point
-├── ARCHITECTURE.md           # System architecture index
-├── PRODUCT.md                # Product intent and constraints
-├── DESIGN.md                 # Design-system index
-├── SECURITY.md               # Security baseline
-├── skill/
-│   ├── SKILL.md              # Canonical INIT / UPGRADE / AUDIT procedure
-│   └── references/
-│       └── audit-checklist.md
-├── docs/
-│   ├── architecture/         # Detailed architecture knowledge
-│   ├── product/              # Product/domain knowledge
-│   ├── design/               # Design rules and tokens
-│   ├── decisions/            # ADRs / durable decisions
-│   └── plans/                # Current execution plans
-├── .agents/skills/           # Codex/shared reusable procedures
-│   └── agentic-app/SKILL.md  # Adapter to canonical skill
-├── .claude/skills/
-│   └── agentic-app/SKILL.md  # Claude Code adapter
-├── .cursor/rules/
-│   └── agentic-app.mdc       # Cursor adapter
-├── examples/                 # Accepted examples / exemplars
-├── evals/                    # Agent-output evaluation fixtures
-└── .github/
-    └── copilot-instructions.md
+INIT    create the right harness for a new project
+UPGRADE inspect an existing project and add only what is missing
+AUDIT   read-only audit with score, gaps, conflicts, and recommended packs
 ```
 
-## How an agent should use this repository
+INIT/UPGRADE are intentionally guided. The agent first inspects the repository, infers what it safely can, then asks only the unresolved high-impact questions. It should show the proposed configuration before applying policy/permission changes.
+
+Example:
 
 ```text
-User task
-   ↓
-AGENTS.md
-   ↓
-Load only relevant knowledge
-   ├── PRODUCT.md / docs/product
-   ├── ARCHITECTURE.md / docs/architecture
-   ├── DESIGN.md / docs/design
-   ├── SECURITY.md
-   └── docs/decisions
-   ↓
-Load relevant SKILL.md procedure
-   ↓
-Inspect examples
-   ↓
-Implement
-   ↓
-Run deterministic checks + evals
-   ↓
-Update docs/decisions when durable knowledge changed
+Use the agentic-app skill in UPGRADE mode.
+Inspect this repository first. Ask me only for decisions you cannot infer safely.
+Propose the packs and permissions before modifying the harness.
 ```
 
-## Use it as a project template
-
-Clone or use this repository as the base for a new project, then replace the placeholders in `PRODUCT.md`, `ARCHITECTURE.md`, `DESIGN.md`, and `SECURITY.md`. Add project-specific skills under `.agents/skills/` and accepted examples under `examples/`.
-
-Do **not** turn `AGENTS.md` into a giant handbook. It should remain a compact router to deeper, version-controlled knowledge.
-
-## Use it as a skill
-
-Point your coding agent at `skill/SKILL.md` and ask for one of the three modes.
-
-Examples:
+## Architecture
 
 ```text
-Use the agentic-app skill in INIT mode and make this repository agent-native.
+                         agentic-app
+                             │
+          ┌──────────────────┼──────────────────┐
+          │                  │                  │
+        CORE               PACKS              SKILLS
+          │                  │                  │
+  source-of-truth docs   knowledge modules   procedures
+          │                  │                  │
+          └──────────────────┼──────────────────┘
+                             ↓
+                           AGENT
+                    inspect → ask → plan
+                             ↓
+                     implement / review
+                             ↓
+                   tests + evals + audit
+                             ↓
+                  decisions/docs/examples
+                             ↓
+                    repository memory
 ```
+
+## Core files
 
 ```text
-Use the agentic-app skill in UPGRADE mode. Preserve all existing conventions and add only missing agent architecture.
+AGENTS.md                 compact router and global rules
+agentic.yaml              machine-readable resolved configuration
+PRODUCT.md                product intent and constraints
+ARCHITECTURE.md           system architecture index
+DESIGN.md                 design source-of-truth index
+REFERENCE.md              observed evidence / source material index
+SECURITY.md               application + agent security baseline
+docs/decisions/           ADRs / durable decisions
+docs/plans/               implementation plans
+docs/tasks/               persistent task state
+docs/research/            source provenance
+docs/data/                schemas and invariants
+docs/testing/             test strategy
+docs/operations/          deployment/runbooks/operations
+.agents/skills/           reusable procedures
+examples/                 accepted exemplars
+evals/                    agent-output evaluation
+packs/                    composable knowledge modules
+skill/                    canonical portable skill
 ```
+
+## Packs
+
+Starter packs:
+
+`web-app`, `design-system`, `backend-api`, `saas`, `mobile`, `ai-app`, `data-platform`, `realtime`, `security-critical`, `library-sdk`, `postgres`.
+
+A pack is **knowledge and constraints**. A skill is **a repeatable procedure**. A template is **initial structure**. An exemplar is **what good looks like**. An eval is **how success is measured**.
+
+The resolved pack set is stored in `agentic.yaml`.
+
+## Guided setup
+
+The skill follows:
 
 ```text
-Use the agentic-app skill in AUDIT mode. Do not modify files; return the audit report and recommended next actions.
+inspect repository
+      ↓
+detect stack / structure / docs / CI / design / tests
+      ↓
+separate detected facts from unresolved decisions
+      ↓
+ask minimal targeted questions
+      ↓
+recommend packs + maturity + permissions
+      ↓
+show proposed configuration
+      ↓
+apply after required approval
+      ↓
+audit generated harness
 ```
 
-The adapter files under `.agents/`, `.claude/`, `.cursor/`, and `GEMINI.md` intentionally remain thin so the same rules do not drift between tools.
+It must not ask "which framework?" when the repository already answers that question.
 
-## Cross-agent model
+## Design systems
+
+The design-system pack and skill organize UI knowledge as:
 
 ```text
-                        skill/SKILL.md
-                              │
-                 canonical procedure + rules
-                              │
-          ┌───────────────────┼───────────────────┐
-          ↓                   ↓                   ↓
-       Codex               Claude              Cursor
- .agents/skills/...   .claude/skills/...   .cursor/rules/...
-          │                   │                   │
-          └───────────────────┼───────────────────┘
-                              ↓
-                       project knowledge
-                 AGENTS / PRODUCT / ARCHITECTURE
-                    DESIGN / SECURITY / docs
+evidence
+  ↓
+primitive tokens
+  ↓
+semantic tokens
+  ↓
+component tokens
+  ↓
+foundations / layouts / components / patterns
+  ↓
+examples + visual/a11y validation
 ```
 
-The goal is not to make every agent use identical vendor-specific syntax. The goal is to make every agent consume the **same durable project truth**.
+See `skill/references/design-system-ontology.md` and `docs/design/README.md`.
+
+## Maturity
+
+`prototype` → lightweight guardrails.
+
+`startup` → ADRs, CI, migrations, observability/security basics.
+
+`production` → runbooks, rollback, compatibility, performance/accessibility budgets, stronger security.
+
+`critical` → threat models, recovery, auditability, strict permissions and review gates.
+
+## Agent adapters
+
+The canonical methodology lives in `skill/SKILL.md`. Agent-specific files should remain thin adapters:
+
+- Codex/shared agents: `.agents/skills/agentic-app/SKILL.md` and `AGENTS.md`
+- Claude Code: `CLAUDE.md` and `.claude/skills/agentic-app/SKILL.md`
+- Cursor: `.cursor/rules/agentic-app.mdc`
+- GitHub Copilot: `.github/copilot-instructions.md`
+- Gemini CLI: `GEMINI.md`
+
+Do not fork the methodology into contradictory agent-specific copies.
+
+## Audit
+
+Run locally:
+
+```bash
+python3 scripts/agentic_audit.py
+```
+
+The script emits a basic machine-readable audit and CI runs it on pushes/PRs. Agent-driven AUDIT mode goes further by evaluating content quality, contradictions, pack fit, stale docs, examples, security boundaries, and repository-specific gaps.
+
+## Principle
+
+Do not turn `AGENTS.md`, `CLAUDE.md`, or a giant prompt into the whole knowledge base. Keep entry points short and route agents to small, version-controlled sources of truth.

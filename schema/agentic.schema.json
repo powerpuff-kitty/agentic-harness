@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agentic App Manifest",
+  "type": "object",
+  "required": ["version", "project", "packs", "agent"],
+  "properties": {
+    "version": {"type": "integer", "const": 1},
+    "project": {
+      "type": "object",
+      "required": ["name", "type", "maturity"],
+      "properties": {
+        "name": {"type": "string"},
+        "type": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "maturity": {"enum": ["prototype", "startup", "production", "critical"]}
+      }
+    },
+    "packs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "agent": {
+      "type": "object",
+      "properties": {
+        "autonomy": {"enum": ["conservative", "balanced", "autonomous"]},
+        "inspect_before_asking": {"type": "boolean"},
+        "require_plan_for": {"type": "array", "items": {"type": "string"}},
+        "approval_required_for": {"type": "array", "items": {"type": "string"}},
+        "forbidden": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  },
+  "additionalProperties": true
+}
