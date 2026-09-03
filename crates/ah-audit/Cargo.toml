@@ -1,9 +1,0 @@
-[package]
-name = "ah-audit"
-version = "0.1.0"
-edition = "2024"
-description = "Shared audit primitives for Agentic Harness"
-license = "MIT OR Apache-2.0"
-
-[lib]
-path = "src/lib.rs"

@@ -1,0 +1,37 @@
+name: Content validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check canonical directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f ARCHITECTURE.md
+          test -f CONCEPTS.md
+          test -d templates/base
+          test -d packs
+          test -d policies
+          test -d profiles
+          test -d presets
+          test -d schema
+          test ! -d crates
+          test ! -d packages/skills
+      - name: Check template metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          for d in templates/*; do
+            [ -d "$d" ] || continue
+            test -f "$d/template.json"
+          done

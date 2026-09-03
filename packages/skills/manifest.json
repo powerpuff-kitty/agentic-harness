@@ -1,7 +1,0 @@
-{
-  "manifest_version": 1,
-  "framework_compatibility": ">=0.2.0 <1.0.0",
-  "modules": {
-    "accessibility-audit":{"version":"0.1.0"},"agentic-app":{"version":"0.2.0"},"api-design":{"version":"0.1.0"},"codebase-audit":{"version":"0.2.0"},"competitive-research":{"version":"0.1.0"},"database-design":{"version":"0.1.0"},"dependency-upgrade":{"version":"0.1.0"},"design-system":{"version":"0.2.0"},"design-system-compliance":{"version":"0.1.0"},"documentation":{"version":"0.1.0"},"implementation-plan":{"version":"0.1.0"},"incident-review":{"version":"0.1.0"},"marketing":{"version":"0.1.0"},"migration":{"version":"0.1.0"},"performance-audit":{"version":"0.1.0"},"product-design":{"version":"0.1.0"},"release":{"version":"0.1.0"},"release-review":{"version":"0.1.0"},"security-review":{"version":"0.1.0"},"threat-model":{"version":"0.1.0"}
-  }
-}
