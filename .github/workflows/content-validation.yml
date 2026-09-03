@@ -19,19 +19,21 @@ jobs:
           set -euo pipefail
           test -f ARCHITECTURE.md
           test -f CONCEPTS.md
-          test -d templates/base
+          test -d boilerplates/base
           test -d packs
           test -d policies
           test -d profiles
           test -d presets
           test -d schema
+          test ! -d templates
+          test ! -d examples
           test ! -d crates
           test ! -d packages/skills
-      - name: Check template metadata
+      - name: Check boilerplate metadata
         shell: bash
         run: |
           set -euo pipefail
-          for d in templates/*; do
+          for d in boilerplates/*; do
             [ -d "$d" ] || continue
             test -f "$d/template.json"
           done
