@@ -1,36 +1,43 @@
 # Repository Architecture
 
-Agentic Harness is intentionally a single monorepo with explicit boundaries between executable code and distributable agent packages.
+`agentic-harness` is intentionally a static, human-readable catalog. It contains no CLI runtime and no agent prompt implementation.
 
 ```text
-crates/                       deterministic Rust implementation
-  ah-cli/src/                 command orchestration and embedded official bundle
-  ah-core/                    package kinds and compatibility primitives
-  ah-audit/                   reusable audit primitives
-  ah-registry/                package source/reference model
-
-packages/                     official distributable content
-  core/                       package-set metadata
-  templates/                  initial repository shapes
-  presets/                    named compositions
-  profiles/                   team/organization defaults
-  packs/                      knowledge and constraints
-  skills/                     repeatable procedures
-  policies/                   enforceable development rules
-
-schema/                       public machine-readable contracts
-docs/                         Agentic Harness engineering documentation
-marketing/                    Agentic Harness positioning and go-to-market truth
+agentic-harness/
+├── base/
+├── web-app/
+├── backend-api/
+├── saas/
+├── monorepo/
+├── library-sdk/
+├── modules/
+│   ├── packs/
+│   ├── policies/
+│   └── profiles/
+├── presets/
+├── schema/
+└── docs/
 ```
 
-## Why one repository now
+The root boilerplate directories are the primary public interface. Supporting reusable content is grouped under `modules/` so it does not compete visually with the catalog.
 
-The CLI and official package set still evolve together. A monorepo gives atomic compatibility changes, one CI gate, simple release binaries, and easy refactoring. The package boundary avoids coupling their filesystem organization to the Rust implementation.
+## Related repositories
 
-## When to split repositories
+- `agentic-harness-agents` owns skills, prompts, adapters, and agent workflows.
+- `agentic-harness-cli` owns the native Rust `ah` binary, source pinning, composition, audits, validation, security checks, and release artifacts.
 
-Split a package collection only when it needs genuinely independent ownership, release cadence, access control, community governance, or distribution. Do not create separate repositories merely because content is modular.
+The CLI consumes pinned revisions of this repository and the agents repository. Generated target projects remain self-contained.
 
-## Compatibility
+## Change direction
 
-The Rust engine should depend on package contracts rather than hard-coded knowledge of every package. Official packages may be embedded for zero-dependency distribution, but generated repositories must remain self-contained. Future registry support should preserve the same package kinds and target-project paths.
+Canonical architecture changes flow outward:
+
+```text
+agentic-harness
+      ↓
+agentic-harness-agents
+      ↓
+agentic-harness-cli
+```
+
+Do not move implementation details back into this repository merely for convenience. If a new reusable concept changes project structure, define its canonical contract here first.
