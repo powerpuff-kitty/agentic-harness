@@ -18,9 +18,9 @@ Read-only. Do not block on setup questions. Evaluate structure and content quali
 1. **Discover** — follow `references/repository-discovery.md`.
 2. **Infer safely** — distinguish detected facts, high-confidence inference, and unresolved decisions.
 3. **Ask minimally** — follow `references/setup-questionnaire.md`. Never ask for repository facts you can inspect.
-4. **Resolve configuration** — choose a template/preset, maturity via `references/maturity-levels.md`, packs via `references/pack-resolution.md`, and autonomy/approval gates via `references/permissions.md`.
-5. **Propose before policy changes** — show detected stack, recommended template/preset/packs, maturity, permissions, files to add/change, and important assumptions. Obtain approval when required by the user's requested interaction or when setting high-impact permissions.
-6. **Compose** — use Agentic Harness (`ah`) to combine the selected template, packs, and skills. Templates, presets, packs, and skills are embedded in the native Rust binary.
+4. **Resolve configuration** — choose a template/preset/profile, maturity via `references/maturity-levels.md`, packs via `references/pack-resolution.md`, and autonomy/approval gates via `references/permissions.md`.
+5. **Propose before policy changes** — show detected stack, recommended template/preset/profile/packs, maturity, permissions, files to add/change, and important assumptions.
+6. **Compose** — use Agentic Harness (`ah`) to combine the selected official packages. Source packages live under `packages/` in the Agentic Harness monorepo and are embedded into release binaries.
 7. **Apply** — preserve project-specific knowledge and add only useful core docs, packs, skills, examples, and evals.
 8. **Validate** — follow `references/testing-strategy.md`, verify links/paths, run repository-native checks, `ah validate`, and `ah harness-audit` / `ah audit` as appropriate.
 9. **Persist truth** — update decisions/docs only for durable accepted changes; keep execution state separate.
@@ -28,17 +28,19 @@ Read-only. Do not block on setup questions. Evaluate structure and content quali
 ## Composition model
 
 ```text
-Rust `ah` binary      deterministic engine
-  + templates/        initial repository shapes
-  + presets/          named compositions
-  + packs/            domain/technical knowledge and constraints
-  + skills/           reusable procedures
-  + schema/           machine-readable contracts
+Rust `ah` binary             deterministic engine
+  + packages/templates/      initial repository shapes
+  + packages/presets/        named compositions
+  + packages/profiles/       organization/team defaults
+  + packages/packs/          domain/technical knowledge + constraints
+  + packages/skills/         reusable procedures
+  + packages/policies/       enforceable development rules
+  + schema/                  machine-readable public contracts
         ↓
 self-contained target repository
 ```
 
-After composition, the target repository should use normal project-local paths such as `AGENTS.md`, `agentic.yaml`, `docs/`, `.agents/skills/`, examples, and evals. Do not leave references back to this source repository unless the user explicitly wants a linked installation.
+The source-repository paths above are implementation details of the official bundle. After composition, the target repository should use normal project-local paths such as `AGENTS.md`, `agentic.yaml`, `docs/`, `.agents/skills/`, `.agentic/packs/`, examples, and evals. Do not leave references back to the Agentic Harness source checkout.
 
 ## Knowledge boundaries
 
@@ -46,6 +48,8 @@ After composition, the target repository should use normal project-local paths s
 - **Skill** = how an agent performs a repeatable task.
 - **Template** = initial file shape, never more authoritative than existing project truth.
 - **Preset** = a named template + packs + skills composition.
+- **Profile** = organization/team defaults that compose packages and maturity.
+- **Policy** = mandatory rule installed into the project harness.
 - **Example** = accepted subjective outcome.
 - **Eval** = how quality/behavior is measured.
 - **Plan/task** = temporary execution state.
@@ -53,7 +57,7 @@ After composition, the target repository should use normal project-local paths s
 
 ## Design-system behavior
 
-For design-heavy projects use the `design-system` pack, the reusable `design-system` skill, and `references/design-system-ontology.md`. Keep evidence separate from distilled rules. Organize primitive -> semantic -> component tokens, then foundations, layouts, components, patterns, content, exemplars, anti-patterns, and deterministic visual/a11y checks.
+For design-heavy projects use the `design-system` pack, the reusable `design-system` skill, and `references/design-system-ontology.md`. Keep evidence separate from distilled rules. Organize primitive -> semantic -> component tokens, then foundations, layouts, components, patterns, content, exemplars, anti-patterns, and deterministic visual/a11y checks. When a design system is active, use `ah design-system-components` and include design-system compliance in audit/gate decisions.
 
 ## Monorepos
 
@@ -69,6 +73,6 @@ If explicitly requested, infer low-risk defaults, do not infer high-impact permi
 
 ## Completion
 
-INIT/UPGRADE: summarize detected project, resolved template/preset/packs/maturity/permissions, files changed, validations run, and unresolved decisions.
+INIT/UPGRADE: summarize detected project, resolved template/preset/profile/packs/maturity/permissions, files changed, validations run, and unresolved decisions.
 
-AUDIT: report score plus present, weak, missing, conflicting, recommended next actions, recommended packs, and unresolved questions.
+AUDIT: report score plus present, weak, missing, conflicting, recommended next actions, recommended packs, design-system compliance when active, and unresolved questions.
