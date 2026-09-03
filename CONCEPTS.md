@@ -1,13 +1,10 @@
 # Concepts
 
-## Template
-Canonical initial repository shape, such as `web-app`, `backend-api`, `saas`, or `monorepo`.
-
 ## Boilerplate
-A documented, opinionated starter composition for a recognizable project type or stack. A boilerplate may correspond to a machine-readable preset but is designed first for humans to understand.
+A canonical initial repository starting point, such as `web-app`, `backend-api`, `saas`, or `monorepo`. A boilerplate defines coherent project shape and durable harness structure. It is intended to be browsable and usable directly by humans, agents, and tooling.
 
 ## Preset
-Machine-readable named composition of a template and selected modules.
+A machine-readable named composition that selects a boilerplate plus useful packs and other modules. Presets reduce setup choices without creating a separate boilerplate for every stack combination.
 
 ## Pack
 Reusable knowledge and constraints. A pack describes what agents need to know about a technical or product domain.
@@ -24,8 +21,8 @@ A coherent set of defaults for an organization/team/project posture, such as sta
 ## Schema
 A machine-readable contract for manifests, audit output, configuration, or package metadata.
 
-## Example
-An accepted reference outcome that helps humans and agents understand what good looks like.
-
 ## Eval
-A test or rubric for whether an outcome satisfies a desired behavior or quality bar.
+A test or rubric for whether an outcome satisfies a desired behavior or quality bar. Agent-facing eval procedures belong primarily in `agentic-harness-agents`; deterministic enforcement belongs in `agentic-harness-cli`.
+
+## Example applications
+Complete demo/reference applications are not part of this canonical repository. If maintained later, they should live in a dedicated examples repository so this repo remains a focused boilerplate catalog and source of truth.
