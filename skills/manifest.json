@@ -6,6 +6,7 @@
     "codebase-audit": {"version":"0.2.0"},
     "design-system": {"version":"0.1.0"},
     "implementation-plan": {"version":"0.1.0"},
+    "marketing": {"version":"0.1.0"},
     "product-design": {"version":"0.1.0"},
     "release-review": {"version":"0.1.0"},
     "security-review": {"version":"0.1.0"}
