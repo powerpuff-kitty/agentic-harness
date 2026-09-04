@@ -1,0 +1,7 @@
+{
+  "format_version": 1,
+  "boilerplate": "saas",
+  "packs": ["web-app", "saas", "auth", "design-system", "accessibility", "privacy", "security-critical"],
+  "policies": ["ai-permissions", "dependencies", "security", "quality-gates"],
+  "skills": ["agentic-app", "codebase-audit", "security-review", "threat-model", "product-design", "accessibility-audit", "design-system-compliance", "release-review"]
+}

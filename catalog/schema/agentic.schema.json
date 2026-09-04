@@ -1,0 +1,6 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/agentic.schema.json",
+  "title": "Agentic Harness manifest compatibility alias",
+  "$ref": "manifest.schema.json"
+}

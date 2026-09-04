@@ -1,0 +1,1 @@
+Read `/AGENTS.md` first. Canonical project context is under `/.agentic/`; reusable authoring content is under `/catalog/`. This adapter must remain thin and must not duplicate or override canonical truth.

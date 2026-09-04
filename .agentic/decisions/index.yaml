@@ -1,0 +1,22 @@
+format_version: 1
+decisions:
+  - id: ADR-001
+    title: Separate canonical, agent, and CLI repositories
+    status: accepted
+    file: ADR-001-separate-repositories.md
+  - id: ADR-002
+    title: Store canonical project context under .agentic
+    status: accepted
+    file: ADR-002-agentic-directory.md
+  - id: ADR-003
+    title: Keep AGENTS.md as the root router
+    status: accepted
+    file: ADR-003-root-agent-router.md
+  - id: ADR-004
+    title: Separate project truth from agent procedures
+    status: accepted
+    file: ADR-004-truth-vs-procedure.md
+  - id: ADR-005
+    title: Publish complete materialized catalog variants
+    status: accepted
+    file: ADR-005-materialized-variants.md

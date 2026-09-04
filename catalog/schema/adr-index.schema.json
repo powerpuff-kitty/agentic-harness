@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/adr-index.schema.json",
+  "title": "ADR index",
+  "type": "object",
+  "required": ["format_version", "decisions"],
+  "properties": {
+    "format_version": {"const": 1},
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "status", "file"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^ADR-\\d{3,}$"},
+          "title": {"type": "string", "minLength": 1},
+          "status": {"enum": ["proposed", "accepted", "rejected", "deprecated", "superseded"]},
+          "file": {"type": "string", "pattern": "^ADR-\\d{3,}-.+\\.md$"}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,110 +1,129 @@
 # Agentic Harness
 
-[![Status: Beta](https://img.shields.io/badge/status-beta-orange)](https://github.com/powerpuff-kitty/agentic-harness)
+[![Status: Beta](https://img.shields.io/badge/status-beta-orange)](.agentic/PRODUCT.md#current-status)
 [![Catalog validation](https://github.com/powerpuff-kitty/agentic-harness/actions/workflows/content-validation.yml/badge.svg)](https://github.com/powerpuff-kitty/agentic-harness/actions/workflows/content-validation.yml)
+[![Agent native](https://img.shields.io/badge/agent--native-AGENTS.md-5c6ac4)](AGENTS.md)
 
-**Agent-native boilerplates and repository architecture for Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and other filesystem/tool-using coding agents.**
+A clean, vendor-neutral project contract for Codex, Claude Code, Cursor, GitHub Copilot, Gemini CLI, and other coding agents.
 
-Agentic Harness provides readable project boilerplates, reusable knowledge modules, policies, profiles, schemas, and deterministic tooling for building agent-native software repositories without making prompts the source of truth.
+Agentic Harness keeps a project root readable: normal project files stay where developers expect them, `AGENTS.md` is the compact agent entrypoint, and durable product/architecture/security context lives under `.agentic/`.
 
-> **Status: Beta.** The canonical repository model is usable for real projects. Public schemas and CLI behavior may still evolve before 1.0.
+> **Beta:** the filesystem contract is versioned and migration-aware, but schemas and CLI behavior may still evolve before 1.0.
 
-## Works with
+## Start here
 
-- OpenAI Codex
-- Claude Code
-- Cursor
-- GitHub Copilot
-- Gemini CLI
-- other coding agents that can read repository files and use development tools
+This repository is both:
 
-## Ecosystem
-
-```text
-agentic-harness          what is true
-        ↓
-agentic-harness-agents   what agents should do
-        ↓
-agentic-harness-cli      how it is applied and checked
-```
-
-- **This repository:** canonical architecture, boilerplates and reusable modules
-- **[agentic-harness-agents](https://github.com/powerpuff-kitty/agentic-harness-agents):** skills, prompts, workflows and agent adapters
-- **[agentic-harness-cli](https://github.com/powerpuff-kitty/agentic-harness-cli):** native Rust `ah` CLI, audits, validation and quality gates
-
-## Boilerplate catalog
-
-The boilerplates are intentionally at the repository root so they are the first thing you see:
+1. **A complete working reference installation** under [`.agentic/`](.agentic/README.md).
+2. **The canonical authoring catalog** under [`catalog/`](catalog/README.md).
 
 ```text
 agentic-harness/
-├── base/              minimal agent-native foundation
-├── web-app/           user-facing web application
-├── backend-api/       API / service repository
-├── saas/              multi-user SaaS product
-├── monorepo/          multi-app / package repository
-├── library-sdk/       public library or SDK
+├── README.md                    human landing page
+├── AGENTS.md                    compact agent router
+├── normal repository files
 │
-├── modules/
-│   ├── packs/         reusable knowledge + constraints
-│   ├── policies/      mandatory rules
-│   └── profiles/      team / organization defaults
+├── .agentic/                    this project's canonical context
+│   ├── README.md                annotated map and precedence
+│   ├── manifest.yaml            machine-readable configuration
+│   ├── lock.json                source/module resolution
+│   ├── PRODUCT.md               product truth
+│   ├── ARCHITECTURE.md          current architecture
+│   ├── SECURITY.md              security model
+│   ├── DESIGN.md                documentation/design truth
+│   ├── REFERENCE.md             evidence and provenance
+│   ├── decisions/               durable ADR history
+│   ├── plans/                   temporary strategies
+│   ├── tasks/                   active execution state
+│   ├── docs/                    supporting documentation
+│   ├── evals/                   quality rubrics
+│   ├── packs/                   installed knowledge modules
+│   └── policies/                installed mandatory rules
 │
-├── presets/           named machine-readable compositions
-├── schema/            public machine contracts
-├── docs/              architecture and compatibility guidance
-├── ARCHITECTURE.md
-└── CONCEPTS.md
+├── catalog/                     reusable authoring source
+│   ├── variants/                complete project structures
+│   ├── packs/                   reusable knowledge + constraints
+│   ├── policies/                mandatory rules
+│   ├── profiles/                organization/team defaults
+│   ├── presets/                 named compositions
+│   └── schema/                  public machine contracts
+│
+└── .github/                     repository automation/adapters
 ```
 
-Start with [`base/`](base), [`web-app/`](web-app), [`backend-api/`](backend-api), [`saas/`](saas), [`monorepo/`](monorepo), or [`library-sdk/`](library-sdk).
-
-Each boilerplate is a complete, directly browsable project starting structure with a `boilerplate.json` describing its metadata and defaults.
-
-## Composition model
+Opening [`.agentic/README.md`](.agentic/README.md) explains when to read and update every path. The key lifecycle is:
 
 ```text
-boilerplate
-+ modules/packs
-+ modules/policies
-+ modules/profiles
-+ preset defaults
-+ skills from agentic-harness-agents
+research / evidence
         ↓
-self-contained project harness
+ADR records why a durable decision was accepted
+        ↓
+current truth describes the resulting system
+        ↓
+plan describes temporary implementation strategy
+        ↓
+task tracks active execution
+        ↓
+implementation + validation
 ```
 
-A **boilerplate** is the starting project shape. A **preset** selects a boilerplate and common modules for a recognizable stack or posture. Packs, policies, and profiles are reusable across boilerplates rather than duplicated inside them.
+## Complete boilerplates
 
-## Why Agentic Harness
+Every catalog variant contains a complete, materialized target tree under `files/`; no hidden overlay composition is required to understand it.
 
-Coding agents are increasingly capable, but repository guidance often ends up fragmented across prompts, vendor-specific instruction files, and undocumented assumptions. Agentic Harness separates durable project truth from agent procedure and deterministic enforcement:
+| Variant | Use it for |
+| --- | --- |
+| [`base`](catalog/variants/base/) | Minimal agent-native project contract |
+| [`web-app`](catalog/variants/web-app/) | User-facing web applications and design systems |
+| [`backend-api`](catalog/variants/backend-api/) | APIs and deployed services |
+| [`saas`](catalog/variants/saas/) | Multi-user SaaS products and tenant isolation |
+| [`monorepo`](catalog/variants/monorepo/) | Multi-application/package repositories |
+| [`library-sdk`](catalog/variants/library-sdk/) | Public or internal libraries and SDKs |
+
+## Quick start with `ah`
+
+The native Rust CLI lives in [`agentic-harness-cli`](https://github.com/powerpuff-kitty/agentic-harness-cli).
+
+```bash
+ah init ./my-app --boilerplate web-app
+ah doctor ./my-app
+ah new adr "Choose the primary database" --target ./my-app
+ah audit ./my-app
+```
+
+For an existing legacy installation:
+
+```bash
+ah migrate ./existing-project
+ah migrate ./existing-project --apply --backup .agentic-migration-backup
+ah validate ./existing-project
+```
+
+Migration defaults to dry-run and reports identical duplicates separately from conflicts.
+
+## Repository responsibilities
 
 ```text
-architecture / policy / product truth
-                ↓
-        reusable agent skills
-                ↓
-      tests / schemas / CI / ah
+agentic-harness
+what is true: project contract, variants, packs, policies, profiles, presets, schemas
+        ↓
+agentic-harness-agents
+what agents should do: skills, prompts, adapters, agent workflows
+        ↓
+agentic-harness-cli
+how it is applied and checked: native composition, migration, audit, validation
 ```
 
-This keeps important decisions reviewable by humans and reusable across different agents.
+- [Agent procedures and prompts](https://github.com/powerpuff-kitty/agentic-harness-agents)
+- [Native Rust CLI](https://github.com/powerpuff-kitty/agentic-harness-cli)
 
-## Canonical-source rule
+## Why `.agentic/` and `.agents/` are separate
 
-Architecture changes land here first. The agents and CLI repositories then pin and consume an accepted revision of this repository. Prompts are procedures, not architectural authority.
+- `.agentic/` is project-owned truth, governance, provenance, and state.
+- `.agents/` contains reusable agent procedures such as installed skills.
 
-## Documentation
+Skills can explain how to work but cannot silently redefine project truth or policy.
 
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) — ecosystem and repository model
-- [`CONCEPTS.md`](CONCEPTS.md) — boilerplate/module vocabulary
-- [`docs/`](docs) — composition, compatibility, security and release guidance
-- [`schema/`](schema) — machine-readable public contracts
+## Contributions
 
-## Examples
-
-This repository intentionally does not contain demo applications. Complete reference apps can live in a separate examples repository later so this catalog remains focused.
-
-## Contributing
-
-Issues and pull requests are welcome while the project is in beta. Small reproducible improvements to boilerplates, schemas, documentation and compatibility are especially useful.
+Start with [`CONTRIBUTING.md`](CONTRIBUTING.md), the relevant ADR/current truth, and catalog validation. Good contributions include clearer schemas, safer migration fixtures, additional deterministic checks, improved agent procedures in the agents repository, and narrowly scoped project variants.

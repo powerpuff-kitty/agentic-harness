@@ -1,0 +1,25 @@
+{
+  "format_version": 1,
+  "canonical_source": {
+    "repository": "powerpuff-kitty/agentic-harness",
+    "revision": "self"
+  },
+  "agents_source": {
+    "repository": "powerpuff-kitty/agentic-harness-agents",
+    "revision": "664ce345841d8fd2e35b234dfa8a735a9f4d3fec"
+  },
+  "variant": "base",
+  "packs": {
+    "security-critical": "0.1.0",
+    "library-sdk": "0.1.0"
+  },
+  "policies": {
+    "ai-permissions": "built-in",
+    "dependencies": "built-in",
+    "licensing": "built-in",
+    "quality-gates": "built-in",
+    "security": "built-in"
+  },
+  "skills": {},
+  "checksums": {}
+}

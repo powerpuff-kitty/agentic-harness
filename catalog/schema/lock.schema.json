@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/lock.schema.json",
+  "title": "Agentic Harness lockfile",
+  "type": "object",
+  "required": ["format_version", "variant", "packs", "policies", "skills", "checksums"],
+  "properties": {
+    "format_version": {"const": 1},
+    "canonical_source": {"type": ["object", "null"]},
+    "agents_source": {"type": ["object", "null"]},
+    "variant": {"type": "string"},
+    "packs": {"type": "object"},
+    "policies": {"type": "object"},
+    "skills": {"type": "object"},
+    "checksums": {"type": "object"}
+  },
+  "additionalProperties": false
+}

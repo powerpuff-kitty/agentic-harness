@@ -1,0 +1,45 @@
+format_version: 1
+
+project:
+  name: project-name
+  type: web-app
+  maturity: prototype
+
+context:
+  product: PRODUCT.md
+  architecture: ARCHITECTURE.md
+  security: SECURITY.md
+  design: DESIGN.md
+  reference: REFERENCE.md
+  decisions: decisions/
+  plans: plans/
+  tasks: tasks/
+  docs: docs/
+  evals: evals/
+
+modules:
+  packs:
+    - web-app
+    - design-system
+    - accessibility
+  policies:
+    - ai-permissions
+    - security
+
+skills:
+  - agentic-app
+  - codebase-audit
+  - security-review
+  - product-design
+  - accessibility-audit
+  - design-system-compliance
+
+permissions:
+  destructive_actions: approval-required
+  production_changes: approval-required
+  secret_access: forbidden
+  external_publication: approval-required
+
+adapters:
+  canonical_router: ../AGENTS.md
+  vendor_files_must_be_thin: true

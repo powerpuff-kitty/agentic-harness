@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "name": "library-sdk",
+  "version": "0.3.0-beta.1",
+  "description": "Public library or SDK harness",
+  "extends": "base",
+  "default_packs": ["library-sdk"],
+  "default_policies": ["ai-permissions", "dependencies", "licensing", "security", "quality-gates"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "api-design", "documentation", "release"]
+}

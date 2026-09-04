@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "name": "backend-api",
+  "version": "0.3.0-beta.1",
+  "description": "API and service repository harness",
+  "extends": "base",
+  "default_packs": ["backend-api"],
+  "default_policies": ["ai-permissions", "dependencies", "security", "quality-gates"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "api-design", "database-design", "implementation-plan"]
+}

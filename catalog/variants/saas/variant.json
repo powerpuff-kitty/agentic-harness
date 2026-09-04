@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "name": "saas",
+  "version": "0.3.0-beta.1",
+  "description": "Multi-user SaaS product harness",
+  "extends": "web-app",
+  "default_packs": ["web-app", "saas", "auth", "design-system", "accessibility"],
+  "default_policies": ["ai-permissions", "dependencies", "security", "quality-gates"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "product-design", "api-design", "database-design", "accessibility-audit", "design-system-compliance"]
+}

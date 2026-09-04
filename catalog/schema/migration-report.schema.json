@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/migration-report.schema.json",
+  "title": "Agentic Harness migration report",
+  "type": "object",
+  "required": ["format_version", "target", "dry_run", "moves", "identical_duplicates", "conflicts", "created", "removed", "valid_after"],
+  "properties": {
+    "format_version": {"const": 1},
+    "target": {"type": "string"},
+    "dry_run": {"type": "boolean"},
+    "moves": {"type": "array"},
+    "identical_duplicates": {"type": "array"},
+    "conflicts": {"type": "array"},
+    "created": {"type": "array"},
+    "removed": {"type": "array"},
+    "backup": {"type": ["string", "null"]},
+    "valid_after": {"type": ["boolean", "null"]}
+  },
+  "additionalProperties": true
+}

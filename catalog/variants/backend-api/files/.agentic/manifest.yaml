@@ -1,0 +1,45 @@
+format_version: 1
+
+project:
+  name: project-name
+  type: backend-api
+  maturity: startup
+
+context:
+  product: PRODUCT.md
+  architecture: ARCHITECTURE.md
+  security: SECURITY.md
+  design: null
+  reference: REFERENCE.md
+  decisions: decisions/
+  plans: plans/
+  tasks: tasks/
+  docs: docs/
+  evals: evals/
+
+modules:
+  packs:
+    - backend-api
+  policies:
+    - ai-permissions
+    - dependencies
+    - security
+    - quality-gates
+
+skills:
+  - agentic-app
+  - codebase-audit
+  - security-review
+  - api-design
+  - database-design
+  - implementation-plan
+
+permissions:
+  destructive_actions: approval-required
+  production_changes: approval-required
+  secret_access: forbidden
+  external_publication: approval-required
+
+adapters:
+  canonical_router: ../AGENTS.md
+  vendor_files_must_be_thin: true
