@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "name": "base",
+  "version": "0.3.0-beta.1",
+  "description": "Minimal agent-native project contract",
+  "extends": null,
+  "default_packs": [],
+  "default_policies": ["ai-permissions", "security"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review"]
+}

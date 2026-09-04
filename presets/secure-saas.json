@@ -1,5 +1,0 @@
-{
-  "boilerplate": "saas",
-  "packs": ["web-app", "saas", "design-system", "postgres", "security-critical"],
-  "skills": ["agentic-app", "codebase-audit", "security-review", "product-design", "release-review"]
-}

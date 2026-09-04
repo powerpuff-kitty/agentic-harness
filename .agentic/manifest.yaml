@@ -1,0 +1,56 @@
+format_version: 1
+
+project:
+  name: agentic-harness
+  type: open-source-tooling
+  maturity: beta
+
+context:
+  product: PRODUCT.md
+  architecture: ARCHITECTURE.md
+  security: SECURITY.md
+  design: DESIGN.md
+  reference: REFERENCE.md
+  decisions: decisions/
+  plans: plans/
+  tasks: tasks/
+  docs: docs/
+  evals: evals/
+
+catalog:
+  root: ../catalog/
+  variants: ../catalog/variants/
+  packs: ../catalog/packs/
+  policies: ../catalog/policies/
+  profiles: ../catalog/profiles/
+  presets: ../catalog/presets/
+  schemas: ../catalog/schema/
+
+modules:
+  packs:
+    - security-critical
+    - library-sdk
+  policies:
+    - ai-permissions
+    - dependencies
+    - licensing
+    - quality-gates
+    - security
+
+skills:
+  - agentic-app
+  - codebase-audit
+  - security-review
+  - documentation
+  - release
+
+permissions:
+  destructive_actions: approval-required
+  production_changes: approval-required
+  secret_access: forbidden
+  external_publication: approval-required
+  release_publication: approval-required
+
+adapters:
+  canonical_router: ../AGENTS.md
+  vendor_files_must_be_thin: true

@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "name": "web-app",
+  "version": "0.3.0-beta.1",
+  "description": "User-facing web application harness",
+  "extends": "base",
+  "default_packs": ["web-app", "design-system", "accessibility"],
+  "default_policies": ["ai-permissions", "security", "quality-gates"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "product-design", "accessibility-audit", "design-system-compliance"]
+}

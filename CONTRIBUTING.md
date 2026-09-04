@@ -1,17 +1,23 @@
 # Contributing
 
-`agentic-harness` is the canonical static catalog for Agentic Harness project architecture.
+Read `AGENTS.md`, `.agentic/README.md`, the relevant current truth, and accepted ADRs before changing the contract.
 
-## Repository boundaries
+Repository boundaries:
 
-- Root boilerplate directories (`base/`, `web-app/`, `backend-api/`, `saas/`, `monorepo/`, `library-sdk/`) define canonical project starting points.
-- `modules/packs/` contains reusable knowledge and constraints.
-- `modules/policies/` contains mandatory rules.
-- `modules/profiles/` contains team and organization defaults.
-- `presets/` contains machine-readable compositions.
-- `schema/` contains public contracts.
-- `docs/` contains architecture and compatibility guidance.
+- `.agentic/` — this repository's own canonical project context.
+- `catalog/variants/` — complete target-project starting structures.
+- `catalog/packs/` — reusable knowledge and constraints.
+- `catalog/policies/` — mandatory rules.
+- `catalog/profiles/` — organization/team defaults.
+- `catalog/presets/` — named compositions.
+- `catalog/schema/` — public machine contracts.
 
-Do not add runtime/CLI code, agent skills, generic examples, or product marketing to this repository. Agent procedures belong in `powerpuff-kitty/agentic-harness-agents`; Rust implementation and deterministic tooling belong in `powerpuff-kitty/agentic-harness-cli`.
+Before opening a PR:
 
-Every boilerplate must include valid `boilerplate.json` metadata. Architecture/content changes should land here before dependent prompt or CLI changes. Avoid duplicating canonical truth into prompts or implementation code.
+```bash
+python3 .github/scripts/validate_catalog.py
+```
+
+A contract change should update the relevant schema, docs, ADR/current truth, migration guidance, and downstream source pins/tests. Do not add root-level canonical project truth or public overlay-only variants. Keep vendor adapters thin.
+
+Agent procedure changes belong in `agentic-harness-agents`; deterministic implementation changes belong in `agentic-harness-cli`.

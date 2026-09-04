@@ -13,5 +13,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate canonical catalog
+      - name: Validate self-hosting contract and catalog
         run: python3 .github/scripts/validate_catalog.py

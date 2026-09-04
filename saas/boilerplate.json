@@ -1,9 +1,0 @@
-{
-  "name": "saas",
-  "version": "0.2.0",
-  "format_version": 1,
-  "extends": "web-app",
-  "description": "Multi-user SaaS product harness",
-  "default_packs": ["web-app", "saas", "design-system"],
-  "default_skills": ["agentic-app", "codebase-audit", "security-review", "product-design"]
-}

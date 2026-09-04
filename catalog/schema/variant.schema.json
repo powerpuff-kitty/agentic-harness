@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/variant.schema.json",
+  "title": "Agentic Harness catalog variant",
+  "type": "object",
+  "required": ["format_version", "name", "version", "description", "extends", "default_packs", "default_policies", "default_skills"],
+  "properties": {
+    "format_version": {"const": 1},
+    "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+(?:-[0-9A-Za-z.-]+)?$"},
+    "description": {"type": "string", "minLength": 1},
+    "extends": {"type": ["string", "null"]},
+    "default_packs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "default_policies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "default_skills": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+  },
+  "additionalProperties": false
+}

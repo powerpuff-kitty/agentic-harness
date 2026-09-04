@@ -1,0 +1,13 @@
+{
+  "format_version": 1,
+  "version": "0.3.0-beta.1",
+  "variants": ["base", "web-app", "backend-api", "saas", "monorepo", "library-sdk"],
+  "paths": {
+    "variants": "variants/",
+    "packs": "packs/",
+    "policies": "policies/",
+    "profiles": "profiles/",
+    "presets": "presets/",
+    "schema": "schema/"
+  }
+}

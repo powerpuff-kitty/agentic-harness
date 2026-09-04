@@ -1,9 +1,0 @@
-{
-  "name": "web-app",
-  "version": "0.2.0",
-  "format_version": 1,
-  "extends": "base",
-  "description": "User-facing web application harness",
-  "default_packs": ["web-app", "design-system"],
-  "default_skills": ["agentic-app", "codebase-audit", "security-review", "product-design"]
-}

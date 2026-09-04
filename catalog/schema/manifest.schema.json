@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/manifest.schema.json",
+  "title": "Agentic Harness manifest",
+  "type": "object",
+  "required": ["format_version", "project", "context", "modules", "skills", "permissions", "adapters"],
+  "properties": {
+    "format_version": {"const": 1},
+    "project": {
+      "type": "object",
+      "required": ["name", "type", "maturity"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "minLength": 1},
+        "maturity": {"enum": ["prototype", "startup", "production", "critical", "beta"]}
+      },
+      "additionalProperties": true
+    },
+    "context": {
+      "type": "object",
+      "required": ["product", "architecture", "security", "decisions"],
+      "properties": {
+        "product": {"type": "string"},
+        "architecture": {"type": "string"},
+        "security": {"type": "string"},
+        "design": {"type": ["string", "null"]},
+        "reference": {"type": ["string", "null"]},
+        "decisions": {"type": "string"},
+        "plans": {"type": ["string", "null"]},
+        "tasks": {"type": ["string", "null"]},
+        "docs": {"type": ["string", "null"]},
+        "evals": {"type": ["string", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "catalog": {"type": "object"},
+    "modules": {
+      "type": "object",
+      "required": ["packs", "policies"],
+      "properties": {
+        "packs": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "policies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "skills": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "permissions": {"type": "object"},
+    "adapters": {
+      "type": "object",
+      "required": ["canonical_router", "vendor_files_must_be_thin"],
+      "properties": {
+        "canonical_router": {"type": "string"},
+        "vendor_files_must_be_thin": {"type": "boolean"}
+      }
+    }
+  },
+  "additionalProperties": true
+}

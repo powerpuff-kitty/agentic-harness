@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "name": "monorepo",
+  "version": "0.3.0-beta.1",
+  "description": "Multi-application and package repository harness",
+  "extends": "base",
+  "default_packs": [],
+  "default_policies": ["ai-permissions", "dependencies", "security", "quality-gates"],
+  "default_skills": ["agentic-app", "codebase-audit", "security-review", "implementation-plan", "dependency-upgrade"]
+}
