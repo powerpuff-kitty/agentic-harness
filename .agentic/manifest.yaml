@@ -5,6 +5,9 @@ project:
   type: open-source-tooling
   maturity: beta
 
+installation:
+  type: self
+
 context:
   product: PRODUCT.md
   architecture: ARCHITECTURE.md
