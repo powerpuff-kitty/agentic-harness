@@ -1,0 +1,50 @@
+{
+  "id": "openai.gpt-6-astra.v1",
+  "vendor": "OpenAI",
+  "model": "GPT-6 Astra",
+  "version": 1,
+  "effective_from": "2026-09-05",
+  "supersedes": null,
+  "status": "current",
+  "recommendations": [
+    {
+      "id": "gpt6.audit-instructions",
+      "area": "instruction_sensitivity",
+      "guidance": "Audit skills and AGENTS.md-style files for unclear, conflicting, or unintended instructions because the model is more sensitive to instructions in context.",
+      "avoid": ["large conflicting instruction surfaces", "silent skill rules that can block work"],
+      "confidence": "vendor-documented",
+      "evidence": [{
+        "type": "vendor",
+        "source": "https://developers.openai.com/api/docs/guides/latest-model",
+        "observed_at": "2026-09-05",
+        "note": "OpenAI model guidance explicitly recommends auditing skills and AGENTS.md files for instructions that can influence behavior."
+      }]
+    },
+    {
+      "id": "gpt6.autonomy-boundaries",
+      "area": "autonomy",
+      "guidance": "Define reversible work as autonomous by default and reserve approval for destructive or irreversible actions; make desired persistence explicit when the workflow expects the agent to continue without clarification.",
+      "avoid": ["unnecessary approval gates for reversible work", "ambiguous completion boundaries"],
+      "confidence": "vendor-documented",
+      "evidence": [{
+        "type": "vendor",
+        "source": "https://developers.openai.com/api/docs/guides/latest-model",
+        "observed_at": "2026-09-05",
+        "note": "OpenAI documents stronger clarification behavior and recommends explicit autonomy/persistence guidance for reversible tasks."
+      }]
+    },
+    {
+      "id": "gpt6.testing-scope",
+      "area": "testing",
+      "guidance": "Prefer task-scoped verification guidance rather than unconditional broad testing; the model already tends to test thoroughly and can over-test small changes.",
+      "avoid": ["always run the entire test suite after every small change"],
+      "confidence": "vendor-documented",
+      "evidence": [{
+        "type": "vendor",
+        "source": "https://developers.openai.com/api/docs/guides/latest-model",
+        "observed_at": "2026-09-05",
+        "note": "OpenAI notes that GPT-6 Astra can run broader tests than necessary on smaller coding tasks."
+      }]
+    }
+  ]
+}
