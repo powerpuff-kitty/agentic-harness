@@ -1,0 +1,50 @@
+{
+  "id": "anthropic.claude-opus-5.v1",
+  "vendor": "Anthropic",
+  "model": "Claude Opus 5",
+  "version": 1,
+  "effective_from": "2026-09-05",
+  "supersedes": null,
+  "status": "current",
+  "recommendations": [
+    {
+      "id": "opus5.prefer-general-over-recipes",
+      "area": "context",
+      "guidance": "Prefer clear general instructions and outcome constraints over hand-written reasoning recipes unless strict sequencing is genuinely required.",
+      "avoid": ["unnecessary step-by-step reasoning prescriptions"],
+      "confidence": "vendor-documented",
+      "evidence": [{
+        "type": "vendor",
+        "source": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "observed_at": "2026-09-05",
+        "note": "Anthropic recommends general instructions over prescriptive steps for current Claude models."
+      }]
+    },
+    {
+      "id": "opus5.remove-redundant-self-check",
+      "area": "testing",
+      "guidance": "Remove legacy blanket self-check or verification instructions when they cause over-verification; define concrete completion criteria instead.",
+      "avoid": ["generic before-you-finish self-check prompts copied from older-model harnesses"],
+      "confidence": "vendor-documented",
+      "evidence": [{
+        "type": "vendor",
+        "source": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "observed_at": "2026-09-05",
+        "note": "Anthropic documents Claude Opus 5 as self-verifying well and warns older verification prompts can add latency/tokens through over-verification."
+      }]
+    },
+    {
+      "id": "opus5.subagent-control",
+      "area": "tooling",
+      "guidance": "Specify when subagent delegation is useful and when direct work is preferred; avoid treating delegation as mandatory for simple exploration.",
+      "avoid": ["unconditional subagent spawning"],
+      "confidence": "vendor-documented",
+      "evidence": [{
+        "type": "vendor",
+        "source": "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "observed_at": "2026-09-05",
+        "note": "Anthropic notes Claude Opus 5 delegates to subagents more readily than prior models and provides control guidance."
+      }]
+    }
+  ]
+}
