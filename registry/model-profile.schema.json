@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/model-profile.schema.json",
+  "title": "Agentic Harness model profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "vendor", "model", "version", "effective_from", "recommendations"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]+$"},
+    "vendor": {"type": "string"},
+    "model": {"type": "string"},
+    "version": {"type": "integer", "minimum": 1},
+    "effective_from": {"type": "string", "format": "date"},
+    "supersedes": {"type": ["string", "null"]},
+    "status": {"enum": ["current", "experimental", "deprecated"]},
+    "recommendations": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/recommendation"}
+    }
+  },
+  "$defs": {
+    "recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "area", "guidance", "confidence", "evidence"],
+      "properties": {
+        "id": {"type": "string"},
+        "area": {"enum": ["context", "agents_md", "skills", "autonomy", "completion", "testing", "tooling", "instruction_sensitivity", "other"]},
+        "guidance": {"type": "string"},
+        "avoid": {"type": "array", "items": {"type": "string"}},
+        "confidence": {"enum": ["vendor-documented", "benchmarked", "community-observed", "inferred"]},
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "source", "observed_at"],
+            "properties": {
+              "type": {"enum": ["vendor", "benchmark", "community", "internal"]},
+              "source": {"type": "string"},
+              "observed_at": {"type": "string", "format": "date"},
+              "note": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}
