@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "id": "framework/vue/3",
+  "kind": "framework",
+  "name": "Vue",
+  "version_selector": "3.x",
+  "authority": "official",
+  "reviewed_at": "2026-09-08",
+  "description": "Vue-specific architecture guidance. Vue deliberately avoids prescribing one universal application folder architecture, so this profile only records conventions supported by official Vue documentation.",
+  "composes_with": ["tooling/vite/current", "ecosystem/pinia/3", "ecosystem/vue-router/current"],
+  "rules": [
+    {
+      "id": "vue.composables.logical-concerns",
+      "title": "Extract composables around logical concerns",
+      "rule_type": "organization",
+      "severity": "recommendation",
+      "enforceability": "heuristic",
+      "authority": "official",
+      "summary": "As component complexity grows, extract logical concerns into composables rather than keeping large components monolithic.",
+      "source_refs": ["vue.composables"],
+      "constraints": {
+        "preferred_abstraction": "composable",
+        "applies_when": "component-logic-is-large-or-reusable"
+      }
+    },
+    {
+      "id": "vue.no-universal-folder-dogma",
+      "title": "Do not treat one folder layout as a Vue requirement",
+      "rule_type": "organization",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "official",
+      "summary": "Vue's official style guide is Vue-code focused and explicitly allows mindful deviations, so application-layer folder structure should come from composed ecosystem or Harness architecture profiles rather than being presented as a Vue mandate.",
+      "source_refs": ["vue.style-guide"],
+      "constraints": {
+        "forbid_claim": "framework-mandates-services-stores-views-layout"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "vue.composables",
+      "title": "Composables | Vue.js",
+      "url": "https://vuejs.org/guide/reusability/composables",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Official guidance describes composables as reusable/organizational units and compares extracted composables to component-scoped services."
+    },
+    {
+      "id": "vue.style-guide",
+      "title": "Style Guide | Vue.js",
+      "url": "https://vuejs.org/style-guide/",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Official Vue-specific style guide; it explicitly notes that no style guide is ideal for every team/project."
+    }
+  ]
+}
