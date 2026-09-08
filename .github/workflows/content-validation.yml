@@ -15,3 +15,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate self-hosting contract and catalog
         run: python3 .github/scripts/validate_catalog.py
+      - name: Validate architecture registry
+        run: python3 .github/scripts/validate_architecture_registry.py
