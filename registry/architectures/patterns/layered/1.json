@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "pattern/layered/1",
+  "kind": "pattern",
+  "name": "Layered architecture",
+  "version_selector": "1",
+  "authority": "harness",
+  "reviewed_at": "2026-09-08",
+  "description": "Harness-owned dependency direction for presentation, application, domain, infrastructure and shared layers.",
+  "composes_with": ["framework/vue/3", "framework/nuxt/4", "framework/angular/current", "pattern/dependency-hygiene/1"],
+  "rules": [
+    {
+      "id": "layered.presentation-direction",
+      "title": "Presentation depends inward",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Presentation may depend on application, domain and shared code, but not infrastructure implementation details.",
+      "source_refs": ["harness.layered"],
+      "constraints": {
+        "from": "presentation/**",
+        "forbid_to": ["infrastructure/**"]
+      }
+    },
+    {
+      "id": "layered.application-direction",
+      "title": "Application depends on domain and shared",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Application orchestration must not depend on presentation or concrete infrastructure layers.",
+      "source_refs": ["harness.layered"],
+      "constraints": {
+        "from": "application/**",
+        "forbid_to": ["presentation/**", "infrastructure/**"]
+      }
+    },
+    {
+      "id": "layered.domain-independent",
+      "title": "Keep the domain independent",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Domain code must not depend on presentation, application orchestration or infrastructure implementation layers.",
+      "source_refs": ["harness.layered"],
+      "constraints": {
+        "from": "domain/**",
+        "forbid_to": ["presentation/**", "application/**", "infrastructure/**"]
+      }
+    },
+    {
+      "id": "layered.infrastructure-inward",
+      "title": "Infrastructure implements inward contracts",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Infrastructure may depend on domain/shared contracts but must not depend on presentation or application orchestration.",
+      "source_refs": ["harness.layered"],
+      "constraints": {
+        "from": "infrastructure/**",
+        "forbid_to": ["presentation/**", "application/**"]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "harness.layered",
+      "title": "Agentic Harness layered architecture pattern",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/tree/main/registry/architectures",
+      "authority": "harness",
+      "reviewed_at": "2026-09-08",
+      "notes": "Harness-owned dependency-direction contract. Projects can select other profiles or declare explicit scoped exceptions when this model does not fit."
+    }
+  ]
+}
