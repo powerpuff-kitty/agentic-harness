@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "pattern/feature-first/1",
+  "kind": "pattern",
+  "name": "Feature-first",
+  "version_selector": "1",
+  "authority": "harness",
+  "reviewed_at": "2026-09-08",
+  "description": "Harness architecture pattern that groups code by product/domain feature and keeps feature internals isolated behind explicit public boundaries.",
+  "composes_with": ["framework/vue/3", "framework/angular/current", "framework/nuxt/4"],
+  "rules": [
+    {
+      "id": "feature-first.group-by-feature",
+      "title": "Group feature-owned code together",
+      "rule_type": "organization",
+      "severity": "recommendation",
+      "enforceability": "heuristic",
+      "authority": "harness",
+      "summary": "Prefer feature/domain ownership over a growing set of global technical buckets once the project is large enough to benefit from explicit feature boundaries.",
+      "source_refs": ["harness.feature-first"],
+      "constraints": {
+        "preferred_roots": ["features", "domains", "modules"],
+        "feature_local_categories": ["components", "api", "services", "stores", "composables", "types", "tests"]
+      }
+    },
+    {
+      "id": "feature-first.no-cross-feature-internals",
+      "title": "Do not import another feature's internals directly",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Cross-feature dependencies should use an explicit public interface rather than reaching into another feature's internal files.",
+      "source_refs": ["harness.feature-first"],
+      "constraints": {
+        "feature_pattern": "features/<feature>/**",
+        "cross_feature_internal_imports": "forbidden",
+        "public_interface_names": ["index.ts", "index.js", "public.ts", "public.js"]
+      }
+    },
+    {
+      "id": "feature-first.shared-not-dumping-ground",
+      "title": "Keep shared code ownership-neutral",
+      "rule_type": "ownership",
+      "severity": "warning",
+      "enforceability": "heuristic",
+      "authority": "harness",
+      "summary": "Shared modules should contain genuinely reusable ownership-neutral code rather than feature-specific logic moved out to bypass boundaries.",
+      "source_refs": ["harness.feature-first"],
+      "constraints": {
+        "shared_roots": ["shared", "common"],
+        "must_not_depend_on_feature_internals": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "harness.feature-first",
+      "title": "Agentic Harness feature-first architecture pattern",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/tree/main/registry/architectures",
+      "authority": "harness",
+      "reviewed_at": "2026-09-08",
+      "notes": "Harness-owned pattern. Framework-specific profiles may strengthen, weaken or supersede its recommendations where official guidance differs."
+    }
+  ]
+}
