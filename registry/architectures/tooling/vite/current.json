@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "tooling/vite/current",
+  "kind": "tooling",
+  "name": "Vite",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-08",
+  "description": "Vite is modeled as build/development tooling, not as the authority for application-layer folder architecture.",
+  "composes_with": ["framework/vue/3"],
+  "rules": [
+    {
+      "id": "vite.role.build-tool",
+      "title": "Treat Vite as build tooling",
+      "rule_type": "tooling-role",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Vite provides a development server and production build pipeline; Agentic Harness must not infer services/stores/views or other application architecture merely from Vite usage.",
+      "source_refs": ["vite.getting-started"],
+      "constraints": {
+        "role": "build-tool",
+        "must_not_select_application_architecture": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "vite.getting-started",
+      "title": "Getting Started | Vite",
+      "url": "https://vite.dev/guide/",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Official documentation defines Vite around its development server, build command, plugins and configuration."
+    }
+  ]
+}
