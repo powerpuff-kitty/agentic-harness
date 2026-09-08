@@ -12,7 +12,7 @@
     {
       "id": "dependency.no-import-cycles",
       "title": "Do not create source import cycles",
-      "rule_type": "dependency-graph",
+      "rule_type": "dependency-boundary",
       "severity": "error",
       "enforceability": "deterministic",
       "authority": "harness",
