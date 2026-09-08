@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/design-genome.schema.json",
+  "title": "Agentic Harness Design Genome",
+  "description": "Versioned, project-owned design and identity contract used by analyzers, compilers, apps, and agents.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "identity", "rules", "sources"],
+  "properties": {
+    "format_version": {"type": "integer", "const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "version": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "enum": ["candidate", "approved", "deprecated"]},
+    "identity": {"$ref": "#/$defs/identity"},
+    "visual": {"$ref": "#/$defs/visual"},
+    "composition": {"$ref": "#/$defs/composition"},
+    "components": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/component"},
+      "default": []
+    },
+    "rules": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/rule"}
+    },
+    "examples": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/example"},
+      "default": []
+    },
+    "sources": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/source"}
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  },
+  "$defs": {
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principles"],
+      "properties": {
+        "purpose": {"type": "string"},
+        "audience": {"type": "array", "items": {"type": "string"}},
+        "principles": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "personality": {"type": "array", "items": {"type": "string"}},
+        "differentiation": {"type": "array", "items": {"type": "string"}},
+        "anti_patterns": {"type": "array", "items": {"type": "string"}},
+        "voice": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "token_sources": {"type": "array", "items": {"$ref": "#/$defs/reference"}},
+        "typography": {"type": "object", "additionalProperties": true},
+        "color": {"type": "object", "additionalProperties": true},
+        "spacing": {"type": "object", "additionalProperties": true},
+        "geometry": {"type": "object", "additionalProperties": true},
+        "imagery": {"type": "object", "additionalProperties": true},
+        "icons": {"type": "object", "additionalProperties": true},
+        "motion": {"type": "object", "additionalProperties": true},
+        "density": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "composition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hierarchy": {"type": "array", "items": {"type": "string"}},
+        "grids": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
+        "responsive": {"type": "array", "items": {"type": "string"}},
+        "surface_rules": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "status"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["approved", "candidate", "deprecated", "hidden"]},
+        "source": {"$ref": "#/$defs/reference"},
+        "variants": {"type": "array", "items": {"type": "string"}},
+        "states": {"type": "array", "items": {"type": "string"}},
+        "usage": {"type": "array", "items": {"type": "string"}},
+        "anti_patterns": {"type": "array", "items": {"type": "string"}},
+        "accessibility": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "importance", "statement"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "kind": {"type": "string", "enum": ["do", "dont", "caution", "info", "constraint"]},
+        "importance": {"type": "string", "enum": ["required", "recommended", "optional"]},
+        "statement": {"type": "string", "minLength": 1},
+        "reason": {"type": "string"},
+        "scope": {"$ref": "#/$defs/scope"},
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["reason"],
+            "properties": {
+              "scope": {"$ref": "#/$defs/scope"},
+              "reason": {"type": "string"}
+            },
+            "additionalProperties": false
+          }
+        },
+        "source_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "surfaces": {"type": "array", "items": {"type": "string"}},
+        "pages": {"type": "array", "items": {"type": "string"}},
+        "components": {"type": "array", "items": {"type": "string"}},
+        "states": {"type": "array", "items": {"type": "string"}},
+        "breakpoints": {"type": "array", "items": {"type": "string"}},
+        "modes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "example": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "decision", "source"],
+      "properties": {
+        "id": {"type": "string"},
+        "decision": {"type": "string", "enum": ["approved", "rejected", "reference"]},
+        "source": {"$ref": "#/$defs/reference"},
+        "rationale": {"type": "string"},
+        "scope": {"$ref": "#/$defs/scope"}
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type"],
+      "properties": {
+        "id": {"type": "string"},
+        "type": {"type": "string", "enum": ["project", "human", "analysis", "reference", "import", "generated"]},
+        "uri": {"type": "string"},
+        "hash": {"type": "string"},
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "notes": {"type": "string"}
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri"],
+      "properties": {
+        "uri": {"type": "string", "minLength": 1},
+        "version": {"type": "string"},
+        "hash": {"type": "string"}
+      }
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/design-analysis.schema.json",
+  "title": "Agentic Harness Design Analysis",
+  "description": "Unified analysis artifact for deterministic static/runtime evidence, optional AI interpretation, and human review.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "source", "domains", "findings", "checks"],
+  "properties": {
+    "format_version": {"type": "integer", "const": 1},
+    "analysis_id": {"type": "string"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "source": {"$ref": "#/$defs/source"},
+    "domains": {
+      "type": "object",
+      "additionalProperties": {"$ref": "#/$defs/domain"}
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "reviews": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/review"},
+      "default": []
+    },
+    "checks": {"$ref": "#/$defs/checks"},
+    "metadata": {"type": "object", "additionalProperties": true}
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {"type": "string", "enum": ["repository", "website", "artifact", "design-tool", "other"]},
+        "uri": {"type": "string"},
+        "revision": {"type": "string"},
+        "analyzer": {"type": "string"},
+        "analyzer_version": {"type": "string"},
+        "environment": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "measurements": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/measurement"},
+          "default": []
+        },
+        "summary": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "metric", "value", "source_type"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "metric": {"type": "string", "minLength": 1},
+        "value": {},
+        "unit": {"type": "string"},
+        "source_type": {"type": "string", "enum": ["static", "runtime", "import", "human", "ai"]},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "domain", "classification", "severity", "statement", "source_type"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "domain": {"type": "string", "minLength": 1},
+        "classification": {
+          "type": "string",
+          "enum": ["observation", "inference", "violation", "outlier", "conflict", "recommendation", "unknown"]
+        },
+        "severity": {"type": "string", "enum": ["critical", "high", "medium", "low", "info"]},
+        "statement": {"type": "string", "minLength": 1},
+        "source_type": {"type": "string", "enum": ["static", "runtime", "import", "human", "ai"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "measurement_refs": {"type": "array", "items": {"type": "string"}},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/evidence"}},
+        "scope": {"$ref": "#/$defs/scope"},
+        "recommendation": {"type": "string"}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {"type": "string"},
+        "selector": {"type": "string"},
+        "component": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1},
+        "uri": {"type": "string"},
+        "viewport": {"type": "string"},
+        "data": {"type": "object", "additionalProperties": true}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "surfaces": {"type": "array", "items": {"type": "string"}},
+        "pages": {"type": "array", "items": {"type": "string"}},
+        "components": {"type": "array", "items": {"type": "string"}},
+        "states": {"type": "array", "items": {"type": "string"}},
+        "breakpoints": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "decision", "reviewer_type"],
+      "properties": {
+        "finding_id": {"type": "string"},
+        "decision": {"type": "string", "enum": ["accepted", "rejected", "edited", "deferred"]},
+        "reviewer_type": {"type": "string", "enum": ["human", "policy", "tool"]},
+        "rationale": {"type": "string"},
+        "reviewed_at": {"type": "string", "format": "date-time"}
+      }
+    },
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "not_checked"],
+      "properties": {
+        "performed": {"type": "array", "items": {"type": "string"}},
+        "not_checked": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
