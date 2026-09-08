@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "id": "framework/angular/current",
+  "kind": "framework",
+  "name": "Angular",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-08",
+  "description": "Current Angular style guidance strongly favors feature-oriented organization over top-level code-type buckets.",
+  "composes_with": ["pattern/feature-first/1"],
+  "rules": [
+    {
+      "id": "angular.organize-by-feature",
+      "title": "Organize application code by feature areas",
+      "rule_type": "organization",
+      "severity": "warning",
+      "enforceability": "heuristic",
+      "authority": "official",
+      "summary": "Angular recommends subdirectories based on application features or common themes.",
+      "source_refs": ["angular.style-guide"],
+      "constraints": {
+        "preferred": "feature-first",
+        "application_root": "src/"
+      }
+    },
+    {
+      "id": "angular.avoid-global-code-type-buckets",
+      "title": "Avoid top-level code-type buckets",
+      "rule_type": "organization",
+      "severity": "warning",
+      "enforceability": "heuristic",
+      "authority": "official",
+      "summary": "Angular explicitly advises against organizing application directories primarily as components, directives and services buckets.",
+      "source_refs": ["angular.style-guide"],
+      "constraints": {
+        "discouraged_top_level_directories": ["components", "directives", "services"]
+      }
+    },
+    {
+      "id": "angular.one-concept-per-file",
+      "title": "Prefer one concept per file",
+      "rule_type": "file-placement",
+      "severity": "recommendation",
+      "enforceability": "heuristic",
+      "authority": "official",
+      "summary": "Angular recommends focusing source files on a single concept.",
+      "source_refs": ["angular.style-guide"],
+      "constraints": {
+        "preferred_granularity": "one-concept-per-file"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "angular.style-guide",
+      "title": "Style Guide • Angular",
+      "url": "https://angular.dev/style-guide",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Current official guide recommends feature-area organization and explicitly discourages directories organized by code type such as components/directives/services."
+    }
+  ]
+}
