@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/design-task.schema.json",
+  "title": "Agentic Harness Design Task",
+  "description": "Structured task input for deterministic selection and compilation of design context.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "id", "objective", "mode"],
+  "properties": {
+    "format_version": {"type": "integer", "const": 1},
+    "id": {"type": "string", "minLength": 1},
+    "objective": {"type": "string", "minLength": 1},
+    "operation": {"type": "string", "enum": ["create", "change", "fix", "review", "reproduce"]},
+    "mode": {"type": "string", "enum": ["explore", "extend", "reproduce", "revise"]},
+    "surface": {"type": "string"},
+    "pages": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "components": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "states": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "breakpoints": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "requirements": {"type": "array", "items": {"type": "string"}},
+    "non_goals": {"type": "array", "items": {"type": "string"}},
+    "implementation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "framework": {"type": "string"},
+        "language": {"type": "string"},
+        "styling": {"type": "string"},
+        "target_paths": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "required_checks": {"type": "array", "items": {"type": "string"}},
+        "required_states": {"type": "array", "items": {"type": "string"}},
+        "required_viewports": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "metadata": {"type": "object", "additionalProperties": true}
+  }
+}
