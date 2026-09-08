@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "pattern/dependency-hygiene/1",
+  "kind": "pattern",
+  "name": "Dependency hygiene",
+  "version_selector": "1",
+  "authority": "harness",
+  "reviewed_at": "2026-09-08",
+  "description": "Framework-neutral dependency graph rules that protect maintainability and deterministic architecture analysis.",
+  "composes_with": ["framework/vue/3", "framework/nuxt/4", "framework/angular/current", "pattern/feature-first/1", "pattern/layered/1"],
+  "rules": [
+    {
+      "id": "dependency.no-import-cycles",
+      "title": "Do not create source import cycles",
+      "rule_type": "dependency-graph",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Local source modules should form an acyclic dependency graph at the module level unless an explicit narrow exception is documented.",
+      "source_refs": ["harness.dependency-hygiene"],
+      "constraints": {
+        "cycles": "forbidden",
+        "scope": "local-source-imports"
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "harness.dependency-hygiene",
+      "title": "Agentic Harness dependency hygiene pattern",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/tree/main/registry/architectures",
+      "authority": "harness",
+      "reviewed_at": "2026-09-08",
+      "notes": "Harness-owned architecture invariant used for deterministic import-graph validation."
+    }
+  ]
+}
