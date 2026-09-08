@@ -20,3 +20,7 @@ decisions:
     title: Publish complete materialized catalog variants
     status: accepted
     file: ADR-005-materialized-variants.md
+  - id: ADR-006
+    title: Add a repository-native design intelligence contract
+    status: accepted
+    file: ADR-006-design-intelligence-contract.md
