@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "id": "framework/nuxt/4",
+  "kind": "framework",
+  "name": "Nuxt",
+  "version_selector": "4.x",
+  "authority": "official",
+  "reviewed_at": "2026-09-08",
+  "description": "Nuxt 4 has an explicit filesystem architecture and enforceable app/server/shared boundaries.",
+  "composes_with": ["framework/vue/3", "tooling/vite/current"],
+  "rules": [
+    {
+      "id": "nuxt.app.path-role",
+      "title": "Use app/ for Vue application code",
+      "rule_type": "path-role",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Nuxt 4 uses app/ as the main application directory and defines conventional subdirectories such as components, composables, layouts, middleware, pages, plugins and utils.",
+      "source_refs": ["nuxt.directory-structure"],
+      "constraints": {
+        "path": "app/",
+        "role": "vue-application",
+        "known_children": ["assets", "components", "composables", "layouts", "middleware", "pages", "plugins", "utils"]
+      }
+    },
+    {
+      "id": "nuxt.server.path-role",
+      "title": "Use server/ for Nitro server code",
+      "rule_type": "path-role",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Nuxt server routes, APIs, middleware, plugins and server utilities belong under server/.",
+      "source_refs": ["nuxt.directory-structure", "nuxt.server"],
+      "constraints": {
+        "path": "server/",
+        "role": "nitro-server",
+        "known_children": ["api", "routes", "middleware", "plugins", "utils"]
+      }
+    },
+    {
+      "id": "nuxt.boundary.app-server",
+      "title": "Keep Vue app and Nitro server imports separated",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Server routes/utilities must not import app-only Vue code, and app code must not import server-only code.",
+      "source_refs": ["nuxt.server"],
+      "constraints": {
+        "forbid": [
+          {"from": "server/**", "to": "app/**"},
+          {"from": "app/**", "to": "server/**"}
+        ]
+      }
+    },
+    {
+      "id": "nuxt.shared.neutral-boundary",
+      "title": "Keep shared/ runtime-neutral",
+      "rule_type": "dependency-boundary",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Code under shared/ is usable by both Vue and Nitro and therefore must not import Vue app or Nitro server code.",
+      "source_refs": ["nuxt.shared"],
+      "constraints": {
+        "from": "shared/**",
+        "forbid_to": ["app/**", "server/**"]
+      }
+    },
+    {
+      "id": "nuxt.layers.modular-architecture",
+      "title": "Use layers for large modular/domain-oriented Nuxt applications",
+      "rule_type": "module-boundary",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "official",
+      "summary": "Nuxt layers are explicitly suitable for modular architectures, reusable UI/configuration and Domain-Driven Design in larger codebases.",
+      "source_refs": ["nuxt.layers"],
+      "constraints": {
+        "path": "layers/",
+        "use_cases": ["modular-architecture", "ddd", "feature-modules", "reusable-ui"]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "nuxt.directory-structure",
+      "title": "Nuxt Directory Structure v4",
+      "url": "https://nuxt.com/docs/4.x/directory-structure/",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Defines the Nuxt 4 app, server, shared, layers, modules, public and test structure."
+    },
+    {
+      "id": "nuxt.server",
+      "title": "server · Nuxt Directory Structure v4",
+      "url": "https://nuxt.com/docs/4.x/directory-structure/server",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Explicitly forbids mixing app-only Vue code and server-only Nitro code."
+    },
+    {
+      "id": "nuxt.shared",
+      "title": "shared · Nuxt Directory Structure v4",
+      "url": "https://nuxt.com/docs/4.x/directory-structure/shared",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Defines shared code as runtime-neutral and states it cannot import Vue or Nitro code."
+    },
+    {
+      "id": "nuxt.layers",
+      "title": "layers · Nuxt Directory Structure v4",
+      "url": "https://nuxt.com/docs/4.x/directory-structure/layers",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Documents layers for reusable code, separation of concerns, feature modules and DDD-style organization."
+    }
+  ]
+}

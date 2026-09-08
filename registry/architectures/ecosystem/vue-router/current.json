@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "ecosystem/vue-router/current",
+  "kind": "ecosystem",
+  "name": "Vue Router",
+  "version_selector": "4.x/5.x",
+  "authority": "ecosystem-official",
+  "reviewed_at": "2026-09-08",
+  "description": "Routing-specific application concepts from official Vue Router documentation. This profile establishes route-component responsibilities without forcing a specific `views/` or `pages/` folder name.",
+  "composes_with": ["framework/vue/3"],
+  "rules": [
+    {
+      "id": "vue-router.route-components",
+      "title": "Model routed screens as route components",
+      "rule_type": "organization",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "ecosystem-official",
+      "summary": "Vue Router maps routes to components; Harness may recognize route-level components/views but must not claim Vue Router mandates a particular folder name.",
+      "source_refs": ["vue-router.guide"],
+      "constraints": {
+        "concept": "route-component",
+        "folder_name_required": false
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "vue-router.guide",
+      "title": "Getting Started | Vue Router",
+      "url": "https://router.vuejs.org/guide/",
+      "authority": "ecosystem-official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Official Vue Router guide documents route components, nested routes, views, file-based routing and related navigation concepts."
+    }
+  ]
+}

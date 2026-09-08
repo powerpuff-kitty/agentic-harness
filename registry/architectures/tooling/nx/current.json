@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "tooling/nx/current",
+  "kind": "tooling",
+  "name": "Nx",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-08",
+  "description": "Nx provides ecosystem-native enforcement mechanisms for architectural/module boundaries using project tags and dependency constraints.",
+  "composes_with": [],
+  "rules": [
+    {
+      "id": "nx.enforce-module-boundaries",
+      "title": "Express project dependency constraints declaratively",
+      "rule_type": "module-boundary",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Nx can enforce which tagged projects are allowed to depend on which other tagged projects, including import checks in JavaScript/TypeScript linting.",
+      "source_refs": ["nx.module-boundaries"],
+      "constraints": {
+        "adapter": "@nx/enforce-module-boundaries",
+        "supports": ["project-tags", "dependency-constraints", "typescript-imports", "package-dependencies"]
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "nx.module-boundaries",
+      "title": "Enforce Module Boundaries | Nx",
+      "url": "https://nx.dev/docs/features/enforce-module-boundaries",
+      "authority": "official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Official Nx documentation describes declarative architectural constraints and lint integration."
+    }
+  ]
+}
