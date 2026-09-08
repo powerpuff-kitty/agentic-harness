@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "id": "ecosystem/pinia/3",
+  "kind": "ecosystem",
+  "name": "Pinia",
+  "version_selector": "3.x",
+  "authority": "ecosystem-official",
+  "reviewed_at": "2026-09-08",
+  "description": "Pinia store organization conventions supported by official documentation.",
+  "composes_with": ["framework/vue/3"],
+  "rules": [
+    {
+      "id": "pinia.store.separate-files",
+      "title": "Define stores in separate files",
+      "rule_type": "file-placement",
+      "severity": "recommendation",
+      "enforceability": "heuristic",
+      "authority": "ecosystem-official",
+      "summary": "Pinia recommends defining each store in a different file.",
+      "source_refs": ["pinia.defining-store"],
+      "constraints": {
+        "concept": "store",
+        "preferred_granularity": "one-store-per-file"
+      }
+    },
+    {
+      "id": "pinia.store.ownership",
+      "title": "Keep store-owned state inside the store abstraction",
+      "rule_type": "ownership",
+      "severity": "warning",
+      "enforceability": "heuristic",
+      "authority": "ecosystem-official",
+      "summary": "Store state, getters and actions should remain part of the store abstraction rather than exposing unrelated injected/router objects as store-owned state.",
+      "source_refs": ["pinia.defining-store"],
+      "constraints": {
+        "owner": "store",
+        "avoid_returning_unowned_injected_objects": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "pinia.defining-store",
+      "title": "Defining a Store | Pinia",
+      "url": "https://pinia.vuejs.org/core-concepts/",
+      "authority": "ecosystem-official",
+      "reviewed_at": "2026-09-08",
+      "notes": "Official Pinia v3 documentation recommends separate files for stores and documents store state/getter/action ownership."
+    }
+  ]
+}
