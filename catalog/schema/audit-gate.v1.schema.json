@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/audit-gate.v1.schema.json",
+  "title": "Audit gate result v1",
+  "type": "object",
+  "required": [
+    "format_version",
+    "kind",
+    "passed",
+    "failures"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "audit-gate"
+    },
+    "passed": {
+      "type": "boolean"
+    },
+    "failures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

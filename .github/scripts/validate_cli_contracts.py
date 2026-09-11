@@ -19,3 +19,17 @@ for key, value in [('overall', 101), ('scores', {}), ('scores', {'testing': 'goo
     assert not validator.is_valid(invalid), (key, value)
 assert not validator.is_valid({})
 print('CLI schemas and audit compatibility fixtures passed')
+
+for name, fixture, invalid_field in [
+    ('audit-gate.v1.schema.json', {'format_version': 1, 'kind': 'audit-gate', 'passed': False, 'failures': ['incomplete evidence']}, 'passed'),
+    ('audit-comparison.v1.schema.json', {'format_version': 1, 'kind': 'audit-comparison', 'overall': {'before': None, 'after': 80, 'delta': None}, 'scores': {'testing': {'before': 50, 'after': 80, 'delta': 30}}}, 'overall'),
+]:
+    validator = Draft202012Validator(json.loads((root / 'catalog/schema' / name).read_text()))
+    validator.validate(fixture)
+    invalid = copy.deepcopy(fixture)
+    invalid[invalid_field] = 'invalid'
+    assert not validator.is_valid(invalid), name
+    invalid = copy.deepcopy(fixture)
+    del invalid['kind']
+    assert not validator.is_valid(invalid), name
+print('Gate and comparison compatibility fixtures passed')

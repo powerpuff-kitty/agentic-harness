@@ -12,6 +12,8 @@ The unversioned legacy codebase-audit schema remains available unchanged. Reader
 
 `catalog/schema/design-system-discovery.schema.json` describes optional `.agentic/design-system.json` configuration. Roots and exception entries are repository-relative paths. Required capabilities are explicit; static native-control observations are suggestions. Aliases map a required capability name to an observed component capability. These observations do not prove visual, accessibility, or runtime conformance.
 
+`audit-comparison.v1.schema.json` and `audit-gate.v1.schema.json` define comparison and policy result envelopes. Both add `format_version: 1` and a `kind` discriminator to the existing result fields. Comparison values and deltas retain explicit nulls for unknown metrics; gate results distinguish passed policy from textual failure reasons. Consumers must allow additive fields within a supported version.
+
 ## Commands and errors
 
 The installed `ah` executable owns composition, validation, audit/gate, architecture, static design, and experimental agentic inspection/preview commands. An upstream source checkout, Rust, network, and companion executable must not be runtime prerequisites. `--version` reports package and pinned source identities.
