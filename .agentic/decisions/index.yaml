@@ -24,3 +24,7 @@ decisions:
     title: Add a repository-native design intelligence contract
     status: accepted
     file: ADR-006-design-intelligence-contract.md
+  - id: ADR-007
+    title: Use MIT for authored CLI, catalog and agent content
+    status: accepted
+    file: ADR-007-mit-licensing.md
