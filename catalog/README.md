@@ -13,3 +13,5 @@ catalog/
 ```
 
 Each public variant is complete and directly browsable. Metadata may describe inheritance, but users and tools do not need to mentally compose hidden overlays to understand the resulting project.
+
+CLI evidence contracts include `schema/codebase-audit.v2.schema.json`, `schema/agentic-readiness.v2.schema.json`, and `schema/design-system-discovery.schema.json`. See [CLI contract semantics](../.agentic/docs/project/cli-contracts.md).

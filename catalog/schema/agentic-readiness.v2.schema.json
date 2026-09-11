@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/agentic-readiness.v2.schema.json",
+  "title": "Agentic inspection v2",
+  "type": "object",
+  "required": [
+    "format_version",
+    "kind",
+    "universal_score",
+    "structural_indicator",
+    "score_kind",
+    "scores",
+    "findings",
+    "checks"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 2
+    },
+    "kind": {
+      "const": "agentic-readiness"
+    },
+    "universal_score": {
+      "type": "null"
+    },
+    "structural_indicator": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "score_kind": {
+      "type": "string"
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "dimension",
+          "message"
+        ],
+        "properties": {
+          "severity": {
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low",
+              "info"
+            ]
+          },
+          "dimension": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "object"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "required": [
+        "performed",
+        "not_checked"
+      ],
+      "properties": {
+        "performed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "not_checked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

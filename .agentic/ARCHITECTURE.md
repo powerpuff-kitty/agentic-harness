@@ -121,3 +121,12 @@ Legacy root-level context is read for compatibility. `ah migrate` performs an in
 - Design analysis distinguishes measurement from inference and recommendation.
 - The Design Genome is project-owned truth only after review/approval.
 - CLI and app parity is defined by canonical contracts and fixtures, not by sharing a frontend or invoking one product from the other.
+
+## Authored-source licensing
+
+The CLI, canonical catalog/registry and agent procedures use MIT for their authored
+content, as accepted in [ADR-007](decisions/ADR-007-mit-licensing.md). Third-party
+licenses remain intact. Complete variants carry `.agentic/THIRD_PARTY_NOTICES.md`
+so copying Harness material retains its attribution without assigning a license
+to the user's independently authored application. Composition preserves existing
+project license files and records the notice in its installed-content checksums.

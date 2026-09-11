@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/audit-comparison.v1.schema.json",
+  "title": "Audit comparison result v1",
+  "type": "object",
+  "required": [
+    "format_version",
+    "kind",
+    "overall",
+    "scores"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "audit-comparison"
+    },
+    "overall": {
+      "type": "object",
+      "required": [
+        "before",
+        "after",
+        "delta"
+      ],
+      "properties": {
+        "before": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "after": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "delta": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -100,
+          "maximum": 100
+        }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "before",
+          "after",
+          "delta"
+        ],
+        "properties": {
+          "before": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "after": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0,
+            "maximum": 100
+          },
+          "delta": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": -100,
+            "maximum": 100
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,199 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/codebase-audit.v2.schema.json",
+  "title": "Codebase audit v2: evidence and explicit unknowns",
+  "type": "object",
+  "required": [
+    "format_version",
+    "kind",
+    "overall",
+    "scores",
+    "findings",
+    "checks"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 2
+    },
+    "kind": {
+      "const": "codebase-audit"
+    },
+    "overall": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "scores": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": [
+          "number",
+          "null"
+        ],
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "required": [
+        "prototype",
+        "startup",
+        "production",
+        "critical"
+      ],
+      "properties": {
+        "prototype": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "startup": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "production": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "critical": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        }
+      }
+    },
+    "target_maturity": {
+      "enum": [
+        "prototype",
+        "startup",
+        "production",
+        "critical",
+        "beta",
+        "unknown"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "severity",
+          "dimension",
+          "message"
+        ],
+        "properties": {
+          "severity": {
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low",
+              "info"
+            ]
+          },
+          "dimension": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": [
+                "string",
+                "object"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "object",
+      "required": [
+        "performed",
+        "not_checked"
+      ],
+      "properties": {
+        "performed": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "not_checked": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "scan": {
+      "type": "object",
+      "required": [
+        "complete",
+        "errors"
+      ],
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "architecture": {
+      "type": "object",
+      "required": [
+        "compliance"
+      ],
+      "properties": {
+        "compliance": {
+          "type": "object",
+          "required": [
+            "deterministic_errors",
+            "passed"
+          ],
+          "properties": {
+            "deterministic_errors": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "passed": {
+              "type": "boolean"
+            },
+            "complete": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

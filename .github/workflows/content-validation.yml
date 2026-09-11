@@ -17,3 +17,7 @@ jobs:
         run: python3 .github/scripts/validate_catalog.py
       - name: Validate architecture registry
         run: python3 .github/scripts/validate_architecture_registry.py
+      - name: Validate CLI evidence contracts
+        run: |
+          python3 -m pip install jsonschema==4.26.0
+          python3 .github/scripts/validate_cli_contracts.py

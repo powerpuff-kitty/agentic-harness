@@ -127,3 +127,10 @@ Skills can explain how to work but cannot silently redefine project truth or pol
 ## Contributions
 
 Start with [`CONTRIBUTING.md`](CONTRIBUTING.md), the relevant ADR/current truth, and catalog validation. Good contributions include clearer schemas, safer migration fixtures, additional deterministic checks, improved agent procedures in the agents repository, and narrowly scoped project variants.
+
+## License
+
+Authored code and content are available under the [MIT License](LICENSE).
+Third-party material retains its existing licenses and attribution requirements.
+Copied Harness templates and skills retain their MIT notice; independently
+written application code may use its own license.

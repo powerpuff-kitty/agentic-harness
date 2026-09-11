@@ -1,0 +1,25 @@
+{
+  "format_version": 2,
+  "kind": "codebase-audit",
+  "overall": null,
+  "scores": {
+    "testing": null,
+    "architecture": 75
+  },
+  "readiness": {
+    "prototype": null,
+    "startup": null,
+    "production": null,
+    "critical": null
+  },
+  "findings": [],
+  "checks": {
+    "performed": [
+      "source import graph"
+    ],
+    "not_checked": [
+      "test execution",
+      "runtime performance"
+    ]
+  }
+}

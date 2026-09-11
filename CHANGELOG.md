@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- License authored content under MIT and retain copied Harness attribution without licensing generated application code.
+
 - Continue beta validation, migration fixtures, release hardening, and ecosystem compatibility work.
 
 ## 0.3.0-beta.1 - 2026-09-04
