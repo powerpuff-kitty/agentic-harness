@@ -36,4 +36,5 @@ for name, fixture, invalid_field in [
     assert not validator.is_valid(invalid), name
 print('Gate and comparison compatibility fixtures passed')
 
-subprocess.run([sys.executable, str(root / '.github/scripts/validate_check_contracts.py')], check=True)
+for script in ['validate_check_contracts.py', 'validate_execution_contracts.py']:
+    subprocess.run([sys.executable, str(root / '.github/scripts' / script)], check=True)
