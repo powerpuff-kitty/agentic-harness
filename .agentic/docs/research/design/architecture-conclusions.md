@@ -10,7 +10,7 @@ Measure what can be measured without AI before asking an AI to interpret it. Sta
 
 ## Design Compiler
 
-The Design Genome should compile deterministically into multiple targets. Natural-language prompts are one backend, not the canonical artifact. Other targets can include DTCG/JSON, CSS/Tailwind-style tokens, implementation briefs, documentation, QA manifests, component contracts, and MCP/context bundles.
+The Design Genome should compile deterministically into multiple targets. Natural-language prompts are one backend, not the canonical artifact. Other targets can include DTCG/JSON, CSS/Tailwind-style tokens, implementation briefs, documentation, QA manifests, component contracts, and MCP/context bundles. These are architectural targets, not a statement that every backend is implemented.
 
 Same inputs + same compiler/schema version should produce equivalent normalized output.
 
@@ -28,9 +28,9 @@ Routine implementation must not silently become redesign.
 
 External screenshots, flows, datasets, and commercial services are evidence providers. Providers need capability/rights metadata for search, indexing, retention, redistribution, benchmark/training use, authentication, and cost. Research observations require review before they can influence canonical product/design truth.
 
-## CLI and app parity
+## Artifact interoperability
 
-`agentic-harness-cli` and `agentic-harness-app` are separate products/surfaces. They should implement equivalent canonical operations and artifact semantics without the web app shelling out to the CLI binary or duplicating project truth. Shared schemas/fixtures define parity.
+Canonical schemas, shared fixtures and equivalent normalized outputs define interoperability. Neither a particular implementation stack nor an interface should become a competing source of design truth. Public documentation describes contracts and approved public capabilities, not internal consumer details.
 
 ## Reproducibility boundary
 

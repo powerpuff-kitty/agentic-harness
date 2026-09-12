@@ -12,7 +12,7 @@ For external claims, record the source, date reviewed, and whether the statement
 
 - [`competitors-and-tools.md`](competitors-and-tools.md) — design-context, extraction, generation, and reference products reviewed.
 - [`datasets-and-research-sources.md`](datasets-and-research-sources.md) — open/free UI datasets and current-reference sources.
-- [`architecture-conclusions.md`](architecture-conclusions.md) — conclusions that shaped the Design Genome, analyzer, compiler, research-provider model, and CLI/app parity.
+- [`architecture-conclusions.md`](architecture-conclusions.md) — conclusions that shaped the Design Genome, analyzer, compiler, research-provider model, and artifact interoperability.
 - [`v0.1-positioning.md`](v0.1-positioning.md) — first-iteration product slice and market position.
 
 ## Core research questions
@@ -25,4 +25,4 @@ For external claims, record the source, date reviewed, and whether the statement
 
 ## Last reviewed
 
-2026-09-08.
+External research: 2026-09-08. Public-scope wording clarified on 2026-09-12; external claims were not re-verified by that clarification.
