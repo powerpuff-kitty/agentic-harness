@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from validate_public_surface import validate_public_surface
+from validate_presentation_contract import validate_contract
 
 ROOT = Path(__file__).resolve().parents[2]
 errors = validate_public_surface(ROOT)
@@ -16,5 +17,6 @@ if errors:
         print(f"- {error}", file=sys.stderr)
     raise SystemExit(1)
 
+validate_contract(ROOT)
 # The original structural validator is retained byte-for-byte in this module.
 runpy.run_path(str(Path(__file__).with_name("_validate_catalog_structure.py")), run_name="__main__")

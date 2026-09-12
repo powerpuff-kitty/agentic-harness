@@ -28,3 +28,7 @@ decisions:
     title: Use MIT for authored CLI, catalog and agent content
     status: accepted
     file: ADR-007-mit-licensing.md
+  - id: ADR-008
+    title: Add an optional project presentation contract
+    status: proposed
+    file: ADR-008-project-presentation-contract.md
