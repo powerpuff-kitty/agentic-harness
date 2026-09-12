@@ -3,6 +3,8 @@
 import copy
 import json
 from pathlib import Path
+import subprocess
+import sys
 from jsonschema import Draft202012Validator
 root = Path(__file__).resolve().parents[2]
 for path in (root / 'catalog/schema').glob('*.schema.json'):
@@ -33,3 +35,5 @@ for name, fixture, invalid_field in [
     del invalid['kind']
     assert not validator.is_valid(invalid), name
 print('Gate and comparison compatibility fixtures passed')
+
+subprocess.run([sys.executable, str(root / '.github/scripts/validate_check_contracts.py')], check=True)
