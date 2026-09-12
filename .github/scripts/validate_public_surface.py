@@ -21,6 +21,16 @@ REPOSITORY_NAME = re.compile(
     r"(?<![a-z0-9_-])agentic-harness(?:-[a-z0-9]+)*(?![a-z0-9_-])",
     re.IGNORECASE,
 )
+# A known distribution filename is not another repository. Keep this narrow.
+PUBLIC_ARCHIVE = re.compile(
+    r'(?<![a-z0-9_-])' + re.escape('agentic-harness-agents')
+    + r'-v(?:[0-9]+\.[0-9]+\.[0-9]+(?:-(?:alpha|beta|rc)\.[0-9]+)?|\{version\})'
+    + r'\.zip(?:\.sha256)?(?![a-z0-9_.-])', re.IGNORECASE,
+)
+REPOSITORY_URL = re.compile(
+    r'(?<![a-z0-9_.-])(?:api\.github\.com/repos/|github\.com/)'
+    r'[a-z0-9_.-]+/(?P<repository>[a-z0-9_{}.-]+)', re.IGNORECASE,
+)
 EXCLUDED_DIRECTORIES = frozenset({".git", ".venv", "venv", "node_modules", "__pycache__"})
 MAX_TEXT_BYTES = 2 * 1024 * 1024
 START = "<!-- ah-quick-start -->"
@@ -29,9 +39,16 @@ END = "<!-- /ah-quick-start -->"
 
 def unapproved_references(value: str) -> bool:
     """Recognize literal names and one level of URL percent encoding."""
+    decoded = unquote(value)
+    # A version-looking archive in the repository-name URL segment is still forbidden.
+    for match in REPOSITORY_URL.finditer(decoded):
+        name = match['repository'].lower().removesuffix('.git')
+        if name.startswith('agentic-harness') and name not in PUBLIC_REPOSITORIES:
+            return True
+    normalized = PUBLIC_ARCHIVE.sub('agentic-harness-agents', decoded)
     return any(
         match.group().lower() not in PUBLIC_REPOSITORIES
-        for match in REPOSITORY_NAME.finditer(unquote(value))
+        for match in REPOSITORY_NAME.finditer(normalized)
     )
 
 
@@ -55,7 +72,6 @@ def reference_errors(root: Path) -> list[str]:
 
     for directory, dirs, filenames in os.walk(root, followlinks=False, onerror=walk_error):
         base = Path(directory)
-        # Check path names before exclusions so an identifier cannot hide there.
         for name in sorted(dirs + filenames):
             relative = (base / name).relative_to(root).as_posix()
             if unapproved_references(relative):
@@ -79,7 +95,6 @@ def reference_errors(root: Path) -> list[str]:
             try:
                 with path.open("rb") as source:
                     data = source.read(MAX_TEXT_BYTES + 1)
-                # Binary payloads are outside this text-only validator's scope.
                 if b"\x00" in data:
                     continue
                 if len(data) > MAX_TEXT_BYTES:
