@@ -40,9 +40,17 @@ END = "<!-- /ah-quick-start -->"
 def unapproved_references(value: str) -> bool:
     """Recognize literal names and one level of URL percent encoding."""
     decoded = unquote(value)
-    # A version-looking archive in the repository-name URL segment is still forbidden.
+    # Check repository URL segments before recognizing distribution filenames.
     for match in REPOSITORY_URL.finditer(decoded):
-        name = match['repository'].lower().removesuffix('.git')
+        name = match['repository'].lower()
+        suffix = decoded[match.end():]
+        # A single prose full stop is not a slug suffix. Do not strip internal
+        # dots, repeated dots or a dot followed by a URL path/query/fragment.
+        if name.endswith('.') and (
+            not suffix or suffix[0].isspace() or suffix[0] in '"\'`)]}>!,;:'
+        ):
+            name = name[:-1]
+        name = name.removesuffix('.git')
         if name.startswith('agentic-harness') and name not in PUBLIC_REPOSITORIES:
             return True
     normalized = PUBLIC_ARCHIVE.sub('agentic-harness-agents', decoded)
