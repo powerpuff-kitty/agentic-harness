@@ -11,5 +11,6 @@ This repository is a self-hosting Agentic Harness project and the canonical cata
 7. Preserve project-authored truth, keep changes scoped and reversible, and never expose secrets or perform destructive/release actions without the approvals in the manifest.
 8. Run catalog validation and relevant downstream tests before declaring a cross-repository change complete.
 9. State unresolved compatibility, migration, security, and validation gaps explicitly.
+10. Follow the [public-surface policy](.agentic/docs/project/public-surface.md) for files and collaboration metadata; never identify internal consumers in public content or fixtures.
 
 Vendor adapters must remain thin and point back to this file and `.agentic/`; they may not redefine canonical architecture.

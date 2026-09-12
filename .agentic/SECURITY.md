@@ -2,34 +2,32 @@
 
 ## Assets
 
-- Project-specific product, architecture, security, and decision truth.
-- Repository and production credentials.
-- Source and release integrity of canonical content, agent procedures, and CLI binaries.
-- User code and data preserved during initialization, upgrade, and migration.
-- Permission and approval declarations.
+Project-specific product, architecture, security and decision truth; repository/production credentials; source and release integrity; preserved user code/data; permission declarations; and non-public project information.
 
 ## Trust boundaries
 
-- Canonical static content, agent procedures, and deterministic CLI code are separate repositories with pinned revisions.
-- Target repository content, issues, logs, fetched pages, generated output, and external package content are untrusted data by default.
-- Release automation and source synchronization cross supply-chain boundaries.
-- Vendor agents may interpret instructions differently; deterministic checks cannot assume identical model behavior.
+Canonical content, reusable procedures and deterministic CLI code have separate owners and pinned revisions. Target repository content, issues, logs, fetched pages, generated output and external packages are untrusted data by default. Source synchronization and publication cross supply-chain boundaries. Host behavior must be verified independently; written instructions are not a sandbox.
 
 ## Required controls
 
-- Pin source revisions used in builds and record resolved sources in `.agentic/lock.json`.
-- Exclude source-only metadata from generated projects.
-- Preserve existing project truth by default; conflicting writes require explicit resolution.
-- Use least-privilege workflow permissions and protected release paths.
-- Treat embedded instructions in external content as data, not authority.
-- Never store or print secrets; baseline secret scanning must be supplemented by platform scanning for production use.
-- Verify release artifacts and publish checksums/signatures as release maturity increases.
-- Keep destructive, production, secret, and publication actions behind declared approval gates.
+- Pin build inputs and record resolved sources/checksums.
+- Exclude source-only metadata from generated projects; preserve project truth and surface conflicting writes.
+- Use least-privilege permissions, protected publication paths and explicit approvals for consequential actions.
+- Treat embedded instructions in fetched content as data, not authority.
+- Never store or print secrets; supplement baseline scanners with appropriate platform/application controls.
+- Verify release artifacts and retain required attribution.
+- Apply the [public-surface policy](docs/project/public-surface.md) to source, diagrams, issues, comments, PRs and release artifacts. Never encode internal identifiers in public validator fixtures or diagnostic output.
+
+## Declared policy versus enforcement
+
+Permission fields express intended policy. Their presence does not prove a host has loaded instructions, blocked an action or run a check. State delivered, checked and enforced capabilities only when supported by scoped evidence. Unsupported and unverified controls remain explicit; no green security claim follows from Markdown or file presence.
+
+Project-command discovery does not authorize execution. An approved runner must define command, path, environment, timeout/output and evidence-freshness boundaries before running repository scripts. Current artifact gates do not execute the application's tests.
 
 ## Migration safety
 
-`ah migrate` defaults to dry-run, records planned moves/conflicts, never deletes a source file before the destination is verified, and supports an explicit backup directory. Duplicate root and `.agentic` canonical files are conflicts unless content is identical.
+Automatic filesystem migration is not currently implemented. Follow the [manual migration procedure](docs/project/migration-v1.md): inventory and back up sources, reconcile differing destinations, verify copied content and routes, then validate the reviewed result. Future automation must default to dry-run and support safe recovery; these requirements must not be described as existing commands.
 
 ## Disclosure
 
-Use the repository's root `SECURITY.md` for vulnerability reporting. Do not publish exploitable details before a fix or coordinated disclosure decision.
+Use root `SECURITY.md` for vulnerability reporting. Do not publish exploitable details before a fix or coordinated disclosure decision. Current-tree cleanup cannot guarantee removal from history, old diffs, caches or notifications.

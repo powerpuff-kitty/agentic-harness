@@ -2,61 +2,48 @@
 
 ## Problem
 
-Coding agents often receive fragmented, duplicated, or stale project context. Repositories mix product truth, architecture, prompts, task state, security rules, and vendor-specific instructions without a clear precedence or deterministic validation model.
-
-AI-assisted UI development adds a related problem: agents can reproduce code patterns while gradually drifting away from a product's visual identity, component vocabulary, interaction rules, and accessibility expectations. Teams repeatedly restate design intent and still receive generic or inconsistent generated interfaces.
+Coding agents receive fragmented, duplicated or stale project context. Product truth, architecture, task state, security rules and vendor instructions often lack explicit precedence or reliable validation. AI-assisted interface changes can also drift from accepted identity, component vocabulary and interaction requirements.
 
 ## Users
 
-- Developers starting agent-assisted projects.
-- Teams upgrading existing repositories for coding-agent use.
-- Platform and security teams defining reusable rules and quality gates.
-- Coding agents that need compact routing, scoped context, safe permissions, and verifiable completion criteria.
-- Developers and small product teams using AI coding tools on existing user-facing products who need design consistency across generated changes.
+Developers and teams using coding agents on new or existing repositories; platform/security teams defining reusable rules; and contributors who need compact, scoped context with verifiable completion criteria.
 
-## Product
+## Public product boundary
 
-Agentic Harness provides:
+Agentic Harness comprises three public responsibilities:
 
-1. A clean target-project contract with `AGENTS.md` as the root router and `.agentic/` as canonical project context.
-2. A browsable catalog of complete project variants, packs, policies, profiles, presets, and schemas.
-3. Agent-facing skills and prompts in `agentic-harness-agents`.
-4. A native Rust `ah` CLI for initialization, migration, upgrades, audits, validation, ADR management, adapter synchronization, quality gates, and deterministic design-intelligence workflows.
-5. A separate `agentic-harness-app` web product that exposes equivalent canonical design operations through visual analysis, review, generation, comparison, and export workflows without making the CLI binary its implementation dependency.
+1. `agentic-harness`: project-context contracts, materialized context templates, packs, policies, profiles, presets, schemas and registries.
+2. `agentic-harness-agents`: reusable procedures and host-integration guidance, distributed separately from project truth.
+3. `agentic-harness-cli`: the Rust `ah` implementation for deterministic composition, validation, audit/artifact gates and experimental architecture/design inspection.
 
-### Design intelligence
+Public documentation describes approved public capabilities only. Follow [public-surface policy](docs/project/public-surface.md) for source, issues, PRs, diagrams and generated artifacts.
 
-The first design-intelligence release focuses on **Understand & Preserve**:
+## Current capability boundaries
 
-1. Analyze an existing project's measurable visual/design-system properties.
-2. Separate observed evidence from inference, recommendation, and unknowns.
-3. Review and preserve approved identity in a versioned Design Genome.
-4. Compile task-specific implementation context/prompts deterministically for any supported AI coding workflow.
-5. Re-analyze changes and report design-system/identity drift.
+Context templates do not contain application scaffolds, completed product decisions or evidence that an agent obeyed a policy. Installed structure, project configuration, check configuration and verified behavior are distinct.
 
-AI interpretation and design generation are optional layers. Deterministic analysis, artifact validation, and prompt/context compilation must remain useful without an API key where the required local inputs are available.
+The CLI command contract is maintained in `agentic-harness-cli/docs/cli-contracts.md`. Initialization, current-layout upgrades, contract validation and explicit artifact gates are implemented. Architecture/design analysis and agentic inspection remain experimental with declared coverage limits. Audit discovers checks but does not execute the project's test suite; unknown overall/readiness measurements remain null.
+
+Filesystem migration automation, ADR-creation commands, comprehensive native adapter synchronization and executed project-completion checks are planned work, not current CLI promises. Experimental model-profile migration preview is separate from filesystem migration.
+
+## Design intelligence
+
+The initial **Understand & Preserve** workflow aims to analyze measurable design evidence, review a candidate Design Genome, compile task-specific context from approved intent, and compare subsequent measured drift. Static evidence cannot establish complete accessibility, runtime behavior, originality or subjective design quality.
+
+Deterministic operations should remain useful without an API key when local inputs are available. AI interpretation and external providers are optional. Canonical schemas and fixtures define interoperability; implementation consumers do not become project-truth authorities.
 
 ## Non-goals
 
-- Running or hosting autonomous agents.
-- Replacing application frameworks, package managers, issue trackers, or CI systems.
-- Making model output trustworthy without evidence and deterministic checks.
-- Locking projects to one model vendor.
-- Claiming that automated checks prove subjective design quality, originality, or complete accessibility.
-- Making commercial design-reference providers mandatory for core design-intelligence workflows.
+- Running or hosting autonomous agents or replacing application frameworks, package managers, issue trackers or CI systems.
+- Locking project truth to one vendor or making commercial providers mandatory.
+- Treating generated files, written policy or structural validation as proof of safety, enforcement, design quality or production readiness.
 
 ## Success criteria
 
-- A new user understands the filesystem model from the root README and `.agentic/README.md`.
-- `ah init` creates a self-contained project without source-only metadata leakage.
-- Existing repositories migrate through an explicit dry-run and conflict-aware process.
-- Repeated composition and adapter synchronization are idempotent.
-- Audits distinguish deterministic evidence, agent-assisted judgment, and checks not performed.
-- Release binaries work offline and embed pinned canonical sources.
-- Design analysis artifacts preserve evidence/provenance and can be reviewed without turning inference into truth automatically.
-- The same approved Design Genome can drive compatible CLI and app workflows.
-- Task-specific design context can be regenerated from canonical inputs without requiring an LLM.
+A developer can understand the public contract, install a compatible CLI, configure project-specific context, load it through a supported host integration, detect supported violations and inspect actual verification evidence. Each part must identify its implementation status and checks performed.
+
+Preserve user content during upgrades; record source pins; surface conflicts and unknowns; never silently approve inferred identity or replace accepted project truth. Integration and outcome evaluation are required before claiming improved model performance.
 
 ## Current status
 
-Beta. The target filesystem contract is versioned, but compatibility and migration behavior may evolve before 1.0. Design intelligence is an early product track under active implementation; its schemas are initially versioned as format version 1 but should be treated as pre-stable until explicitly promoted.
+Beta. Filesystem/artifact contracts are versioned but pre-stable. The [remediation roadmap](plans/audit-remediation-2026-09-12.md) prioritizes one demonstrably complete adoption path. Tickets and schemas are not evidence that the remaining workflow has shipped.
