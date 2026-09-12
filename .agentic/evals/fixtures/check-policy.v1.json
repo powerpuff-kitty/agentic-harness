@@ -1,0 +1,8 @@
+{
+  "format_version": 1,
+  "kind": "check-policy",
+  "inputs": ["src", "package.json"],
+  "checks": [{"id": "unit", "argv": ["npm", "test"], "cwd": ".", "required": true, "timeout_ms": 60000, "max_output_bytes": 65536}],
+  "required_controls": [{"rule_id": "architecture.boundaries", "capability": "checked"}],
+  "max_age_ms": 3600000
+}

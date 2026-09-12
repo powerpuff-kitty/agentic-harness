@@ -1,0 +1,19 @@
+{
+  "format_version": 1,
+  "kind": "governance-evidence",
+  "policy_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "source_digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "revision": null,
+  "producer": {"id": "synthetic-fixture", "version": "1"},
+  "observed_at_ms": 0,
+  "host": null,
+  "adapter": null,
+  "scope": ["src"],
+  "claims": [
+    {"rule_id": "architecture.boundaries", "capability": "declared", "status": "verified", "mechanism": "inspected declaration", "evidence_refs": ["fixture:declaration"]},
+    {"rule_id": "architecture.boundaries", "capability": "delivered", "status": "unverified", "mechanism": null, "evidence_refs": []},
+    {"rule_id": "architecture.boundaries", "capability": "checked", "status": "unverified", "mechanism": null, "evidence_refs": []},
+    {"rule_id": "architecture.boundaries", "capability": "enforced", "status": "unverified", "mechanism": null, "evidence_refs": []}
+  ],
+  "not_checked": ["host delivery", "command execution", "runtime enforcement"]
+}
