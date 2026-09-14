@@ -22,8 +22,9 @@ Initial support sequence: JavaScript/TypeScript first, then Python, Rust and Go.
 - `development`: test/build/tool-only relation when deterministically known.
 - `resource`: non-code resource reference.
 - `package` / `module`: language-level package/module relation where a file-to-file target is not the correct abstraction.
+- `unknown`: the frontend or compatibility adapter observed a dependency reference but cannot truthfully recover its edge kind. It is permitted only with `resolution: unresolved`, a null target, and incomplete coverage. Consumers must never treat it as runtime, type-only, or clean evidence.
 
-`resolution` records whether the target is local, workspace-local, external, a resource, or unresolved. Unresolved edges never count as clean architecture evidence.
+`resolution` records whether the target is local, workspace-local, external, a resource, or unresolved. Unresolved edges never count as clean architecture evidence. A frontend that knows an unresolved edge's kind should preserve the known kind rather than downgrade it to `unknown`.
 
 ## Coverage
 
