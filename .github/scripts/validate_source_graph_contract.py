@@ -64,6 +64,8 @@ def semantic_errors(value):
     for edge in value['edges']:
         if edge['from'] not in node_set:
             errors.append(f"edge source is unknown: {edge['from']}")
+        if edge['kind'] == 'unknown' and edge['resolution'] != 'unresolved':
+            errors.append('unknown edge kind is only valid for unresolved evidence')
         if edge['resolution'] == 'unresolved':
             unresolved += 1
             if edge['to'] is not None:
@@ -103,7 +105,7 @@ for language, implementation, extensions in [
     value['nodes'][1]['path'] = f'src/service.{extensions[0]}'
     validate(value)
 
-for mutation in ['wrong-version', 'unknown-kind', 'invalid-resolution', 'negative-coverage']:
+for mutation in ['wrong-version', 'unknown-kind', 'invalid-resolution', 'negative-coverage', 'unknown-resolved']:
     value = graph()
     if mutation == 'wrong-version':
         value['format_version'] = 2
@@ -111,6 +113,8 @@ for mutation in ['wrong-version', 'unknown-kind', 'invalid-resolution', 'negativ
         value['edges'][0]['kind'] = 'magic'
     elif mutation == 'invalid-resolution':
         value['edges'][0]['resolution'] = 'guessed'
+    elif mutation == 'unknown-resolved':
+        value['edges'][0]['kind'] = 'unknown'
     else:
         value['coverage']['files_failed'] = -1
     assert not VALIDATOR.is_valid(value), mutation
@@ -147,6 +151,7 @@ for mutation in [
 partial = graph()
 partial['edges'][0]['resolution'] = 'unresolved'
 partial['edges'][0]['to'] = None
+partial['edges'][0]['kind'] = 'unknown'
 partial['coverage']['edges_resolved'] = 0
 partial['coverage']['edges_unresolved'] = 1
 partial['coverage']['complete'] = False
