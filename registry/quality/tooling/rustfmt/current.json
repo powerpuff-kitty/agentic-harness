@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "tooling/rustfmt/current",
+  "kind": "tooling",
+  "name": "rustfmt",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Rust source formatter capability.",
+  "capabilities": ["detect", "check", "fix"],
+  "rules": [
+    {
+      "id": "rustfmt.formatting.check",
+      "title": "Check Rust formatting without implicit writes",
+      "category": "formatting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Rust formatting evidence should use rustfmt/cargo fmt in check mode when execution is authorized; formatting writes remain a separate action.",
+      "source_refs": ["rustfmt.home"],
+      "tools": ["rustfmt", "cargo-fmt"],
+      "autofix": "safe",
+      "constraints": {
+        "check_before_fix": true,
+        "fix_requires_authorization": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "rustfmt.home",
+      "title": "The rustfmt book",
+      "url": "https://doc.rust-lang.org/rustfmt/",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}
