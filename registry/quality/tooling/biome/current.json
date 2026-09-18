@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "tooling/biome/current",
+  "kind": "tooling",
+  "name": "Biome",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Biome formatter/linter capability. Detection does not authorize replacing ESLint or Prettier in an existing project.",
+  "capabilities": ["detect", "analyze", "check", "fix"],
+  "rules": [
+    {
+      "id": "biome.configuration.project-config",
+      "title": "Preserve project-selected Biome configuration",
+      "category": "configuration",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Biome behavior should follow the repository's Biome configuration and native diagnostics when the project selects Biome.",
+      "source_refs": ["biome.configuration"],
+      "tools": ["biome"],
+      "autofix": "conditional",
+      "constraints": {
+        "config_presence_is_execution": false,
+        "fix_requires_authorization": true,
+        "preserve_native_code": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "biome.configuration",
+      "title": "Biome configuration",
+      "url": "https://biomejs.dev/reference/configuration/",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}
