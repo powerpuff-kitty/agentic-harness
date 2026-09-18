@@ -44,3 +44,7 @@ Final combined CLI candidate `02bf336` passes all 197 Rust tests, formatting, Cl
 5. Complete remaining agent procedure/evaluation scope and candidate-specific release gates. No release/tag is part of the branch-publication proposal.
 
 No source push, main merge, release or successful model task is claimed by this reconciliation. No issue was closed merely because local tests pass.
+
+## Publication follow-up
+
+The owner subsequently authorized the prepared source branches and draft PRs. All three are published; corrected CLI CI passes all nine jobs and all four candidate archives/evidence reports were downloaded and checked. See [the exact candidate evidence](../../docs/testing/2026-09-18-verified-adoption-ci.md). Review/merge and the authentication-blocked native-host task remain outstanding. Earlier local-only statements describe the pre-publication audit.
