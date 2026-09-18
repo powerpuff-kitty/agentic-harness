@@ -88,3 +88,7 @@ The experimental [local execution contract](docs/project/check-execution-v1.md) 
 ## Authored-source licensing
 
 Authored CLI, catalog/registry and agent content use MIT, as accepted in [ADR-007](decisions/ADR-007-mit-licensing.md). Third-party licenses remain intact. Variants retain `.agentic/THIRD_PARTY_NOTICES.md` without assigning a license to independently authored application code. Composition preserves project license files and records copied-notice provenance.
+
+## Caller-approved imported evidence
+
+ADR-010 selects explicit caller-approved exact evidence digests for the first imported completion gate, with signed producers deferred. The [completion v1 contract](docs/project/check-completion-v1.md) adds a separate verdict scoped to declared checks and required governance controls. Approval is external to the manifest; producer authentication and whole-project readiness remain unverified.
