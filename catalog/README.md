@@ -14,4 +14,4 @@ catalog/
 
 Each public variant is complete and directly browsable. Metadata may describe inheritance, but users and tools do not need to mentally compose hidden overlays to understand the resulting project.
 
-CLI evidence contracts include `schema/codebase-audit.v2.schema.json`, `schema/agentic-readiness.v2.schema.json`, and `schema/design-system-discovery.schema.json`. See [CLI contract semantics](../.agentic/docs/project/cli-contracts.md).
+CLI evidence contracts include `schema/codebase-audit.v2.schema.json`, `schema/agentic-readiness.v2.schema.json`, and `schema/design-system-discovery.schema.json`. The provider-neutral Decision Kernel contract is the `schema/decision-*.v1.schema.json` family covering specs, graphs, requests, provider capabilities, policy, immutable receipts, outcomes and side-effect-free evaluation. See [Decision Kernel architecture](../.agentic/docs/architecture/decision-kernel.md) and [CLI contract semantics](../.agentic/docs/project/cli-contracts.md).
