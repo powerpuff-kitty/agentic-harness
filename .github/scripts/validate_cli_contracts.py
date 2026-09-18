@@ -48,6 +48,7 @@ for name, fixture, invalid_field in [
 print('Gate and comparison compatibility fixtures passed')
 
 for script in ['validate_check_contracts.py', 'validate_execution_contracts.py', 'validate_completion_contracts.py',
+               'validate_decision_contracts.py',
                'validate_source_graph_contract.py', 'validate_adapter_contracts.py',
                'test_public_archive_names.py', 'test_public_surface.py', 'test_context_profiles.py']:
     subprocess.run([sys.executable, str(root / '.github/scripts' / script)], check=True)
