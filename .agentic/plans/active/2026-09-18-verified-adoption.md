@@ -20,7 +20,7 @@ Next dependencies, in order:
 
 1. Review the local CLI #55 / PR #60 corrections across Linux/macOS and retain their explicit cleanup/platform limits. GitHub issues #55/#61–#63 and #86 now record local progress and are In progress; remote source/PR state remains unchanged.
 2. Caller-approved imported completion is now implemented and tested under ADR-010: exact manifest/report/reference binding, current review equality, recomputed outcomes and required governance evaluation. The app trial accepts a saved run and rejects it after source changes. Signed producer authentication is deferred; the scoped verdict is not whole-project readiness.
-3. Exercise native context delivery and a real host/model implementation task; preserve separate installed/configured/verified evidence states.
+3. Exercise native context delivery and a real host/model implementation task. A [bounded Claude trial](../../evals/fixtures/adoption/reading-list/native-host/README.md) is prepared: real init + typed-UI adapter, one permitted Vue edit, a $1 requested API cap and 300-second supervisor deadline. Preparation and authored reference tests are not native/model evidence. Preserve separate installed/configured/verified states; explicit separate-agent authorization is needed before launch.
 4. Publish only when authorized, observe CI and then reconcile the board against executed evidence. Do not close #86 early.
 
 Rollback is a normal reviewed revert of fixture/CI files and the isolated CLI parser correction. No installed user project or production data was changed. The original context-only #84 fixture remains intact.

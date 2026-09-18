@@ -44,3 +44,5 @@ python3 tests/execution.py /absolute/path/to/ah --report /tmp/reading-list-execu
 ```
 
 `.agentic/checks.native.json` declares explicit native Node invocations for unit tests, type checking, build and browser tests. The disposable trial reviews those exact synthetic commands, executes them, then checks stale-review and missing-tool refusal. It also saves the run, evaluates a caller-approved evidence manifest, and confirms that a subsequent source change rejects completion. Approval is restricted to this authored synthetic trial. This app policy has no required governance controls; separate CLI probes cover required claims. Signed producer authentication and whole-project readiness remain unverified.
+
+The [native-host trial](native-host/README.md) prepares a disposable Claude Code task with an independent unread-counter acceptance test. Preparation does not launch a model or verify native loading.
