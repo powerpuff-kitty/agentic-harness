@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 QUALITY = ROOT / "registry" / "quality"
 PROFILE_SCHEMA = QUALITY / "quality-profile.schema.json"
 ANALYSIS_SCHEMA = QUALITY / "quality-analysis.schema.json"
+CONTRACT_SCHEMA = QUALITY / "quality-contract.schema.json"
+BASELINE_SCHEMA = QUALITY / "quality-baseline.schema.json"
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ID = re.compile(r"^[a-z0-9][a-z0-9._/-]*$")
 KINDS = {"language", "framework", "tooling", "pattern"}
@@ -54,7 +56,7 @@ def expect_string(data: dict, key: str, path: Path) -> str | None:
     return value
 
 
-for schema in (PROFILE_SCHEMA, ANALYSIS_SCHEMA):
+for schema in (PROFILE_SCHEMA, ANALYSIS_SCHEMA, CONTRACT_SCHEMA, BASELINE_SCHEMA):
     if not schema.is_file():
         fail(f"missing {schema.relative_to(ROOT)}")
     else:
