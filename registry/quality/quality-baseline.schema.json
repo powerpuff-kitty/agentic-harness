@@ -18,7 +18,7 @@
   "properties": {
     "format_version": { "type": "integer", "const": 1 },
     "kind": { "type": "string", "const": "quality-baseline" },
-    "created_at": { "type": "string", "format": "date-time" },
+    "created_at": { "type": "string", "format": "date" },
     "target": {
       "type": "object",
       "additionalProperties": false,
