@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "tooling/clippy/current",
+  "kind": "tooling",
+  "name": "Clippy",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Rust linting capability provided by Clippy.",
+  "capabilities": ["detect", "check", "fix"],
+  "rules": [
+    {
+      "id": "clippy.linting.native-diagnostics",
+      "title": "Preserve Clippy lint identity and configured levels",
+      "category": "linting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Clippy findings should retain their native lint names and the project's configured warning/deny/allow levels when normalized by Harness.",
+      "source_refs": ["clippy.usage"],
+      "tools": ["clippy", "cargo-clippy"],
+      "autofix": "conditional",
+      "constraints": {
+        "preserve_native_code": true,
+        "fix_requires_authorization": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "clippy.usage",
+      "title": "Clippy usage",
+      "url": "https://doc.rust-lang.org/clippy/usage.html",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}
