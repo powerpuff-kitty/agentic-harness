@@ -24,3 +24,5 @@ Next dependencies, in order:
 4. Publish only when authorized, observe CI and then reconcile the board against executed evidence. Do not close #86 early.
 
 Rollback is a normal reviewed revert of fixture/CI files and the isolated CLI parser correction. No installed user project or production data was changed. The original context-only #84 fixture remains intact.
+
+Current board ownership, combined-main reconciliation and finishing order are recorded in the [roadmap reconciliation](2026-09-18-roadmap-reconciliation.md).

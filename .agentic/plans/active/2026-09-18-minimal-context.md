@@ -38,7 +38,7 @@ Catalog validation checks the existing variants and the new context fixture. `py
 
 Content-only changes are reversible with a normal reviewed revert. No installed user project is edited. Future composition changes must be previewable and preserve authored files; do not use deletion as rollback.
 
-#84 now has local downstream selection, pin, preservation and legacy-refusal evidence. Cross-platform review and publication remain pending; the GitHub issue is unchanged. #86's runnable application is now in the separate adoption fixture; executor and native host evidence remain pending.
+#84 now has local downstream selection, pin, preservation and legacy-refusal evidence. Cross-platform review and publication remain pending. The issue and project status were updated during the [roadmap reconciliation](2026-09-18-roadmap-reconciliation.md). #86's runnable application and executor/completion evidence are recorded separately; native-host acceptance remains authentication-blocked.
 
 ## Catalog slice evidence — 2026-09-18
 
