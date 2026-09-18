@@ -30,7 +30,7 @@ Keep structure installed, project configured, checks configured and behavior ver
 2. Completed locally: explicit minimal/full CLI composition, compatible full default, persisted selection and installed-variant inheritance. Pins reference committed catalog and agents content; source checkouts matched those identities.
 3. Completed on macOS x86_64: minimal/full selection, module-triggered additions, repeated composition, both transitions, custom/null routes, custom optional files, modified pack conflicts, injected write failures and legacy-layout refusal. Linux/Windows/macOS arm64 CI remains pending; automatic legacy migration remains unsupported.
 4. Actual generated-output measurements are recorded below. Compare materialized-source metrics with actual generated results. Count selected module/skill/adapter files separately. Measure task routing on the filled fixture: form change reads PRODUCT/DESIGN/web-app guidance; boundary change reads ARCHITECTURE; link-input change reads SECURITY plus relevant validation requirements. Report bytes/words, not invented model token counts or improved outcomes.
-5. Build #86's runnable synthetic Vue/TypeScript project and seed supported architecture/design violations. Approved check execution and fresh evidence depend on #85 and CLI #55; native host delivery/outcome evidence depends on agents #24–26.
+5. Runnable #86 source, browser checks and seeded architecture/design probes now live in [the adoption fixture](../../evals/fixtures/adoption/reading-list/README.md). See its verification record for actual outcomes. Approved check execution and fresh evidence still depend on #85 and CLI #55; native host delivery/outcome evidence depends on agents #24–26.
 
 ## Validation and rollback
 
@@ -38,7 +38,7 @@ Catalog validation checks the existing variants and the new context fixture. `py
 
 Content-only changes are reversible with a normal reviewed revert. No installed user project is edited. Future composition changes must be previewable and preserve authored files; do not use deletion as rollback.
 
-#84 now has local downstream selection, pin, preservation and legacy-refusal evidence. Cross-platform review and publication remain pending; the GitHub issue is unchanged. #86 still needs runnable application and host/check evidence.
+#84 now has local downstream selection, pin, preservation and legacy-refusal evidence. Cross-platform review and publication remain pending; the GitHub issue is unchanged. #86's runnable application is now in the separate adoption fixture; executor and native host evidence remain pending.
 
 ## Catalog slice evidence — 2026-09-18
 

@@ -4,4 +4,4 @@
 
 It includes the current core plus DESIGN.md, without empty optional directory trees. It is hand-authored evaluation input, not output of a new CLI minimal mode. No fixture data identifies a real consumer.
 
-Use it for context review and the future #86 integration project. Its unresolved lock is not installation evidence. Runnable application source and installed-binary composition/preservation tests remain downstream work.
+Use it for context review. Its unresolved lock is not installation evidence. The separate [runnable #86 fixture](../adoption/reading-list/README.md) adds application source and composition/preservation probes while retaining this context-only baseline.
