@@ -17,8 +17,8 @@ Completed locally:
 
 Next dependencies, in order:
 
-1. Review the local CLI #55 / PR #60 corrections across Linux/macOS and retain their explicit cleanup/platform limits. Remote issue and PR state remain unchanged.
-2. Implement authenticated imported-evidence freshness/completion rejection. Stale execution-review refusal is verified but is not that completion gate.
+1. Review the local CLI #55 / PR #60 corrections across Linux/macOS and retain their explicit cleanup/platform limits. GitHub issues #55/#61–#63 and #86 now record local progress and are In progress; remote source/PR state remains unchanged.
+2. Integrate authenticated imported-evidence freshness/completion rejection. Local CLI `7d49d13` adds a pure governance evaluator (190 Rust tests passed, including 16 evaluator tests; formatting/Clippy/catalog passed). It validates caller-supplied trust bindings, references, identities, age and exact required capabilities. It does not acquire trust or current filesystem snapshots and does not verify completion. The first consuming command still needs an explicit trust-mechanism decision and execution-report validation.
 3. Exercise native context delivery and a real host/model implementation task; preserve separate installed/configured/verified evidence states.
 4. Publish only when authorized, observe CI and then reconcile the board against executed evidence. Do not close #86 early.
 
