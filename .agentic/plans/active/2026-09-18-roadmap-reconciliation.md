@@ -48,3 +48,7 @@ No source push, main merge, release or successful model task is claimed by this 
 ## Publication follow-up
 
 The owner subsequently authorized the prepared source branches and draft PRs. All three are published; corrected CLI CI passes all nine jobs and all four candidate archives/evidence reports were downloaded and checked. See [the exact candidate evidence](../../docs/testing/2026-09-18-verified-adoption-ci.md). Review/merge and the authentication-blocked native-host task remain outstanding. Earlier local-only statements describe the pre-publication audit.
+
+## Owner removes the Claude prerequisite
+
+Claude is unavailable and is no longer a required adoption host. An existing-session Codex-assisted trial passed the one-file task and deterministic executor/completion checks; see [its observation and limits](../../evals/fixtures/adoption/reading-list/native-host/README.md). No credentials were accessed, no authentication mechanism bypassed and no separate model invocation launched. #86 now awaits review of this demonstrated scope; automatic native loading/enforcement and the broader host matrix remain unverified.

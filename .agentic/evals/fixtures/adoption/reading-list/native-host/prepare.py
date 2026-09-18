@@ -1,20 +1,20 @@
 """Prepare an inspectable native-host trial; never launches an agent/model.
 
-python3 native-host/prepare.py /absolute/path/to/ah /new/trial-directory
+python3 native-host/prepare.py /absolute/path/to/ah /new/trial-directory [--host current-session|claude]
 """
 from pathlib import Path
+import argparse
 import hashlib
 import json
 import shutil
 import subprocess
-import sys
 
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def prepare(binary, destination):
+def prepare(binary, destination, host_mode="current-session"):
     binary = binary.resolve(strict=True)
     if destination.exists():
         raise ValueError('Trial directory must not exist; existing work is never overwritten.')
@@ -46,37 +46,47 @@ Keep the existing announcement and keyboard/focus behavior. Use existing visual 
 add no dependency, storage, network request, service/domain change or new raw control.
 Only src/presentation/views/ReadingList.vue may change during this task.
 ''')
-    plan = ah('adapters', 'sync', '.', '--host', 'claude', '--profile', 'typed-ui')
-    installed = ah('adapters', 'sync', '.', '--host', 'claude', '--profile', 'typed-ui', '--apply', '--review', plan['plan_digest'])
-    assert installed['host_delivery_verified'] is False
+    if host_mode == 'claude':
+        plan = ah('adapters', 'sync', '.', '--host', 'claude', '--profile', 'typed-ui')
+        installed = ah('adapters', 'sync', '.', '--host', 'claude', '--profile', 'typed-ui', '--apply', '--review', plan['plan_digest'])
+        assert installed['host_delivery_verified'] is False
     shutil.copyfile(fixture / 'native-host/unread-count.spec.ts', root / 'tests/browser/native-host.spec.ts')
     if (fixture / 'node_modules').is_dir():
         (root / 'node_modules').symlink_to(fixture / 'node_modules', target_is_directory=True)
     prompt = ('Implement the approved native-host trial change described in this project context. '
               'Follow the repository instructions and change only the allowed application file. '
-              'Do not run commands or modify tests, policy, adapters or dependencies. '
+              'Do not modify tests, policy, adapters or dependencies. '
               'In your final response identify the context files used, the change made, and checks you could not run.')
+    if host_mode == 'claude':
+        prompt += ' Do not run commands; the parent will verify after the file-inventory check.'
+    else:
+        prompt += ' Verify only after comparing the allowed edit against the starting file inventory.'
     (destination / 'prompt.txt').write_text(prompt + '\n')
-    host = shutil.which('claude')
-    host_version = subprocess.check_output([host, '--version'], text=True).strip() if host else None
-    argv = [host or 'claude', '--print', '--output-format', 'stream-json', '--verbose',
-            '--no-session-persistence', '--setting-sources', 'project',
-            '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}',
-            '--no-chrome', '--disable-slash-commands', '--permission-mode', 'dontAsk',
-            '--tools', 'Read,Edit,Write,Glob,Grep', '--allowedTools', 'Read,Edit,Write,Glob,Grep',
-            '--max-budget-usd', '1', prompt]
+    host_version = None
+    argv = None
+    if host_mode == 'claude':
+        host = shutil.which('claude')
+        host_version = subprocess.check_output([host, '--version'], text=True).strip() if host else None
+        argv = [host or 'claude', '--print', '--output-format', 'stream-json', '--verbose',
+                '--no-session-persistence', '--setting-sources', 'project',
+                '--strict-mcp-config', '--mcp-config', '{"mcpServers":{}}',
+                '--no-chrome', '--disable-slash-commands', '--permission-mode', 'dontAsk',
+                '--tools', 'Read,Edit,Write,Glob,Grep', '--allowedTools', 'Read,Edit,Write,Glob,Grep',
+                '--max-budget-usd', '1', prompt]
     files = {}
     for p in root.rglob('*'):
         if p.is_file() and not p.is_symlink() and 'node_modules' not in p.relative_to(root).parts:
             files[p.relative_to(root).as_posix()] = sha(p)
     report = {'kind': 'prepared-native-host-trial', 'format_version': 1,
               'binary_sha256': sha(binary), 'cli_version': version,
-              'host_version': host_version, 'cwd': str(root.resolve()), 'argv': argv,
+              'host_mode': host_mode, 'host_version': host_version, 'cwd': str(root.resolve()), 'argv': argv,
               'allowed_change': 'src/presentation/views/ReadingList.vue', 'before': files,
-              'max_budget_usd': 1, 'supervisor_timeout_seconds': 300,
+              'max_budget_usd': 1 if host_mode == 'claude' else None,
+              'supervisor_timeout_seconds': 300 if host_mode == 'claude' else None,
               'host_invoked': False, 'model_execution': 'not-run',
               'native_loading_verified': False, 'enforcement_verified': False,
-              'limitations': ['Tool allowlisting is not an OS sandbox.',
+              'limitations': ['Current-session mode launches no separate agent and has no separate process/billing cap.',
+                              'Tool allowlisting is not an OS sandbox.',
                               'Host versions and installed adapter files are not proof of native loading.',
                               'Raw host transcripts require review before publication.']}
     (destination / 'trial.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -85,6 +95,9 @@ Only src/presentation/views/ReadingList.vue may change during this task.
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        raise SystemExit(__doc__)
-    prepare(Path(sys.argv[1]), Path(sys.argv[2]).absolute())
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('binary', type=Path)
+    parser.add_argument('destination', type=Path)
+    parser.add_argument('--host', choices=['current-session', 'claude'], default='current-session')
+    args = parser.parse_args()
+    prepare(args.binary, args.destination.absolute(), args.host)

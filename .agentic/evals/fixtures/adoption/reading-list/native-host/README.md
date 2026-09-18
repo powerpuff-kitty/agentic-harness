@@ -1,32 +1,34 @@
-# Prepared Claude Code adoption trial
+# Assisted adoption trial
 
-Latest outcome: the first authorized host invocation ended with an API 401 authentication error; no model response, tool call or file change was observed. See [the sanitized observation](2026-09-18-observation.json).
+The owner confirmed Claude is unavailable. Claude authentication is **not an adoption prerequisite**. The default route uses the existing coding-agent session, without starting a separate host, accessing credentials or requiring another account.
 
-This is a bounded real-host/model trial for #86. Preparation is deterministic and **does not launch a model**. The authored task is to implement the unread counter described in the disposable project's `.agentic/DESIGN.md`, changing only `src/presentation/views/ReadingList.vue`.
+The task changes only `src/presentation/views/ReadingList.vue`: implement the unread counter described in the disposable project's `.agentic/DESIGN.md`. Preparation is deterministic and never launches a model.
+
+## Current-session route
 
 ```sh
-python3 native-host/prepare.py /absolute/path/to/ah /new/trial-directory
+python3 native-host/prepare.py /absolute/path/to/ah /new/trial-directory --host current-session
 ```
 
-The directory must not exist. Preparation initializes a fresh minimal web-app harness, overlays authored application truth while retaining real manifest/lock provenance, and installs the pinned Claude typed-UI adapter through reviewed CLI synchronization. Root `CLAUDE.md` imports `AGENTS.md`. It adds the task requirements to the disposable design document and an independent browser acceptance test. Installed Node dependencies are linked for later parent-supervised verification; their bytes are not authenticated by this setup.
+Preparation initializes a fresh minimal web-app harness, retains actual manifest/lock provenance, overlays authored application truth and adds an independent browser acceptance test. It does not install or invoke Claude. The existing session explicitly reads `AGENTS.md`, the context map, manifest and relevant project rules, then edits the one allowed file.
 
-`trial.json` records the exact CLI hash/source pins, observed Claude version, file hashes, permitted edit, prompt, cwd and proposed argv. It records model execution and native delivery as unverified. No model result is fabricated by preparation.
+`trial.json` records the CLI hash/source pins, file inventory, allowed edit and prompt. Separate-host argv, host version, API budget and supervisor timeout are null in current-session mode: the active session has no separately launched process or independently observed billing/timeout receipt. Never attribute an installed Codex CLI version to a session that did not run through that CLI.
 
-## Proposed run
+Before editing, build the baseline and run `npm run test:browser -- tests/browser/native-host.spec.ts`; it must fail because the unread status is absent. After the edit, compare all starting-file hashes and dependency links **before** running changed code. Reject changes outside the permitted Vue file, including tests, policies, context and dependencies. Generated test/build output is separate from authored-file comparisons.
 
-After explicit authorization to launch the separate agent, invoke the recorded argv in its recorded cwd with a 300-second supervisor deadline. The proposed command uses the installed Claude default model, records stream-JSON output, disables session persistence and skills, allows only Read/Edit/Write/Glob/Grep, loads project settings only, supplies an empty strict MCP configuration, disables Chrome and requests a $1 API budget cap. It does not enable permission bypass, shell execution, nested agents or web tools. Inspect the host's supported flags before using another version. These settings are not an OS sandbox or an independent billing guarantee.
+Then run `npm test`, `npm run build`, all browser tests, `python3 tests/adoption.py /absolute/path/to/ah` and `python3 tests/execution.py /absolute/path/to/ah --report /outside/project/execution.json`. The executor probe approves only its fixed synthetic policy/report bytes; it is not approval for arbitrary project commands.
 
-Keep raw transcript and stderr outside the project and review them before publication. Record the actual model and host from execution receipts; a prepared command is not a model trial. A failed authorization, budget/time limit, failed host invocation or unavailable model is a failed/unverified trial, never a skip promoted to success.
+## Recorded assisted Codex outcome
 
-## Acceptance after a real run
+See [the observation](2026-09-18-codex-session.json) and [the exact application patch](2026-09-18-codex-session.patch). The existing Codex session explicitly read the context and authored this change. The baseline failed; the changed app passed acceptance. Deterministic checks and scoped completion evidence are recorded separately in the observation.
 
-1. Record exit status, host/model identity, cost/usage if reported and transcript hashes. Inspect tool results for observed context reads and denied/error calls. Self-report alone does not establish native loading.
-2. Before executing any resulting code, compare the recorded file inventory. Reject edits outside the single permitted Vue file, new project files, changed tests/policy/adapter/dependencies or replaced links. Keep host logs outside that comparison.
-3. Run the existing domain tests, type/build, all browser tests including the new counter case, and architecture/design analysis. The counter must follow the entire session across adds, invalid input, toggles, filtering and reload while preserving existing accessibility/focus behavior.
-4. Run the fixed reviewed executor/completion workflow for the changed disposable project if applicable; retain separate command/control scope and caller-trust limitations.
-5. Record accepted/rejected implementation evidence independently of installed adapter state. Successful task execution does not by itself prove automatic scoped-rule loading or security enforcement. Any missing native-loading evidence stays unverified.
+This is one assisted implementation run, not a blinded or comparative evaluation: the session already had fixture/reference context. There is no independent host/model version or billing receipt. Explicit context reads are observed; automatic native loading, scoped-rule selection and host enforcement remain unverified. The evidence does not certify Claude compatibility or finish the broader agents #24/#26 evaluation matrix.
 
-The new browser test must fail against the unchanged application. An authored reference patch may be used to verify the test harness, but must be restored and explicitly labeled non-model evidence before the native trial. Never carry that reference implementation into the model's starting tree.
+The patch can reproduce the changed fixture with `patch -p1 < /path/to/2026-09-18-codex-session.patch` from a newly prepared project. Replaying a patch reproduces application checks, not a new model outcome. The committed baseline app remains unchanged so the negative acceptance test stays meaningful.
+
+## Optional Claude route
+
+`--host claude` retains the earlier preparation recipe for environments that independently provide Claude. It installs the pinned typed-UI adapter and proposes a tool-restricted command with a requested $1 API cap and a 300-second supervisor deadline. It never runs automatically and is not required here. No authentication bypass is implemented.
 
 ## Local preflight — 2026-09-18
 
@@ -40,4 +42,4 @@ The owner authorized the prepared bounded trial. Claude Code 2.1.76 started with
 
 The client reported $0 cost, not independently verified billing. There were no tool calls or observed context reads. Every recorded starting-file hash and the dependency link remained unchanged; no files were added, removed or replaced. No implementation was produced, so post-model application tests were not run. The earlier reference patch was not present and cannot count as model evidence.
 
-Raw transcript/stderr remain local; the linked receipt publishes only bounded metadata and hashes. Authentication must be repaired through the user's configured Claude authentication method before another attempt. Do not inspect or publish credentials, change model/tools or expand the budget to work around this failure. Native loading, enforcement and task acceptance remain unverified; #86 remains open.
+Raw transcript/stderr remain local; the linked receipt publishes only bounded metadata and hashes. The owner subsequently confirmed Claude is unavailable and removed it as an adoption prerequisite. No Claude retry or credential workaround is planned. This failed attempt remains historical evidence; Claude loading/enforcement stay unverified. The current-session route above now owns the adoption task evidence.
