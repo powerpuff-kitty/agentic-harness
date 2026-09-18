@@ -25,6 +25,16 @@ Design Genome, Design Analysis and related public schemas live under `catalog/sc
 
 The implemented static workflow is analysis → review-required candidate → approved identity/task context compilation → measured drift comparison. Runtime analysis and additional compiler outputs remain planned unless the installed CLI contract explicitly supports them. External reference data and AI interpretations remain evidence, not accepted project intent.
 
+## Decision-intelligence boundary
+
+The provider-neutral [Decision Kernel contract](docs/architecture/decision-kernel.md), accepted in [ADR-008](decisions/ADR-008-decision-kernel.md), separates immutable state/evidence, atomic decision specifications, provider execution, policy, receipts, outcomes and side-effect-free evaluation.
+
+Jev, deterministic rules, statistical models, LLMs and humans may act as decision providers when their declared capabilities fit the DecisionSpec. Providers never own consequence authorization. Provider confidence, calibration, evidence coverage, evidence reliability, decision certainty and domain outcome probability are separate quantities.
+
+Decision graphs describe dependencies between atomic decisions and deterministic reducers; they do not replace workflow engines. DecisionPolicy remains application-owned, and high-consequence actions require separate authorization/review according to project policy. DecisionReceipt preserves what was known and produced at decision time; later observations append DecisionOutcome rather than rewriting history.
+
+The canonical schemas live under `catalog/schema/decision-*.v1.schema.json`. The CLI may implement deterministic validation, provider adapters, fan-out, cache/replay and executable policy checks, but published schemas alone are not evidence that those runtime capabilities are installed or enforced.
+
 ## Target-project contract
 
 ```text
@@ -80,6 +90,8 @@ The planned evidence model and approved check runner must preserve source/config
 - Deterministic operations do not introduce unexplained drift.
 - Design identity becomes project truth only through explicit acceptance; observed drift alone is not a quality judgment.
 - Provider rights/retention restrictions must be verified before restricted ingestion or redistribution.
+- Decision providers cannot grant consequence authority; semantic/model output remains advisory input until deterministic project policy and any required human/authoritative review are satisfied.
+- Evaluation, shadow and counterfactual runs are side-effect free; recorded provider confidence is never silently reinterpreted as domain outcome probability.
 
 ## Authored-source licensing
 
