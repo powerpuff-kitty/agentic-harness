@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/quality-analysis.schema.json",
+  "title": "Agentic Harness Quality Analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "target",
+    "languages",
+    "tools",
+    "findings",
+    "coverage"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "quality-analysis" },
+    "target": { "type": "string", "minLength": 1 },
+    "languages": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "tools": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/tool" }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    },
+    "coverage": { "$ref": "#/$defs/coverage" }
+  },
+  "$defs": {
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "detected", "executed"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "detected": { "type": "boolean" },
+        "executed": { "type": "boolean" },
+        "config": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "commands": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": ["integer", "null"], "minimum": 1 },
+        "detail": { "type": ["string", "null"] }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "category",
+        "severity",
+        "enforceability",
+        "message",
+        "evidence"
+      ],
+      "properties": {
+        "rule_id": { "type": "string", "minLength": 1 },
+        "native_code": { "type": ["string", "null"] },
+        "category": { "type": "string", "minLength": 1 },
+        "severity": {
+          "type": "string",
+          "enum": ["error", "warning", "recommendation"]
+        },
+        "enforceability": {
+          "type": "string",
+          "enum": ["deterministic", "heuristic", "advisory"]
+        },
+        "message": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        },
+        "remediation": { "type": ["string", "null"] }
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "not_checked", "unsupported"],
+      "properties": {
+        "performed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "not_checked": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        },
+        "unsupported": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}
