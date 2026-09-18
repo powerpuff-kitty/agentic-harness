@@ -1,0 +1,21 @@
+{
+  "format_version": 1,
+  "kind": "decision-provider",
+  "id": "typesafe/jev",
+  "vendor": "typesafe",
+  "transport": "http-json",
+  "models": {
+    "stable_alias": "jev-latest",
+    "preview_alias": "jev-preview"
+  },
+  "capabilities": [
+    "boolean-probability",
+    "choice",
+    "score"
+  ],
+  "secret_env": [
+    "TYPESAFE_API_KEY"
+  ],
+  "docs": "https://docs.typesafe.ai/api",
+  "reviewed_at": "2026-09-18"
+}
