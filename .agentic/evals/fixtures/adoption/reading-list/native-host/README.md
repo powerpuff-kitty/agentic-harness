@@ -1,5 +1,7 @@
 # Prepared Claude Code adoption trial
 
+Latest outcome: the first authorized host invocation ended with an API 401 authentication error; no model response, tool call or file change was observed. See [the sanitized observation](2026-09-18-observation.json).
+
 This is a bounded real-host/model trial for #86. Preparation is deterministic and **does not launch a model**. The authored task is to implement the unread counter described in the disposable project's `.agentic/DESIGN.md`, changing only `src/presentation/views/ReadingList.vue`.
 
 ```sh
@@ -30,4 +32,12 @@ The new browser test must fail against the unchanged application. An authored re
 
 Preparation used CLI source `f017973` and debug binary SHA-256 `a5ab1faca2e0741496eb47049eefad5328c6d23c271f2d3496b70a01ea44f68c`, with installed Claude Code 2.1.76. The new browser test rejected the unchanged app. An authored reference change passed four domain tests, type/build and all five browser tests. The reference change was then removed; every recorded starting-file hash matched and generated browser/build outputs were removed.
 
-This validates preparation and the acceptance harness only. No Claude model was launched, no model/version was inferred from an alias, and native loading/enforcement remain unverified. The prepared session awaits explicit separate-agent authorization.
+This validates preparation and the acceptance harness only. No Claude model was launched, no model/version was inferred from an alias, and native loading/enforcement remain unverified. At preflight completion, the prepared session awaited explicit separate-agent authorization.
+
+## Authorized attempt — 2026-09-18
+
+The owner authorized the prepared bounded trial. Claude Code 2.1.76 started with configured model `claude-opus-4-6[1m]` and exactly Glob/Grep/Read/Edit/Write available. It exited naturally with code 1 after 198.524 seconds, before the five-minute supervisor deadline, reporting an API 401 authentication error. Its final record had `subtype:success` but `is_error:true`; that is a failure. No actual model response was observed (the only message model was synthetic).
+
+The client reported $0 cost, not independently verified billing. There were no tool calls or observed context reads. Every recorded starting-file hash and the dependency link remained unchanged; no files were added, removed or replaced. No implementation was produced, so post-model application tests were not run. The earlier reference patch was not present and cannot count as model evidence.
+
+Raw transcript/stderr remain local; the linked receipt publishes only bounded metadata and hashes. Authentication must be repaired through the user's configured Claude authentication method before another attempt. Do not inspect or publish credentials, change model/tools or expand the budget to work around this failure. Native loading, enforcement and task acceptance remain unverified; #86 remains open.
