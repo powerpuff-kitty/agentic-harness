@@ -60,6 +60,9 @@ DecisionEvaluation / calibration / replay
 - `decision-receipt.v1.schema.json`: immutable result provenance, evidence coverage and uncertainty dimensions.
 - `decision-outcome.v1.schema.json`: later observed outcome/verification used as feedback without rewriting the original receipt.
 - `decision-evaluation.v1.schema.json`: offline, replay, shadow, champion/challenger and counterfactual evaluation. Evaluation side effects are forbidden.
+- `decision-eval-dataset.v1.schema.json`: versioned labeled cases pairing immutable receipts with independently verified truth.
+- `decision-calibration.v1.schema.json`: empirical quality/calibration/reliability metrics and threshold-selection evidence over one exact dataset/provider/spec identity.
+- `decision-regression.v1.schema.json`: deterministic baseline/candidate comparison against explicit quality/coverage/calibration/latency/cost budgets.
 
 These contracts allow additive compatible fields within v1. Semantic validators must additionally enforce graph referential integrity, acyclicity and arithmetic invariants that JSON Schema cannot prove conveniently.
 
@@ -156,6 +159,44 @@ state -> decision -> policy -> action -> observed outcome -> evaluation
 ```
 
 This supports labeled eval datasets, calibration and quality measurement without rewriting what the system knew at decision time.
+
+## Calibration and threshold tuning
+
+Calibration is an empirical property of a provider/spec/domain combination, not an intrinsic property of a confidence field.
+
+A labeled evaluation dataset binds every case to:
+
+- exact DecisionSpec ID/revision and decision kind;
+- exact state schema/version;
+- one exact provider/model/version identity;
+- the immutable DecisionReceipt;
+- independently verified expected truth and verification provenance;
+- optional measured cost.
+
+Dataset splits are explicit:
+
+- `training`: model/provider development only;
+- `calibration`: threshold selection and reliability calibration;
+- `validation`: iterative quality checks without threshold fitting;
+- `test`: final held-out measurement.
+
+Threshold selection is permitted only on `calibration` data. A `test` dataset may evaluate a preselected threshold but must not derive one.
+
+DecisionCalibration separates:
+
+- produced coverage;
+- accuracy among produced cases;
+- abstention/failure rates;
+- Brier/log loss when distributions support them;
+- expected calibration error and reliability bins when provider confidence is present;
+- ordinal error for ordered decisions;
+- measured latency and cost when available.
+
+Missing confidence/distribution/cost remains `null`; the evaluator must not synthesize those quantities.
+
+A selected confidence threshold is evidence for application policy, not authorization. High-consequence actions remain governed by deterministic product policy and required human/authoritative review.
+
+DecisionRegression compares baseline/candidate calibration reports on the same held-out dataset and applies explicit regression budgets. CI may gate on those reports without contacting a network-only provider.
 
 ## Shadow, challenger and counterfactual evaluation
 

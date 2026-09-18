@@ -22,6 +22,9 @@ SCHEMAS = {
         "decision-receipt.v1.schema.json",
         "decision-outcome.v1.schema.json",
         "decision-evaluation.v1.schema.json",
+        "decision-eval-dataset.v1.schema.json",
+        "decision-calibration.v1.schema.json",
+        "decision-regression.v1.schema.json",
     ]
 }
 
@@ -101,6 +104,104 @@ def evaluation_semantic_errors(value: dict) -> list[str]:
     if value["mode"] == "counterfactual" and not value.get("changed_dimensions"):
         return ["counterfactual evaluation must declare changed_dimensions"]
     return []
+
+
+def dataset_semantic_errors(value: dict) -> list[str]:
+    errors: list[str] = []
+    decision = value["decision"]
+    spec_id = decision["spec_id"]
+    spec_revision = decision["spec_revision"]
+    kind = decision["decision_kind"]
+    schema = value["state_schema"]
+    case_ids: set[str] = set()
+    receipt_ids: set[str] = set()
+    provider_identity = None
+
+    for case in value["cases"]:
+        case_id = case["id"]
+        if case_id in case_ids:
+            errors.append(f"duplicate eval case id: {case_id}")
+        case_ids.add(case_id)
+
+        receipt = case["receipt"]
+        if receipt.get("kind") != "decision-receipt":
+            errors.append(f"case {case_id} receipt is not a decision-receipt")
+            continue
+        rid = receipt.get("id")
+        if rid in receipt_ids:
+            errors.append(f"duplicate receipt id in dataset: {rid}")
+        receipt_ids.add(rid)
+
+        if receipt.get("spec", {}).get("id") != spec_id or receipt.get("spec", {}).get("revision") != spec_revision:
+            errors.append(f"case {case_id} receipt spec does not match dataset decision")
+        state = receipt.get("state", {})
+        if state.get("schema_id") != schema["id"] or state.get("schema_version") != schema["version"]:
+            errors.append(f"case {case_id} receipt state schema does not match dataset")
+
+        provider = receipt.get("provider", {})
+        identity = (provider.get("type"), provider.get("id"), provider.get("model"), provider.get("version"))
+        if provider_identity is None:
+            provider_identity = identity
+        elif provider_identity != identity:
+            errors.append("evaluation dataset must contain one exact provider/model/version identity")
+
+        expected = case["expected"]
+        if kind == "boolean" and not isinstance(expected.get("value"), bool):
+            errors.append(f"case {case_id} boolean expected.value must be boolean")
+        if kind == "choice":
+            if expected.get("value") not in decision.get("options", []):
+                errors.append(f"case {case_id} choice expected.value must be one declared option")
+        if kind == "ordinal":
+            index = expected.get("ordinal_index")
+            levels = decision.get("levels", [])
+            if not isinstance(index, int) or isinstance(index, bool) or index < 0 or index >= len(levels):
+                errors.append(f"case {case_id} ordinal_index must reference a declared level")
+
+        if case.get("truth", {}).get("verification_type") == "unknown":
+            errors.append(f"case {case_id} truth cannot use unknown verification")
+    return errors
+
+
+def calibration_semantic_errors(value: dict) -> list[str]:
+    errors: list[str] = []
+    metrics = value["metrics"]
+    total = metrics["total"]
+    if metrics["produced"] + metrics["abstained"] + metrics["failed"] != total:
+        errors.append("calibration coverage counts do not sum to total")
+    expected_coverage = metrics["produced"] / total
+    if abs(metrics["coverage"] - expected_coverage) > 1e-9:
+        errors.append("calibration coverage arithmetic mismatch")
+    if metrics["produced"] == 0:
+        if metrics["accuracy"] is not None:
+            errors.append("accuracy must be null when produced == 0")
+    elif metrics["accuracy"] is None or abs(metrics["accuracy"] - metrics["correct"] / metrics["produced"]) > 1e-9:
+        errors.append("calibration accuracy arithmetic mismatch")
+    if abs(metrics["abstention_rate"] - metrics["abstained"] / total) > 1e-9:
+        errors.append("calibration abstention_rate arithmetic mismatch")
+    if abs(metrics["failure_rate"] - metrics["failed"] / total) > 1e-9:
+        errors.append("calibration failure_rate arithmetic mismatch")
+
+    threshold = value["threshold"]
+    if value["dataset"]["split"] != "calibration" and threshold["tuning_allowed"]:
+        errors.append("threshold tuning is only allowed for calibration split")
+    selected = threshold.get("selected")
+    if selected is not None:
+        if not threshold["tuning_allowed"]:
+            errors.append("selected threshold requires tuning_allowed")
+        if selected["accepted"] > total:
+            errors.append("selected threshold accepted exceeds total")
+        if abs(selected["coverage"] - selected["accepted"] / total) > 1e-9:
+            errors.append("selected threshold coverage arithmetic mismatch")
+    return errors
+
+
+def regression_semantic_errors(value: dict) -> list[str]:
+    errors: list[str] = []
+    if value["side_effects"] is not False or value["consequence_authorized"] is not False:
+        errors.append("regression artifacts must be side-effect free and non-authorizing")
+    if value["passed"] != (len(value.get("failures", [])) == 0):
+        errors.append("regression passed must match failures emptiness")
+    return errors
 
 
 spec = {
@@ -304,5 +405,133 @@ counterfactual = copy.deepcopy(evaluation)
 counterfactual["mode"] = "counterfactual"
 counterfactual["changed_dimensions"] = []
 assert evaluation_semantic_errors(counterfactual)
+
+
+dataset = {
+    "format_version": 1,
+    "kind": "decision-eval-dataset",
+    "id": "property.zoning-conflict.eval",
+    "revision": 1,
+    "split": "calibration",
+    "decision": {
+        "spec_id": "property.zoning-conflict",
+        "spec_revision": 4,
+        "decision_kind": "boolean",
+    },
+    "state_schema": {"id": "lahaku.property-decision-state", "version": 3},
+    "cases": [
+        {
+            "id": "case-1",
+            "receipt": receipt,
+            "expected": {"value": True},
+            "truth": {
+                "verification_type": "external-authority",
+                "ref": "evidence:zoning-authority:44",
+                "observed_at": "2026-09-19T09:00:00Z",
+            },
+            "cost_usd": None,
+        }
+    ],
+    "created_at": "2026-09-19T10:00:00Z",
+}
+validate("decision-eval-dataset.v1.schema.json", dataset)
+assert not dataset_semantic_errors(dataset)
+mixed_provider = copy.deepcopy(dataset)
+mixed_provider["cases"].append(copy.deepcopy(dataset["cases"][0]))
+mixed_provider["cases"][1]["id"] = "case-2"
+mixed_provider["cases"][1]["receipt"]["id"] = "dec_02"
+mixed_provider["cases"][1]["receipt"]["provider"]["model"] = "different-model"
+assert dataset_semantic_errors(mixed_provider)
+
+calibration_report = {
+    "format_version": 1,
+    "kind": "decision-calibration",
+    "id": "cal_property_zoning_1",
+    "dataset": {"id": dataset["id"], "revision": 1, "split": "calibration"},
+    "decision": dataset["decision"],
+    "state_schema": dataset["state_schema"],
+    "provider": {"type": "jev", "id": "typesafe-jev", "model": "system-one", "version": "2026-09"},
+    "metrics": {
+        "total": 1,
+        "produced": 1,
+        "correct": 1,
+        "abstained": 0,
+        "failed": 0,
+        "coverage": 1.0,
+        "accuracy": 1.0,
+        "abstention_rate": 0.0,
+        "failure_rate": 0.0,
+        "brier_score": 0.0049,
+        "log_loss": 0.0725706928,
+        "expected_calibration_error": 0.07,
+        "ordinal_mae": None,
+        "mean_latency_ms": 87.0,
+        "total_cost_usd": None,
+    },
+    "reliability": {
+        "bin_count": 10,
+        "confidence_case_count": 1,
+        "bins": [
+            {"lower": 0.9, "upper": 1.0, "count": 1, "mean_confidence": 0.93, "accuracy": 1.0}
+        ],
+    },
+    "threshold": {
+        "tuning_allowed": True,
+        "target_accuracy": 0.9,
+        "minimum_coverage": 0.5,
+        "minimum_samples": 1,
+        "selected": {
+            "minimum_provider_confidence": 0.93,
+            "accepted": 1,
+            "coverage": 1.0,
+            "accuracy": 1.0,
+        },
+        "rationale": "lowest observed confidence satisfying calibration objectives",
+    },
+    "generated_at": "2026-09-19T10:05:00Z",
+    "side_effects": False,
+    "consequence_authorized": False,
+}
+validate("decision-calibration.v1.schema.json", calibration_report)
+assert not calibration_semantic_errors(calibration_report)
+test_tuning = copy.deepcopy(calibration_report)
+test_tuning["dataset"]["split"] = "test"
+assert calibration_semantic_errors(test_tuning)
+
+regression = {
+    "format_version": 1,
+    "kind": "decision-regression",
+    "id": "reg_zoning_1",
+    "baseline": {"calibration_id": "base", "dataset_id": "zoning-test", "dataset_revision": 1},
+    "candidate": {"calibration_id": "candidate", "dataset_id": "zoning-test", "dataset_revision": 1},
+    "budgets": {
+        "max_accuracy_drop": 0.01,
+        "max_coverage_drop": 0.02,
+        "max_brier_increase": 0.01,
+        "max_ece_increase": 0.01,
+        "max_ordinal_mae_increase": 0.1,
+        "max_mean_latency_increase_ms": None,
+        "max_total_cost_increase_usd": None,
+    },
+    "deltas": {
+        "accuracy": 0.0,
+        "coverage": 0.0,
+        "brier_score": 0.0,
+        "expected_calibration_error": 0.0,
+        "ordinal_mae": None,
+        "mean_latency_ms": 0.0,
+        "total_cost_usd": None,
+    },
+    "failures": [],
+    "passed": True,
+    "generated_at": "2026-09-19T10:06:00Z",
+    "side_effects": False,
+    "consequence_authorized": False,
+}
+validate("decision-regression.v1.schema.json", regression)
+assert not regression_semantic_errors(regression)
+bad_regression = copy.deepcopy(regression)
+bad_regression["passed"] = False
+assert regression_semantic_errors(bad_regression)
 
 print("Decision Kernel v1 schemas, fixtures and semantic invariants passed")
