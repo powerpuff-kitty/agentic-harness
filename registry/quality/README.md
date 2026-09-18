@@ -26,17 +26,27 @@ It complements the Architecture Registry. Architecture defines dependency/owners
 
 ```text
 language/
+  javascript/current.json
   typescript/current.json
   rust/current.json
+  python/current.json
+  go/current.json
 
 tooling/
   eslint/current.json
+  biome/current.json
   prettier/current.json
   rustfmt/current.json
   clippy/current.json
+  ruff/current.json
+  gofmt/current.json
+  go-vet/current.json
+
+patterns/
+  maintainability/1.json
 ```
 
-Additional JavaScript, Python, Go, Biome, Ruff and gofmt/go vet profiles are tracked by the quality roadmap.
+Additional framework-specific and ecosystem-specific quality profiles remain tracked by the quality roadmap.
 
 ## Machine contracts
 
