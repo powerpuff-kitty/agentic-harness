@@ -28,3 +28,7 @@ decisions:
     title: Use MIT for authored CLI, catalog and agent content
     status: accepted
     file: ADR-007-mit-licensing.md
+  - id: ADR-008
+    title: Adopt a provider-neutral Decision Kernel contract
+    status: accepted
+    file: ADR-008-decision-kernel.md
