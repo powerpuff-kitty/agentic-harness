@@ -34,6 +34,17 @@ def prepare(binary, destination, host_mode="current-session"):
     shutil.copytree(fixture, root, dirs_exist_ok=True, ignore=shutil.ignore_patterns(
         'node_modules', 'dist', 'test-results', 'playwright-report', 'evidence', '__pycache__',
         'manifest.yaml', 'lock.json', 'native-host'))
+    context_map = root / '.agentic/README.md'
+    context_map.write_text(context_map.read_text().replace(
+        'Unresolved sources; this fixture is not an installed project',
+        'Resolved sources and original installed-file checksums; authored overlays are recorded in trial.json'
+    ).replace(
+        'No optional docs, plans, tasks, packs, policies or skills have been installed. '
+        'Create supporting context only when useful content exists.',
+        'The manifest and lock record installed packs, policies and skills. '
+        'Optional docs, plans, tasks and eval routes remain null in this minimal installation. '
+        'Create supporting context only when useful content exists.'
+    ))
     design = root / '.agentic/DESIGN.md'
     design.write_text(design.read_text() + '''
 ## Approved native-host trial change
@@ -74,13 +85,17 @@ Only src/presentation/views/ReadingList.vue may change during this task.
                 '--tools', 'Read,Edit,Write,Glob,Grep', '--allowedTools', 'Read,Edit,Write,Glob,Grep',
                 '--max-budget-usd', '1', prompt]
     files = {}
+    links = {}
     for p in root.rglob('*'):
+        if p.is_symlink():
+            links[p.relative_to(root).as_posix()] = str(p.readlink())
         if p.is_file() and not p.is_symlink() and 'node_modules' not in p.relative_to(root).parts:
             files[p.relative_to(root).as_posix()] = sha(p)
     report = {'kind': 'prepared-native-host-trial', 'format_version': 1,
               'binary_sha256': sha(binary), 'cli_version': version,
               'host_mode': host_mode, 'host_version': host_version, 'cwd': str(root.resolve()), 'argv': argv,
               'allowed_change': 'src/presentation/views/ReadingList.vue', 'before': files,
+              'before_links': links,
               'max_budget_usd': 1 if host_mode == 'claude' else None,
               'supervisor_timeout_seconds': 300 if host_mode == 'claude' else None,
               'host_invoked': False, 'model_execution': 'not-run',
