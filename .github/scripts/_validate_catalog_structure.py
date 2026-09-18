@@ -136,6 +136,7 @@ for path in [ROOT / "README.md", ROOT / "AGENTS.md", ROOT / ".agentic", ROOT / "
         fail(f"missing required root path: {path.relative_to(ROOT)}")
 
 validate_target(ROOT, "self")
+validate_target(ROOT / ".agentic/evals/fixtures/context/reading-list", "web-app")
 if len(list((ROOT / ".agentic" / "decisions").glob("ADR-*.md"))) < 6:
     fail("self-hosting project must include real ADR examples, not only the template")
 

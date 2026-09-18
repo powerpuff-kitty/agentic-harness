@@ -60,6 +60,8 @@ Only the compact `AGENTS.md` router is mandatory at the project root. Vendor-req
 
 ## Composition and compatibility
 
+[Context selection v1](docs/project/context-selection-v1.md) adds catalog-owned full/minimal file selection, separate from organization profiles. Full remains the compatibility default; minimal retains core context and selected-module content. The optional manifest composition mapping persists selection. Existing files and routes are preserved across mode changes. See ADR-009; installed CLI support must be checked by version.
+
 Implemented composition selects a variant/preset/profile, installs context and selected modules, records source identities/checksums, preserves project-authored files and reports conflicts. Refer to the CLI's version-specific contract for exact behavior. Comprehensive generated vendor adapter synchronization is tracked work, not a current universal capability.
 
 Legacy root-level context can be inspected for compatibility. Automatic filesystem migration is not implemented in the current CLI. Use the [backup-first manual procedure](docs/project/migration-v1.md); the model-profile migration preview does not move files.
