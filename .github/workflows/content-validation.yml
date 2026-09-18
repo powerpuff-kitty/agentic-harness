@@ -21,3 +21,21 @@ jobs:
         run: |
           python3 -m pip install jsonschema==4.26.0
           python3 .github/scripts/validate_cli_contracts.py
+
+  reading-list:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .agentic/evals/fixtures/adoption/reading-list
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '26.8.1'
+          cache: npm
+          cache-dependency-path: .agentic/evals/fixtures/adoption/reading-list/package-lock.json
+      - run: npm ci --workspaces=false --no-fund --no-audit
+      - run: npm test
+      - run: npm run build
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: npm run test:browser

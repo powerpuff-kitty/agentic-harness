@@ -12,5 +12,6 @@ This repository is a self-hosting Agentic Harness project and the canonical cata
 8. Run catalog validation and relevant downstream tests before declaring a cross-repository change complete.
 9. State unresolved compatibility, migration, security, and validation gaps explicitly.
 10. Follow the [public-surface policy](.agentic/docs/project/public-surface.md) for files and collaboration metadata; never identify internal consumers in public content or fixtures.
+11. For TypeSafe/Jev integration, semantic decision features, or AI feature planning, use the installed [TypeSafe skill](.agents/skills/typesafe-ai/SKILL.md) and its live-documentation workflow. Keep deterministic rules and authorization in project-owned code.
 
 Vendor adapters must remain thin and point back to this file and `.agentic/`; they may not redefine canonical architecture.

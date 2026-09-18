@@ -1,0 +1,47 @@
+{
+  "exceptions": [],
+  "format_version": 1,
+  "kind": "architecture-contract",
+  "profiles": [
+    "pattern/dependency-hygiene/1",
+    "pattern/layered/1"
+  ],
+  "registry_schema_version": 1,
+  "rules": [
+    {
+      "authority": "harness",
+      "enforceability": "deterministic",
+      "id": "dependency.no-import-cycles",
+      "profile": "pattern/dependency-hygiene/1",
+      "severity": "error"
+    },
+    {
+      "authority": "harness",
+      "enforceability": "deterministic",
+      "id": "layered.application-direction",
+      "profile": "pattern/layered/1",
+      "severity": "error"
+    },
+    {
+      "authority": "harness",
+      "enforceability": "deterministic",
+      "id": "layered.domain-independent",
+      "profile": "pattern/layered/1",
+      "severity": "error"
+    },
+    {
+      "authority": "harness",
+      "enforceability": "deterministic",
+      "id": "layered.infrastructure-inward",
+      "profile": "pattern/layered/1",
+      "severity": "error"
+    },
+    {
+      "authority": "harness",
+      "enforceability": "deterministic",
+      "id": "layered.presentation-direction",
+      "profile": "pattern/layered/1",
+      "severity": "error"
+    }
+  ]
+}
