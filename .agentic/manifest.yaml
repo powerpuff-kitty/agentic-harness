@@ -41,6 +41,7 @@ modules:
     - security
 
 skills:
+  - typesafe-ai
   - agentic-app
   - codebase-audit
   - security-review
