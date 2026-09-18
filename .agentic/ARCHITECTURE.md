@@ -72,6 +72,8 @@ Declared policy, delivered instructions, executed checks and enforced restrictio
 
 The planned evidence model and approved check runner must preserve source/config identity, freshness, failure/skip states and host limitations. Do not change existing artifact meanings silently while implementing them.
 
+The experimental [local execution contract](docs/project/check-execution-v1.md) also distinguishes invocation review time, execution and bounded cleanup/recovery. Its macOS `no-live-group-members` observation requires verified native inspection; it never treats arbitrary permission errors as successful cleanup. Consumers must use a compatible pinned schema. Local execution does not establish imported-evidence authenticity or global completion.
+
 ## Invariants
 
 - Project truth remains local, inspectable and self-contained.
