@@ -1,0 +1,75 @@
+{
+  "format_version": 1,
+  "kind": "check-policy",
+  "inputs": [
+    "src",
+    "tests",
+    "public",
+    "package.json",
+    "package-lock.json",
+    "tsconfig.json",
+    "vite.config.ts",
+    "playwright.config.ts",
+    "index.html",
+    ".node-version",
+    "AGENTS.md",
+    ".agentic/PRODUCT.md",
+    ".agentic/ARCHITECTURE.md",
+    ".agentic/SECURITY.md",
+    ".agentic/DESIGN.md",
+    ".agentic/architecture.json",
+    ".agentic/design-system.json"
+  ],
+  "checks": [
+    {
+      "id": "unit",
+      "argv": [
+        "node",
+        "--test",
+        "tests/domain.test.ts"
+      ],
+      "cwd": ".",
+      "required": true,
+      "timeout_ms": 60000,
+      "max_output_bytes": 65536
+    },
+    {
+      "id": "types",
+      "argv": [
+        "node",
+        "node_modules/vue-tsc/bin/vue-tsc.js",
+        "--noEmit"
+      ],
+      "cwd": ".",
+      "required": true,
+      "timeout_ms": 120000,
+      "max_output_bytes": 65536
+    },
+    {
+      "id": "build",
+      "argv": [
+        "node",
+        "node_modules/vite/bin/vite.js",
+        "build"
+      ],
+      "cwd": ".",
+      "required": true,
+      "timeout_ms": 120000,
+      "max_output_bytes": 65536
+    },
+    {
+      "id": "browser",
+      "argv": [
+        "node",
+        "node_modules/@playwright/test/cli.js",
+        "test"
+      ],
+      "cwd": ".",
+      "required": true,
+      "timeout_ms": 120000,
+      "max_output_bytes": 131072
+    }
+  ],
+  "required_controls": [],
+  "max_age_ms": 3600000
+}

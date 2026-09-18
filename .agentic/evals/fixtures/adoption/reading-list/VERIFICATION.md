@@ -1,6 +1,6 @@
 # Local verification — 2026-09-18
 
-Status: runnable application and deterministic adoption probes verified locally. **Issue #86 remains open**: this record is not executor-generated completion evidence or a native-host/model trial.
+Status: runnable application, deterministic adoption probes and reviewed local execution verified. **Issue #86 remains open**: imported completion evidence and a native-host/model trial remain unverified. The first sections record the earlier adoption baseline; the executor follow-up below uses the corrected CLI.
 
 ## Reproduction identities
 
@@ -56,10 +56,22 @@ The original CLI accepted computed `import(name)` as complete architecture evide
 
 ## Remaining completion gates
 
-- CLI #55 / draft PR #60 still own reviewed execution, process cleanup, deadlines/budgets, outcome ledger integration and stale completion rejection. The fixture only declares checks and verifies planning digests. Missing-tool execution outcomes remain part of that executor integration.
+- CLI #55 / draft PR #60 has local executor corrections and the trial below. Authenticated imported-evidence freshness and completion rejection remain pending; rejecting a stale execution review does not establish that gate.
 - Run an actual native coding-host/model trial with delivered context, an implementation change and recorded accept/reject evidence. Neither adapter installation nor this Codex-authored fixture proves host effectiveness.
 - Observe Linux CI after publication; other operating systems/browsers, screen-reader/zoom testing, full accessibility review and performance budgets remain unverified. Axe checks in three states are not a WCAG compliance certification.
 - The layered profile does not enforce component-versus-view ownership within presentation, external Vue imports into domain, or semantic logic placement. The design checker does not prove every token use. Those gaps remain explicit review obligations.
 - Changes are local; no issue status, remote branch, pull request or deployment was published by this work.
 
 Tool references: [Vite setup/build](https://vite.dev/guide/), [Playwright configuration](https://playwright.dev/docs/test-configuration). Project rules and acceptance remain in `.agentic/`, not in these external references.
+
+## Executor follow-up
+
+CLI source `283817f` passed this fixture through the #55 executor with #61 ledger, #62 ownership and #63 budget corrections. Binary SHA-256: `bfede1e7a1b94c8014142e240538a52b80128e2a24d4dfd7c8086181cc6909c0`; embedded canonical source: `e109cabb62521143cb4abe6c475dbe61d6a3d1d6`. Agent and model pins match the baseline above.
+
+```sh
+python3 tests/execution.py /absolute/path/to/ah --report /tmp/reading-list-execution.json
+```
+
+All four declared native-Node commands passed: unit, types, build and browser. All direct children were reaped; macOS reported inspected `no-live-group-members` cleanup. Total invocation was 39,113 ms, including 20,536 ms of review/revalidation. A changed source refused the old approval digest; an absent native tool failed preparation. Global `completion_verified` stayed false.
+
+The fixed synthetic trial copies source into a temporary project, checks exact authored argv before approving that trial, and links preinstalled dependencies. It is not approval automation for arbitrary projects. Installed transitive dependency bytes and runtime versions are not authenticated by the executor. Full CLI validation passed 174 Rust tests, Clippy, formatting, canonical schema checks and copied-binary candidate probes. These remain local macOS x86_64 results; no remote CI or native-host effectiveness claim is made.

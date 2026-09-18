@@ -27,10 +27,20 @@ python3 tests/adoption.py /absolute/path/to/ah
 
 The tests print the binary identity and SHA-256, copy this fixture into temporary directories, and exercise clean architecture/design checks, seeded wrong-direction imports, raw controls/literal colors, scoped exceptions, expired exceptions, computed-import coverage, check-plan drift and repeated initialization/upgrade/adapter synchronization. They require the computed-import completeness fix described in `VERIFICATION.md`; an older binary should fail that regression.
 
-These are bounded regression tests, not an alternative check executor. `.agentic/checks.json` declares unit/build/browser commands for the existing CLI planning contract. `ah checks plan . --config .agentic/checks.json` previews and fingerprints them without running or approving them. The CLI #55 executor, execution evidence ledger, stale completion rejection and native host/model outcomes remain outstanding.
+These are bounded regression tests, not an alternative check executor. `.agentic/checks.json` declares unit/build/browser commands for the existing CLI planning contract. `ah checks plan . --config .agentic/checks.json` previews and fingerprints them without running or approving them. The corrected local CLI #55 executor is exercised separately below. Imported completion-evidence freshness and native host/model outcomes remain outstanding.
 
 Architecture and design configuration express **this fixture's selected rules**. See [the context map](.agentic/README.md) for their rationale and limitations. `ah audit` also reports the fixture's absent standalone CI/deployment/runbook configuration and returns 1; the adoption tests assert the relevant architecture/design sections, not overall production readiness. The parent catalog workflow runs the application tests.
 
 The committed harness lock deliberately remains unresolved: authored context is not installation provenance. Installation/upgrade tests resolve pins in disposable copies and check preservation. The original [context-only example](../../context/reading-list/README.md) remains independently inspectable.
 
 See [VERIFICATION.md](VERIFICATION.md) for exact local evidence and remaining completion gates. Do not close #86 based only on this fixture.
+
+## Reviewed execution trial
+
+After installing the dependencies and browser above, use a CLI containing the executor corrections recorded in `VERIFICATION.md`:
+
+```sh
+python3 tests/execution.py /absolute/path/to/ah --report /tmp/reading-list-execution.json
+```
+
+`.agentic/checks.native.json` declares explicit native Node invocations for unit tests, type checking, build and browser tests. The disposable trial reviews those exact synthetic commands, executes them, then checks stale-review and missing-tool refusal. It does not grant approval to arbitrary repository policies or establish imported completion freshness.
