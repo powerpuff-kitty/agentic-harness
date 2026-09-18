@@ -1,6 +1,6 @@
 # Local verification — 2026-09-18
 
-Status: runnable application, deterministic adoption probes and reviewed local execution verified. **Issue #86 remains open**: imported completion evidence and a native-host/model trial remain unverified. The first sections record the earlier adoption baseline; the executor follow-up below uses the corrected CLI.
+Status: runnable application, deterministic adoption probes and reviewed local execution verified. **Issue #86 remains open**: caller-approved scoped completion is verified in the follow-up below; signed producers and a native-host/model trial remain unverified. The first sections record the earlier adoption baseline; the executor follow-up below uses the corrected CLI.
 
 ## Reproduction identities
 
@@ -56,7 +56,7 @@ The original CLI accepted computed `import(name)` as complete architecture evide
 
 ## Remaining completion gates
 
-- CLI #55 / draft PR #60 has local executor corrections and the trial below. Authenticated imported-evidence freshness and completion rejection remain pending; rejecting a stale execution review does not establish that gate.
+- CLI #55 / draft PR #60 has local executor corrections and the trial below. The later follow-up verifies caller-approved imported completion and rejects post-invocation source changes. Signed producer authentication remains deferred.
 - Run an actual native coding-host/model trial with delivered context, an implementation change and recorded accept/reject evidence. Neither adapter installation nor this Codex-authored fixture proves host effectiveness.
 - Observe Linux CI after publication; other operating systems/browsers, screen-reader/zoom testing, full accessibility review and performance budgets remain unverified. Axe checks in three states are not a WCAG compliance certification.
 - The layered profile does not enforce component-versus-view ownership within presentation, external Vue imports into domain, or semantic logic placement. The design checker does not prove every token use. Those gaps remain explicit review obligations.
@@ -75,3 +75,11 @@ python3 tests/execution.py /absolute/path/to/ah --report /tmp/reading-list-execu
 All four declared native-Node commands passed: unit, types, build and browser. All direct children were reaped; macOS reported inspected `no-live-group-members` cleanup. Total invocation was 39,113 ms, including 20,536 ms of review/revalidation. A changed source refused the old approval digest; an absent native tool failed preparation. Global `completion_verified` stayed false.
 
 The fixed synthetic trial copies source into a temporary project, checks exact authored argv before approving that trial, and links preinstalled dependencies. It is not approval automation for arbitrary projects. Installed transitive dependency bytes and runtime versions are not authenticated by the executor. Full CLI validation passed 174 Rust tests, Clippy, formatting, canonical schema checks and copied-binary candidate probes. These remain local macOS x86_64 results; no remote CI or native-host effectiveness claim is made.
+
+## Caller-approved completion follow-up
+
+The owner selected explicit caller-approved report digests first, signed producers later (ADR-010). The updated `tests/execution.py` ran all four app checks, saved the run and an exact-digest evidence manifest outside declared inputs, and obtained `check-completion` for `scope:declared-checks-and-required-controls` with `producer_authenticated:false`. Changing source after that run rejected the same approved manifest. The original check-run's completion field and this trial's whole-project completion remain false.
+
+CLI implementation `1f08b82`; 190 Rust tests, Clippy/formatting, actual schemas and copied-binary candidate validation (25 completion cases) passed. Tested binary SHA-256: `a5ab1faca2e0741496eb47049eefad5328c6d23c271f2d3496b70a01ea44f68c`; canonical pin `eac2d48`, agents pin `7e7d44e`. Run duration: 23,678 ms. This fixture declares no required governance controls; it does not fabricate host evidence. Separate synthetic CLI probes cover required governance claims and producer/reference bindings. The synthetic harness approves only its fixed authored artifacts, not arbitrary imported reports.
+
+These are local macOS x86_64 results. Signed producers, cross-platform CI and native coding-host/model verification remain outstanding, and #86 stays open.

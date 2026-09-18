@@ -72,8 +72,28 @@ with tempfile.TemporaryDirectory(prefix='ah-reading-execution-') as directory:
     assert (root / 'dist/index.html').is_file()
     assert (root / 'dist/THIRD_PARTY_NOTICES.txt').is_file()
 
+    # Approve only this fixed synthetic run's bytes, never arbitrary imported reports.
+    evidence_dir = root / 'evidence'
+    evidence_dir.mkdir()
+    run_bytes = json.dumps(result, sort_keys=True).encode()
+    (evidence_dir / 'run.json').write_bytes(run_bytes)
+    manifest = {'format_version': 1, 'kind': 'check-evidence-manifest',
+                'run': {'path': 'evidence/run.json', 'digest': 'sha256:' + hashlib.sha256(run_bytes).hexdigest()},
+                'governance': [], 'references': []}
+    assert policy['required_controls'] == [], 'Do not invent governance evidence for this app trial.'
+    manifest_bytes = json.dumps(manifest, sort_keys=True).encode()
+    (evidence_dir / 'manifest.json').write_bytes(manifest_bytes)
+    complete_args = ('checks', 'complete', *config, '--evidence', 'evidence/manifest.json',
+                     '--approve-evidence', 'sha256:' + hashlib.sha256(manifest_bytes).hexdigest())
+    completion = call(*complete_args)
+    assert completion['completion_verified'] is True
+    assert completion['scope'] == 'declared-checks-and-required-controls'
+    assert completion['producer_authenticated'] is False
+
     source = root / 'src/domain/entry.ts'
     source.write_text(source.read_text() + '\n// changed after the successful trial\n')
+    stale_completion = call(*complete_args, expected=2)
+    assert stale_completion['kind'] == 'diagnostic'
     stale = call(*run_args, expected=2)
     assert stale['kind'] == 'diagnostic'
     missing = json.loads(settings.read_text())
@@ -88,8 +108,8 @@ with tempfile.TemporaryDirectory(prefix='ah-reading-execution-') as directory:
         'results': [{'id': r['id'], 'outcome': r['outcome']} for r in result['results']],
         'duration_ms': result['duration_ms'], 'timing': result['timing'],
         'stale_review_rejected': True, 'missing_tool_rejected': True,
-        'completion_verified': False,
-        'limitations': ['No imported-evidence freshness/completion gate or native coding-host/model trial.',
+        'completion_verified': False, 'scoped_completion': completion, 'stale_completion_rejected': True,
+        'limitations': ['No signed producer or native coding-host/model trial; required governance controls are empty in this app trial.',
                         'Installed third-party/transitive bytes and runtime versions are not authenticated by this executor.',
                         'Local macOS/Linux backend only; this trial is not a sandbox test.'],
     }
