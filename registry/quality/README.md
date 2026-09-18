@@ -54,6 +54,7 @@ Additional framework-specific and ecosystem-specific quality profiles remain tra
 - `quality-analysis.schema.json` defines normalized read-only analysis output.
 - `quality-contract.schema.json` defines optional project-local policy (recommended path: `.agentic/quality.json`) without inventing tool choices.
 - `quality-baseline.schema.json` preserves historical findings, metrics, tool/config identity and coverage for debt ratcheting.
+- `quality-diff.schema.json` compares the current inventory to a baseline and makes stale identity explicit.
 
 A normalized finding carries the stable Harness rule ID, optional native diagnostic code, category, severity, enforceability, exact evidence and remediation. Reports separately list performed, not-checked and unsupported capability.
 
