@@ -52,6 +52,8 @@ Additional framework-specific and ecosystem-specific quality profiles remain tra
 
 - `quality-profile.schema.json` defines canonical profile/rule/source metadata.
 - `quality-analysis.schema.json` defines normalized read-only analysis output.
+- `quality-contract.schema.json` defines optional project-local policy (recommended path: `.agentic/quality.json`) without inventing tool choices.
+- `quality-baseline.schema.json` preserves historical findings, metrics, tool/config identity and coverage for debt ratcheting.
 
 A normalized finding carries the stable Harness rule ID, optional native diagnostic code, category, severity, enforceability, exact evidence and remediation. Reports separately list performed, not-checked and unsupported capability.
 
@@ -66,3 +68,10 @@ A normalized finding carries the stable Harness rule ID, optional native diagnos
 - `ah audit` quality coverage
 - `ah verify`
 - agent quality-review/remediation procedures
+
+
+## Project contracts and ratchets
+
+Projects may opt into a `.agentic/quality.json` contract. The contract selects profiles and required checks, defines project-specific thresholds, controls autofix scope, and uses dated/path-scoped exceptions. No contract is generated automatically merely because a formatter or linter was detected.
+
+A quality baseline stores the full historical finding inventory plus tool/config identity and coverage. A baseline is not a waiver: existing findings remain reportable. Ratchets may reject new findings, severity increases or metric regressions while allowing legacy debt to be reduced incrementally. Material contract/tool/config changes make previous evidence subject to reconciliation rather than silent reuse.
