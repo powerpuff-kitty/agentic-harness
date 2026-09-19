@@ -35,4 +35,4 @@ A fixture can validate a rubric; only recorded observations can establish behavi
 - [TypeSafe confidence](https://docs.typesafe.ai/confidence): distributions, uncertainty and domain-specific evaluation.
 - [Agent Skills specification](https://agentskills.io/specification): narrow metadata, concise instructions and on-demand references.
 
-References were reviewed on 2026-09-20; availability and API details must be rechecked when implementing an integration. No hosted model was called to author or validate this guide.
+References were reviewed on 2026-09-20; availability and API details must be rechecked when implementing an integration. No TypeSafe inference was performed for this change.
