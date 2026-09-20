@@ -205,7 +205,34 @@ MAX_SOURCE_BYTES = 1_048_576
 MAX_TOTAL_SOURCE_BYTES = 4_194_304
 
 
-def _bind_sources(value: dict, sources: Any) -> dict:
+def _source_context(reference: str, digest: str, lines: list[bytes],
+                    final_newline: bool, occurrences: list[dict]) -> dict:
+    """Retain the complement of verified rule ranges, not inferred rule meaning."""
+    cursor = 1
+    gaps = []
+    for start, end in sorted((r['source']['start_line'], r['source']['end_line'])
+                             for r in occurrences):
+        if cursor < start:
+            gaps.append((cursor, start - 1))
+        cursor = max(cursor, end + 1)
+    if cursor <= len(lines):
+        gaps.append((cursor, len(lines)))
+
+    spans = []
+    retained_lines = 0
+    for start, end in gaps:
+        raw = b'\n'.join(lines[start - 1:end])
+        if end < len(lines) or final_newline:
+            raw += b'\n'
+        spans.append({'start_line': start, 'end_line': end, 'text': raw.decode('utf-8')})
+        retained_lines += end - start + 1
+    return {'reference': reference, 'sha256': digest,
+            'rule_covered_lines': len(lines) - retained_lines,
+            'retained_context_lines': retained_lines, 'spans': spans}
+
+
+def _bind_sources(value: dict, sources: Any, *,
+                  context_records: list[dict] | None = None) -> dict:
     if type(sources) is not dict:
         raise RuleError('invalid-source-map')
     if len(sources) > MAX_SOURCE_COUNT:
@@ -262,6 +289,9 @@ def _bind_sources(value: dict, sources: Any) -> dict:
                 excerpt += b'\n'
             if excerpt != rule['statement'].encode('utf-8'):
                 raise RuleError('source-statement-mismatch')
+        if context_records is not None:
+            context_records.append(_source_context(reference, actual_digest, lines,
+                                                   final_newline, occurrences))
         identities.append({'reference': reference, 'sha256': actual_digest,
                            'bytes': len(raw), 'lines': len(lines)})
 
@@ -274,33 +304,47 @@ def _bind_sources(value: dict, sources: Any) -> dict:
 
 
 def compile_with_sources(value: Any, *, target: str, sources: dict[str, bytes],
-                         budget_bytes: int = DEFAULT_BUDGET) -> dict:
+                         budget_bytes: int = DEFAULT_BUDGET,
+                         preserve_source_context: bool = False) -> dict:
     """Bind a review plan to an exact, caller-supplied full-source byte map.
 
     This optional repository API does not acquire files, authenticate their origin,
     establish freshness, find omitted rules or upgrade the declared authority.
     A matching source map is not approval, a Jev cache hit or project verification.
     The nested Rule IR v1 is unchanged; binding evidence belongs to this report.
+    Opting into preserve_source_context returns all surrounding supplied text too;
+    review the full source disclosure for the destination before enabling it.
+    Coverage of supplied lines is not semantic completeness or source discovery.
     All inputs must remain quiescent during the call. Fixed-code RuleError rejects
     mismatches without returning source text, references or a partially bound plan.
     """
     if type(budget_bytes) is not int or not 1 <= budget_bytes <= MAX_BYTES:
         raise RuleError('invalid-output-budget')
+    if type(preserve_source_context) is not bool:
+        raise RuleError('invalid-source-context-mode')
     plan = _compile_inventory(value)
     if type(target) is not str or target != value['target']:
         raise RuleError('source-target-mismatch')
-    binding = _bind_sources(value, sources)
+    context_records = [] if preserve_source_context else None
+    binding = _bind_sources(value, sources, context_records=context_records)
     result = {'format_version': 1, 'kind': 'rule-source-review',
               'authority': 'navigation-only', 'target': target, 'status': plan['status'],
               'source_binding': binding, 'plan': plan, 'complete_payload_emitted': True}
+    if preserve_source_context:
+        result['source_context'] = {
+            'scope': 'supplied-sources-only', 'all_supplied_lines_represented': True,
+            'sources': context_records}
     output_bytes = len(encoded(result))
     if output_bytes > budget_bytes:
         # This small diagnostic can itself exceed a very small requested budget;
         # the budget governs the complete review payload, never evidence clipping.
-        return {'format_version': 1, 'kind': 'rule-source-review',
+        deferred = {'format_version': 1, 'kind': 'rule-source-review',
                 'authority': 'navigation-only', 'status': 'budget-exceeded',
                 'source_binding': None, 'plan': None, 'complete_payload_emitted': False,
                 'required_output_bytes': output_bytes, 'budget_bytes': budget_bytes,
                 'conflicts_detected': len(plan['conflicts']),
                 'next_step': 'Review the selected task scope or raise the budget; do not drop applicable rules.'}
+        if preserve_source_context:
+            deferred['source_context'] = None
+        return deferred
     return result
