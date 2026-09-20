@@ -1,8 +1,17 @@
 {
-  "format_version": 1,
+  "format_version": 2,
   "kind": "standalone-skill",
   "name": "agentic-improvement",
-  "files": ["SKILL.md", "references/efficiency.md"],
-  "optional_tools": [],
-  "shared_references": {}
+  "files": ["SKILL.md", "references/efficiency.md", "scripts/compact_log.py"],
+  "optional_tools": [
+    {"name": "python3", "fallback": "Use the manual diagnostic procedure; never install or execute a helper automatically."}
+  ],
+  "shared_references": {},
+  "optional_scripts": [
+    {
+      "path": "scripts/compact_log.py",
+      "execution": "explicit-invocation-only",
+      "fallback": "Preserve each distinct diagnostic, its order, source and truncation manually. Missing helper execution is not a passed check or permission to discard evidence."
+    }
+  ]
 }

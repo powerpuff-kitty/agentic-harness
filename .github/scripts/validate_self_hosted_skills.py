@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify reviewed self-hosted skills and declarations; never fetch or install."""
+"""Verify reviewed self-hosted skills and declarations; never fetch, install or execute helpers."""
 from __future__ import annotations
 
 import hashlib
@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = '90d0c95a3ffc6b2676cf62b6f8f5a21be501069b'
+REVISION = '7a82aafdaf692fc343e107708c67d6d1e67036a2'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -24,8 +24,9 @@ EXPECTED = {
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
-    "agentic-improvement/bundle.json": "22c849c8d25e6ddad13c8c910a187cdb8ca88b8d",
-    "agentic-improvement/references/efficiency.md": "e7f7d28bbeb8c3109008f4fe2ccfb87e0df0c724",
+    "agentic-improvement/bundle.json": "9d2e3b093909037b1c604b43838820f959a850b2",
+    "agentic-improvement/references/efficiency.md": "0168195f27eecda66ded604df60bb8d023e6feb0",
+    "agentic-improvement/scripts/compact_log.py": "39db1fee08fca6614605719c0acee0854965eeac",
     "codebase-audit/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "codebase-audit/SKILL.md": "b067587f94411fe4078d715899f3084f55b83ef1",
     "codebase-audit/bundle.json": "db8517805e844168fac766fc695d78274d7f11b9",
@@ -160,7 +161,9 @@ def inventory(folder: Path, prefix: str = '') -> set[str]:
                 require(not linked(meta), 'linked input refused')
                 name = relative + entry.name
                 if stat.S_ISDIR(meta.st_mode):
-                    require(name == 'references', 'undeclared directory')
+                    require(name in ('references', 'scripts') and
+                            any(p.startswith(folder.name + '/' + name + '/') for p in EXPECTED),
+                            'undeclared directory')
                     walk(entry, name + '/', depth + 1)
                 else:
                     require(stat.S_ISREG(meta.st_mode), 'regular input required')
@@ -230,6 +233,16 @@ def verify(root: Path = ROOT) -> dict:
                     'incomplete bundle declaration')
             require(bundle['name'] == name and bundle['kind'] == 'standalone-skill',
                     'incorrect bundle identity')
+            version = bundle.get('format_version')
+            require(type(version) is int and version in (1, 2), 'unsupported bundle version')
+            scripts = {p for p in actual if p.startswith('scripts/')}
+            if version == 2:
+                optional = bundle.get('optional_scripts', [])
+                require(bool(optional) and {s['path'] for s in optional} == scripts and
+                        all(s['execution'] == 'explicit-invocation-only' and s['fallback']
+                            for s in optional), 'invalid optional helper declaration')
+            else:
+                require(not scripts, 'v1 bundle cannot contain scripts')
         for file in actual:
             if not file.endswith('.md'):
                 continue
@@ -245,6 +258,7 @@ def verify(root: Path = ROOT) -> dict:
         'independent_skills': list(INDEPENDENT), 'shared_source_paths': SHARED_SOURCES,
         'network_calls': 0, 'host_loading_verified': False,
         'model_behaviour_verified': False, 'token_savings_verified': False,
+        'script_execution': 'not-performed',
         'limitations': ['trusted quiescent checkout', 'reviewed hashes are not signatures',
                         'independent vendor content is not source-verified',
                         'manifest skills use a checked authoring subset, not full YAML parsing'],
