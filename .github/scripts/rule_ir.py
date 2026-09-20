@@ -101,14 +101,8 @@ def _digest(raw: bytes) -> str:
     return 'sha256:' + hashlib.sha256(raw).hexdigest()
 
 
-def compile_inventory(value: Any, *, budget_bytes: int = DEFAULT_BUDGET) -> dict:
-    """Combine declared exact duplicates; expose conflicts without resolving them.
-
-    Raises fixed-code RuleError on malformed/ambiguous input, never a partial plan.
-    The output is a generated review view, not authenticated or executable policy.
-    """
-    if type(budget_bytes) is not int or not 1 <= budget_bytes <= MAX_BYTES:
-        raise RuleError('invalid-output-budget')
+def _compile_inventory(value: Any) -> dict:
+    """Build a bounded-input review view before applying a caller output budget."""
     try:
         raw = _bounded(value)
         if not VALIDATOR.is_valid(value) or type(value.get('format_version')) is not int:
@@ -181,12 +175,132 @@ def compile_inventory(value: Any, *, budget_bytes: int = DEFAULT_BUDGET) -> dict
                         'nonidentical-selector-overlap', 'natural-language-contradictions',
                         'host-precedence-and-loading'],
     }
+    return result
+
+
+def compile_inventory(value: Any, *, budget_bytes: int = DEFAULT_BUDGET) -> dict:
+    """Combine declared exact duplicates; expose conflicts without resolving them.
+
+    Raises fixed-code RuleError on malformed/ambiguous input, never a partial plan.
+    The output is a generated review view, not authenticated or executable policy.
+    """
+    if type(budget_bytes) is not int or not 1 <= budget_bytes <= MAX_BYTES:
+        raise RuleError('invalid-output-budget')
+    result = _compile_inventory(value)
     output_bytes = len(encoded(result))
     if output_bytes > budget_bytes:
         # Never prune mandatory rules, occurrences, exceptions or conflicting rules.
         return {'format_version': 1, 'kind': 'compiled-rule-ir', 'authority': 'navigation-only',
                 'status': 'budget-exceeded', 'rules': [], 'conflicts': [],
                 'required_output_bytes': output_bytes, 'budget_bytes': budget_bytes,
-                'conflicts_detected': len(conflicts), 'complete_payload_emitted': False,
+                'conflicts_detected': len(result['conflicts']), 'complete_payload_emitted': False,
+                'next_step': 'Review the selected task scope or raise the budget; do not drop applicable rules.'}
+    return result
+
+
+# These bounds apply to bytes the caller has already acquired. The API never
+# interprets a reference as a path, URL or permission to acquire more material.
+MAX_SOURCE_COUNT = 128
+MAX_SOURCE_BYTES = 1_048_576
+MAX_TOTAL_SOURCE_BYTES = 4_194_304
+
+
+def _bind_sources(value: dict, sources: Any) -> dict:
+    if type(sources) is not dict:
+        raise RuleError('invalid-source-map')
+    if len(sources) > MAX_SOURCE_COUNT:
+        raise RuleError('source-count-limit')
+    if any(type(key) is not str for key in sources):
+        raise RuleError('invalid-source-reference')
+    selected = dict(sources)
+    by_reference: dict[str, list[dict]] = {}
+    for rule in value['rules']:
+        by_reference.setdefault(rule['source']['reference'], []).append(rule)
+    if set(selected) != set(by_reference):
+        raise RuleError('source-set-mismatch')
+
+    # Validate the entire map before hashing or decoding any selected contents.
+    total_bytes = 0
+    for raw in selected.values():
+        if type(raw) is not bytes:
+            raise RuleError('source-bytes-required')
+        if len(raw) > MAX_SOURCE_BYTES:
+            raise RuleError('source-size-limit')
+        total_bytes += len(raw)
+        if total_bytes > MAX_TOTAL_SOURCE_BYTES:
+            raise RuleError('source-total-size-limit')
+    for occurrences in by_reference.values():
+        if len({item['source']['sha256'] for item in occurrences}) != 1:
+            raise RuleError('conflicting-source-versions')
+
+    identities = []
+    for reference, occurrences in sorted(by_reference.items()):
+        raw = selected[reference]
+        actual_digest = _digest(raw)
+        if actual_digest != occurrences[0]['source']['sha256']:
+            raise RuleError('source-digest-mismatch')
+        try:
+            text = raw.decode('utf-8')
+        except UnicodeError:
+            raise RuleError('source-not-utf8-text') from None
+        if any(ord(char) < 32 and char not in '\t\r\n' or 127 <= ord(char) <= 159 for char in text):
+            raise RuleError('source-not-utf8-text')
+
+        # Only LF delimits lines, exactly as in RuleInventory v1. Keep CRLF,
+        # Unicode separators and the final-newline distinction byte-exact.
+        lines = raw.split(b'\n') if raw else []
+        final_newline = raw.endswith(b'\n')
+        if final_newline:
+            lines.pop()
+        for rule in occurrences:
+            start = rule['source']['start_line']
+            end = rule['source']['end_line']
+            if end > len(lines):
+                raise RuleError('source-range-unavailable')
+            excerpt = b'\n'.join(lines[start - 1:end])
+            if end < len(lines) or final_newline:
+                excerpt += b'\n'
+            if excerpt != rule['statement'].encode('utf-8'):
+                raise RuleError('source-statement-mismatch')
+        identities.append({'reference': reference, 'sha256': actual_digest,
+                           'bytes': len(raw), 'lines': len(lines)})
+
+    return {'matched': True, 'scope': 'supplied-byte-map-only',
+            'inventory_sha256': _digest(encoded(value)),
+            'sources': identities, 'occurrences_checked': len(value['rules']),
+            'source_bytes_checked': total_bytes,
+            'acquisition_authenticated': False, 'current_at_use_verified': False,
+            'inventory_complete': None, 'authority_authenticated': False}
+
+
+def compile_with_sources(value: Any, *, target: str, sources: dict[str, bytes],
+                         budget_bytes: int = DEFAULT_BUDGET) -> dict:
+    """Bind a review plan to an exact, caller-supplied full-source byte map.
+
+    This optional repository API does not acquire files, authenticate their origin,
+    establish freshness, find omitted rules or upgrade the declared authority.
+    A matching source map is not approval, a Jev cache hit or project verification.
+    The nested Rule IR v1 is unchanged; binding evidence belongs to this report.
+    All inputs must remain quiescent during the call. Fixed-code RuleError rejects
+    mismatches without returning source text, references or a partially bound plan.
+    """
+    if type(budget_bytes) is not int or not 1 <= budget_bytes <= MAX_BYTES:
+        raise RuleError('invalid-output-budget')
+    plan = _compile_inventory(value)
+    if type(target) is not str or target != value['target']:
+        raise RuleError('source-target-mismatch')
+    binding = _bind_sources(value, sources)
+    result = {'format_version': 1, 'kind': 'rule-source-review',
+              'authority': 'navigation-only', 'target': target, 'status': plan['status'],
+              'source_binding': binding, 'plan': plan, 'complete_payload_emitted': True}
+    output_bytes = len(encoded(result))
+    if output_bytes > budget_bytes:
+        # This small diagnostic can itself exceed a very small requested budget;
+        # the budget governs the complete review payload, never evidence clipping.
+        return {'format_version': 1, 'kind': 'rule-source-review',
+                'authority': 'navigation-only', 'status': 'budget-exceeded',
+                'source_binding': None, 'plan': None, 'complete_payload_emitted': False,
+                'required_output_bytes': output_bytes, 'budget_bytes': budget_bytes,
+                'conflicts_detected': len(plan['conflicts']),
                 'next_step': 'Review the selected task scope or raise the budget; do not drop applicable rules.'}
     return result
