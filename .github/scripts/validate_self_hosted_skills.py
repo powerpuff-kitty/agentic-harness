@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = '9d029d60bec1ca827a278d0ab18a6ad3e4fc13dc'
+REVISION = '90d0c95a3ffc6b2676cf62b6f8f5a21be501069b'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -17,7 +17,9 @@ PREFIX = '.agents/skills/'
 # comes from upstream LICENSE and lifecycle's shared guides come from references/.
 EXPECTED = {
     "agentic-app/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
-    "agentic-app/SKILL.md": "30d5644f9491fe29d4b151458d3dfc2d2b2a30db",
+    "agentic-app/SKILL.md": "83d6cbcfc4d6c2959a1ea1a8ff2b56d20414fc79",
+    "agentic-app/references/completion.md": "a166f10f4e4b8c1b5115c5364c3d85bce34312c0",
+    "agentic-app/references/composition.md": "e8b6b127867322b3d3a4a4a6e8aef0c5e4c1d57c",
     "agentic-app/references/context-engineering.md": "04679455159a19816b4613813d419163df00d786",
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
