@@ -1,0 +1,44 @@
+{
+  "format_version": 1,
+  "catalogue_version": 1,
+  "profiles": {
+    "headless": {
+      "description": "Non-visual package or service. No UI component baseline is implied.",
+      "required": []
+    },
+    "marketing-site": {
+      "description": "Public presentation or marketing surface with a small interactive footprint.",
+      "required": [
+        "tokens", "typography", "icon", "layout", "surface",
+        "header", "button", "icon-button", "form-field", "input",
+        "alert", "spinner", "empty-state", "error-state", "card"
+      ]
+    },
+    "web-app": {
+      "description": "General interactive application baseline. Optional catalogue capabilities become required when the product uses them.",
+      "required": [
+        "tokens", "typography", "icon", "layout", "surface",
+        "app-shell", "header",
+        "button", "icon-button", "menu",
+        "form-field", "input", "textarea", "select", "checkbox", "radio",
+        "alert", "toast", "spinner", "skeleton", "empty-state", "error-state",
+        "dialog", "tooltip",
+        "list", "card", "badge",
+        "search", "filter"
+      ]
+    },
+    "data-heavy-app": {
+      "description": "Interactive application where dense tabular/data exploration is core.",
+      "extends": "web-app",
+      "required": [
+        "sidebar", "tabs", "pagination", "dropdown", "progress", "drawer", "popover",
+        "table", "data-grid", "stat", "chart", "command-palette"
+      ]
+    },
+    "custom": {
+      "description": "Project-defined applicability. Every catalogue item used by the product must still be classified explicitly.",
+      "required": ["tokens", "typography", "icon", "layout", "surface"]
+    }
+  },
+  "rule": "Profile requirements are minimum capabilities, not mandatory screen content. Any optional catalogue capability becomes required for a project once the product implements or depends on that capability."
+}
