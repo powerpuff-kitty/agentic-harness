@@ -80,7 +80,8 @@
       ],
       "evidence_source_ids": [
         "failure-log"
-      ]
+      ],
+      "output_complete": true
     },
     {
       "id": "unit-2",
@@ -94,7 +95,8 @@
       ],
       "evidence_source_ids": [
         "passing-log"
-      ]
+      ],
+      "output_complete": true
     },
     {
       "id": "browser-1",
@@ -106,7 +108,8 @@
         "after",
         "rules"
       ],
-      "evidence_source_ids": []
+      "evidence_source_ids": [],
+      "output_complete": null
     }
   ],
   "open_items": [

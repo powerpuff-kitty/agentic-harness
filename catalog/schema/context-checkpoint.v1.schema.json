@@ -136,7 +136,8 @@
           "command",
           "status",
           "input_source_ids",
-          "evidence_source_ids"
+          "evidence_source_ids",
+          "output_complete"
         ],
         "properties": {
           "id": {
@@ -184,6 +185,16 @@
             },
             "maxItems": 128,
             "uniqueItems": true
+          },
+          "output_complete": {
+            "oneOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         }
       },

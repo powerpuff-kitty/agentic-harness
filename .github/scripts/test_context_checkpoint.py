@@ -111,7 +111,7 @@ class ContextCheckpoint(unittest.TestCase):
         self.reject('check-command-changed-within-history')
 
     def test_unknown_unexecuted_command_does_not_invent_a_run(self):
-        self.value['checks'][0].update(status='not-run', command=None, evidence_source_ids=[])
+        self.value['checks'][0].update(status='not-run', command=None, evidence_source_ids=[], output_complete=None)
         self.assertTrue(checkpoint.inspect(self.value)['consistent'])
 
     def test_blocking_item_requires_blocked_status(self):
@@ -202,6 +202,18 @@ class ContextCheckpoint(unittest.TestCase):
                     parent = parent[key]
                 parent[path[-1]] = value
                 self.reject('schema-invalid')
+
+    def test_output_completeness_is_explicit_and_not_a_verification_claim(self):
+        for complete in (True, False, None):
+            self.value['checks'][1]['output_complete'] = complete
+            result = checkpoint.inspect(self.value)
+            self.assertTrue(result['consistent'])
+            self.assertFalse(result['claims_authenticated'])
+        self.value['checks'][1].pop('output_complete')
+        self.reject('schema-invalid')
+        self.value = copy.deepcopy(FIXTURE)
+        self.value['checks'][2]['output_complete'] = True
+        self.reject('unexecuted-check-has-execution-evidence')
 
     def test_json_roundtrip_and_deterministic_inspection(self):
         encoded = json.dumps(self.value).encode()

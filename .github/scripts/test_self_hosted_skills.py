@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 36)
+        self.assertEqual(report['files_verified'], 37)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])

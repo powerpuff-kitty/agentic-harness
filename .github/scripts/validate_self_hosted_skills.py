@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = '6a1ca1e194bf9ccb898f9b790a763e1fe88f763c'
+REVISION = '2b57bd1eb676e7ecf9dd464b9668420df70509f2'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -24,8 +24,9 @@ EXPECTED = {
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
-    "agentic-improvement/bundle.json": "8d48ef6234c2412fab6db30ebe97effe927d4bae",
-    "agentic-improvement/references/efficiency.md": "96d9c135ea6ff000f8489b3cf4baa43352e3b286",
+    "agentic-improvement/bundle.json": "8d91a2346d854d35b19adbf86ce1271d86cf55f9",
+    "agentic-improvement/references/continuation.md": "b00e135a2448972abb1b95963b20bc925195f16d",
+    "agentic-improvement/references/efficiency.md": "3be75f2fca7c4d540e4fb5ec1dd2cf4b1b8be2c3",
     "agentic-improvement/references/evidence-reuse.md": "2c3f74e26216ec0eddfd169b5212435864e1ecea",
     "agentic-improvement/references/required-evidence.md": "66943795ed64d98497781a5ee00fe1595b6ef667",
     "agentic-improvement/scripts/compact_log.py": "39db1fee08fca6614605719c0acee0854965eeac",

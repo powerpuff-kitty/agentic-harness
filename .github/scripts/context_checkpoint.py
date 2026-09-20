@@ -100,7 +100,8 @@ def inspect(value: Any) -> dict[str, Any]:
             if executed and (check['command'] is None or not check['input_source_ids']
                              or not check['evidence_source_ids']):
                 errors.add('executed-check-provenance-required')
-            if check['status'] in ('not-run', 'blocked') and check['evidence_source_ids']:
+            if check['status'] in ('not-run', 'blocked') and (check['evidence_source_ids']
+                    or check['output_complete'] is not None):
                 errors.add('unexecuted-check-has-execution-evidence')
         for group in attempts.values():
             sequence = sorted(check['attempt'] for check in group)

@@ -2,7 +2,7 @@
   "format_version": 2,
   "kind": "standalone-skill",
   "name": "agentic-improvement",
-  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "references/required-evidence.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py", "scripts/extract_context.py"],
+  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "references/required-evidence.md", "references/continuation.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py", "scripts/extract_context.py"],
   "optional_tools": [
     {"name": "python3", "fallback": "Use the manual diagnostic and source-review procedures; never install or execute a helper automatically."}
   ],

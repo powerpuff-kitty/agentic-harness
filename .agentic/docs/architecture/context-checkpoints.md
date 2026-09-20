@@ -34,8 +34,12 @@ interchange; a compact human-readable handoff may remain the better choice.
 
 Checks record a name, attempt number, command, status, exact input source IDs and
 separate diagnostic source IDs. Passed/failed fields require recorded inputs and
-logs. They describe supplied historical observations, not current verification.
-Not-run and blocked checks must not contain an execution-log claim. Unknown status
+logs. Explicit output completeness is true, false or unknown (null); it describes
+producer-output capture, not whether the referenced file is readable. A reported
+pass with incomplete output remains a historical claim, not independently verified
+success. These records describe supplied observations, not current verification.
+Not-run and blocked checks must not contain an execution-log or output-completeness
+claim. Unknown status
 can retain an explicitly unknown earlier attempt without inventing its outcome.
 
 Within one check name, attempts start at 1 and remain contiguous; retain failures
