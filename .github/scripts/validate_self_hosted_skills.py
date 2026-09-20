@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'acdc94e984b232be24fbedd1ab52f425d21960be'
+REVISION = 'cb1d8474405a0a54f3b02847ed43ffedabe1e1c6'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -26,7 +26,7 @@ EXPECTED = {
     "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
     "agentic-improvement/bundle.json": "3a0a3ad6de4749df2fdcf20e4befc3c7a24dc956",
     "agentic-improvement/references/continuation.md": "92adf3bd7e5fb5c9ef6b677b8cd75f1bc24385c3",
-    "agentic-improvement/references/efficiency.md": "a5ef35811e44c8768500ff2d2254ebcb5ba6fe64",
+    "agentic-improvement/references/efficiency.md": "badba4015304a40b15d56b795362f2e630930784",
     "agentic-improvement/references/evidence-reuse.md": "6ea9ad36d815b46566948193b5d1b8bc77b94f05",
     "agentic-improvement/references/python-outline.md": "462d7785c233a5d09732c3370821927d78d4ac2b",
     "agentic-improvement/references/required-evidence.md": "66943795ed64d98497781a5ee00fe1595b6ef667",

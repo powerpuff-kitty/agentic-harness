@@ -16,6 +16,8 @@ Deduplication applies to repeated presentation, not automatically to source file
 
 Near-duplicates may differ materially. Keep unresolved conflicts visible. Prefer narrow triggers and one specialist owner to overlapping skills. Put examples behind conditional local links. JSON/YAML can support validation but is not inherently shorter.
 
+For substantial repeated-rule review, a target with the accepted [Rule IR contracts](https://github.com/powerpuff-kitty/agentic-harness/blob/main/.agentic/docs/architecture/rule-ir.md) may expose `rule_ir.compile_inventory(value, budget_bytes=65536)`. Supply exact current excerpts with reviewed keys, authority, scope, conditions, exceptions and source identities; the tool does not extract or authenticate those declarations. It combines only exact declared duplicates, retains every occurrence and exposes opposed directives without choosing a winner. A budget failure must not drop applicable rules. Different selectors and natural-language conflicts still require review. Without this optional repository API, compare manually; do not install tools or treat the generated view as canonical policy, verified source, automatic host injection or permission for Jev reuse. Include inventory acquisition and output overhead in any efficiency comparison.
+
 ## Native checks and compact logs
 
 Use permitted formatters, linters, compilers and tests for exact questions. Preserve every required check; an unavailable tool or missing exit is not a pass. Retain invocation, input identity, scope, outcome, distinct failures, source locations, truncation and a real accessible log reference. Never invent artifact IDs or expose secrets.
