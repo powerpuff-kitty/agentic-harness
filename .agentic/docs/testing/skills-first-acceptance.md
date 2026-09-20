@@ -8,6 +8,8 @@ A user must be able to copy the whole reviewed skill directory and retain its re
 
 The selected procedure must have a narrow trigger, bounded default body, conditional local guides and explicit completion/approval limits. For nontrivial resumed work, a compact handoff may retain task scope, accepted decisions, actual source identities (including changed working-tree files), observed checks, unresolved evidence and next steps. It is optional and never grants approval or makes stale evidence current.
 
+Efficiency must also work inside ordinary planning, documentation and review skills. Do not require every task to load a separate optimisation or decision skill first. Preserve each procedure's trigger and specialist boundaries, and put its relevant freshness, diagnostic and handoff rules directly in its concise entrypoint. Changed shared definitions may require dependent callers, screens or tests even when the diff is small. A narrower working set must not hide a wider impact.
+
 ## Gate 2: portable bytes and preservation
 
 The companion repository's documentation-bundle validator must preserve required files and the MIT notice, reject missing/undeclared documents and detect byte changes. Verify sealed archives without reading the original source checkout. Record exact candidate commit and archive digest; a digest is not a signature or trusted-author proof.
@@ -28,10 +30,12 @@ Count all submitted input/output across retries and auxiliary providers. Tool re
 
 Do not aggregate synthetic grader records with recorded sessions or use a broken baseline as proof of preserved quality. Repeated representative trials, reviewed traces, observed task success and retained failures/variance are required before claiming general quality or token-efficiency improvements. Changing the provider/model is a separately labelled experiment, not evidence for a context-only change.
 
+Source-byte ceilings and unchanged trigger digests can prevent unreviewed entrypoint growth or routing changes in repository validation. They do not test semantic equivalence or model adherence. Record source-size comparisons by exact baseline revision and selected files; a sum across alternative skills is not a per-session token saving or a reason to load all of them. Supporting guides, required checks and counterevidence must not be deleted merely to meet a smaller byte ceiling.
+
 ## Current implementation ownership
 
 - Agents #32: decision-intelligence and independently optional TypeSafe guidance.
-- Agents #36: agentic-improvement, source-preserving handoffs and portable documentation bundles.
+- Agents #36: agentic-improvement, ordinary skill adoption, source-preserving handoffs and portable documentation bundles.
 - Agents #26: supplied-record comparisons now; representative independently reviewed host observations remain separate.
 
 Candidate implementation lives in agents PR #37 and canonical guidance in PR #120. Passing repository validation establishes content/test/packaging properties, not deployment, host enforcement, paid inference or empirical savings. Leave broader roadmap issues open until their actual accepted gates are met.
