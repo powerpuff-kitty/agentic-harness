@@ -72,6 +72,64 @@ remain unverified. Do not trust a supplied policy label or a matching hash as
 permission to inject instructions, reuse a Jev result or execute an action.
 Near-duplicate rewriting and automatic host/adapter use remain outside this slice.
 
+## Optional binding to supplied source bytes
+
+A permitted caller can bind a reviewed inventory to full-source bytes it has
+already acquired, without asking the model to repeat exact hash and span checks:
+
+```python
+report = rule_ir.compile_with_sources(
+    inventory,
+    target=reviewed_target,
+    sources=reviewed_source_bytes,  # exact dict[str, bytes], keyed by source reference
+    budget_bytes=65536,
+)
+```
+
+The explicit target must equal the inventory target. Supply exactly the referenced
+sources, at most 128 entries, 1 MiB per source and 4 MiB total. Keys are opaque;
+even URL-looking references never trigger reads, network calls or execution.
+Bytes must be immutable, valid UTF-8 text without binary control characters.
+The caller owns acquisition permission, safe reading, provenance and freshness;
+this function does not inspect the filesystem or authenticate the byte supplier.
+Keep the inventory and source map quiescent during the call.
+
+For every occurrence, the inspector checks the full-file SHA-256, 1-based inclusive
+LF line span and exact statement bytes. It preserves indentation, CRLF, Unicode,
+blank lines and final-newline distinctions. A change outside the selected excerpt
+still changes the full-file identity. Missing or extra sources, different hashes
+under one reference, unavailable ranges and altered statements raise fixed-code
+`RuleError` without source bodies, rejected references or a partial compiled plan.
+Versioned historical sources need distinct references, and are not thereby current.
+
+The repository inspection report has `kind: rule-source-review`. Its
+`source_binding` records matched source identities, sizes, lines, checked occurrence
+count and a SHA-256 of `rule_ir.encoded(inventory)`. That digest preserves list order
+while normalizing JSON object-key order; compare it to the actual reviewed inventory,
+not to a reconstructed or edited record. The nested `plan` is unchanged Rule IR v1;
+its metadata-only `source_bytes_verified: false` remains intact. Binding evidence
+belongs to the enclosing report, not to a silently strengthened v1 plan or policy.
+
+`matched: true` means agreement with the supplied byte map only. Authentic
+acquisition, freshness at use, complete extraction, declared authority and semantic
+scope remain unverified. A new exception omitted from the inventory is still an
+omission even after the whole-file hash is refreshed. Review applicable root/nested
+instructions, qualifications and contradictions independently. Never use a matching
+report as check acceptance, Jev cache permission or authorisation to take action.
+
+The budget covers the complete serialized report, including binding metadata and
+the nested plan. Overflow emits neither binding identities nor a plan, reports the
+required size and conflict count, and keeps `complete_payload_emitted: false`.
+Its small control record can exceed a tiny budget; it is not the compiled payload.
+No unselected source bodies are replayed. Binding has overhead and does not promise
+smaller output than direct reading. Without this optional API, use permitted native
+hash/excerpt checks and manual review rather than installing a tool automatically.
+
+Run `python3 .github/scripts/test_rule_sources.py` for source-binding regressions.
+They include actual temporary-file acquisition and changes, malformed byte maps,
+exact output-budget boundaries, preserved conflicts and no acquisition side effects.
+They do not evaluate a model or prove a host used the procedure.
+
 ## Tests and measured scope
 
 Run `python3 .github/scripts/test_rule_ir.py`. Existing repository contract
