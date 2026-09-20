@@ -23,13 +23,13 @@ skill does not authorise a release; installing a helper does not authorise execu
 
 ## Optional deterministic helpers
 
-The efficiency skill now carries three explicitly invoked helpers:
+The efficiency skill carries three explicitly invoked helpers:
 
 | Helper | Scope | Conditional local guide |
 | --- | --- | --- |
 | `compact_log.py` | Lossless adjacent-line compaction of a named reviewed log | `agentic-improvement/references/efficiency.md` |
 | `evidence_snapshot.py` | Capture/compare explicitly selected source hashes and scope | `agentic-improvement/references/evidence-reuse.md` |
-| `extract_context.py` | Retrieve explicit source line ranges against expected file hashes | `agentic-improvement/references/evidence-reuse.md` |
+| `extract_context.py` | Retrieve hash-pinned ranges, optionally preserving declared required spans | `agentic-improvement/references/evidence-reuse.md` |
 
 Decision Intelligence separately carries `review_graph.py`; its local graph-review
 guide defines the supported DecisionGraph subset. Layers are structural review,
@@ -53,10 +53,19 @@ and no excerpts, not silently truncated evidence. Exit 0 is retrieval success, n
 verified project compliance; exit 2 rejects invalid, stale or unavailable input.
 A tiny control record can exceed an extremely small budget.
 
-The extractor reuses the reviewed sibling `evidence_snapshot.py`. Copy the complete
-skill directory; no unrelated PYTHONPATH fallback is accepted. Its bounds are 128
-span requests, 1 MiB per file and 8 MiB total reads, with a default 65,536-byte output
-budget. Existing helpers keep their existing distinct bounds and exit semantics.
+When a task has reviewed required source spans, the optional `--require-span` guard
+checks that the selected excerpts cover them before reading target source. See the
+skill-local `references/required-evidence.md` guide. Requirements cannot add reads;
+a one-line gap or conflicting source pin stops retrieval. Budget deferral must not
+claim required evidence was emitted. The requirement list itself remains operator-
+supplied: it is neither authenticated policy nor proof of semantic completeness.
+
+The extractor compiles the current bounded source of its reviewed sibling
+`evidence_snapshot.py`, never stale reader bytecode. Existing caches are left intact.
+Copy the complete skill directory; no unrelated PYTHONPATH fallback is accepted.
+Bounds are 128 selected and, when supplied, 128 required spans, 1 MiB per file and
+8 MiB total reads, with a default 65,536-byte output budget. Existing helpers keep
+their distinct bounds and exit semantics.
 
 Helpers use Python 3.10+ standard library, require permitted execution and reviewed
 non-secret inputs, and make no provider calls or source writes. They do not redact
@@ -75,11 +84,12 @@ The two preserved older lifecycle guides map to upstream shared `references/`
 paths explicitly recorded in the verifier. They remain installed for preservation,
 not mandatory initial reads. No existing source or customised content is deleted.
 
-This delivery adds the extractor and updates its bundle and reuse guide. All default
-SKILL.md files, triggers, existing helpers, vendor content and permission definitions
-are unchanged. The source lock and reviewed blob/SHA-256 identities cover 35 imports.
-Upstream version metadata remains 0.5.0-beta.1; updating a source pin is not publishing
-a release or replacing a global installation.
+This delivery updates the extractor and its optional guide/declaration, adding one
+conditional required-evidence guide. All default SKILL.md files, triggers, other
+helper implementations, vendor content and permission definitions are unchanged.
+The source lock and reviewed blob/SHA-256 identities cover 36 imports. Upstream
+version metadata remains 0.5.0-beta.1; updating a source pin is not publishing a release
+or replacing a global installation.
 
 Both guidance bundles use explicit v2 optional-script declarations with manual
 fallbacks; three enrolled review bundles remain documentation-only v1. Older v1-only
@@ -89,25 +99,28 @@ retain scripts as opaque bytes, never execute them or certify script safety.
 ```sh
 python3 .github/scripts/validate_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_skills.py
+python3 .github/scripts/test_self_hosted_reader_cache.py
 ```
 
 The verifier binds manifest membership, local directories, conditional routes,
 selected lock names, exact reviewed bytes and references. The 31-test import suite
 retains prior regressions and explicitly exercises copied helpers separately from
-integrity-only verification. The new excerpt test checks overlap, budget deferral
-and stale-pin refusal. Missing/changed files and undeclared helpers fail without
-repair or overwrite. Manifest parsing remains the documented own-repository block-list
-subset, not full YAML; vendor validation checks presence, not vendor authenticity.
+integrity-only verification. Its excerpt test now also checks required coverage,
+missing required ranges and budget deferral. The three additional warm-cache tests
+retain source-exact loader coverage. Missing/changed files and undeclared helpers fail
+without repair or overwrite. Manifest parsing remains the documented own-repository
+block-list subset, not full YAML; vendor validation checks presence, not authenticity.
 Hashes detect drift but are not trusted-author signatures.
 
-Upstream PR #50 records 26 local retrieval tests and four complete-CI distribution
-checks. Reproducible synthetic outputs include both a large partial-source reduction
-and growth for tiny input. They are byte measurements, not a representative model
-benchmark. Source review is by the implementation assistant; independent host/task
-and complete-token evidence remains open under agents #26/#32/#36. No live Jev
-inference, runtime application/CLI change, downstream pin, workflow YAML, credential
-access, new release or device-global update is part of this delivery.
+Agents issue #53 and PR #54 record 20 required-coverage tests, including actual
+snapshot/extraction/changed-policy subprocess workflows. Four local exact-baseline
+comparisons preserve unguarded ready and deferred bytes for small and large synthetic
+sources. Existing retrieval, packaging, loader and recorded-measurement fixtures
+remain in complete repository validation. These are deterministic tool/workflow
+checks, not independent model trials or complete token-usage measurements.
 
-Earlier delivery history and reproduced defects remain in canonical PRs #122-#129
-and agents #41/#43/#45/#47. Usage detail stays in the owning skill-local guides
-rather than being copied into this status document on every synchronization.
+Source review is by the implementation assistant. Independent host/task and complete-
+token evidence remains open under agents #26/#32/#36. No live Jev inference, runtime
+application/CLI change, downstream pin, workflow YAML, credential access, new release
+or device-global update is part of this delivery. Earlier evidence remains in canonical
+PRs #122-#131 and the linked agents issues. Usage detail stays in the skill-local guides.

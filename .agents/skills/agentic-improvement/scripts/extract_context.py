@@ -70,6 +70,10 @@ class ExcerptError(ValueError):
     """Fixed diagnostics contain no source bodies or rejected input values."""
 
 
+class RequiredEvidenceError(ExcerptError):
+    """The explicit selection does not cover its separately declared requirements."""
+
+
 def require(ok: bool, code: str) -> None:
     if not ok:
         raise ExcerptError(code)
@@ -115,15 +119,41 @@ def merge_ranges(ranges: list[tuple[int, int]]) -> list[list[int]]:
     return merged
 
 
+def required_coverage(selected: dict, required_spans: list) -> dict[str, Any]:
+    """Inspect declarations only; requirements never add paths to the read selection."""
+    required = requests(required_spans)
+    normalized = []
+    count = lines = 0
+    for path, request in required.items():
+        chosen = selected.get(path)
+        if chosen is None or chosen["sha256"] != request["sha256"]:
+            raise RequiredEvidenceError("required-spans-not-covered")
+        available = merge_ranges(chosen["ranges"])
+        ranges = merge_ranges(request["ranges"])
+        # Do not use min(start)..max(end): holes may contain required counterevidence.
+        if not all(any(left <= start and end <= right for left, right in available)
+                   for start, end in ranges):
+            raise RequiredEvidenceError("required-spans-not-covered")
+        normalized.append({"path": path, "sha256": request["sha256"], "ranges": ranges})
+        count += len(ranges)
+        lines += sum(end - start + 1 for start, end in ranges)
+    return {"declaration_digest": evidence.sha(evidence.encoded(normalized)),
+            "files": len(required), "ranges": count, "lines": lines,
+            "coverage": "complete-for-declared-spans", "emitted": True,
+            "requirements_authenticated": False}
+
+
 def lf_lines(raw: bytes) -> list[bytes]:
     # Only LF separates numbered lines. CRLF bytes and other separators stay exact.
     parts = raw.split(b"\n")
     return [part + b"\n" for part in parts[:-1]] + ([parts[-1]] if parts[-1] else [])
 
 
-def extract(root: Path, spans: list, budget: int = DEFAULT_BUDGET) -> dict[str, Any]:
+def extract(root: Path, spans: list, budget: int = DEFAULT_BUDGET, *,
+            required_spans: list | None = None) -> dict[str, Any]:
     require(type(budget) is int and 1 <= budget <= MAX_BUDGET, "invalid-output-budget")
     selected = requests(spans)  # Validate the entire selection before reading source.
+    coverage = required_coverage(selected, required_spans) if required_spans is not None else None
     root = evidence.real_directory(root)
     files = []
     read_bytes = selected_bytes = omitted_lines = duplicate_lines = range_count = 0
@@ -159,14 +189,21 @@ def extract(root: Path, spans: list, budget: int = DEFAULT_BUDGET) -> dict[str, 
                          "unselected_files_checked": False, "evidence_sufficient": None,
                          "checks_verified": False, "provider_calls": 0, "model_tokens": None,
                          "snapshot_authenticated": False, "atomic_snapshot": False}}
+    if coverage is not None:
+        report["required_evidence"] = coverage
     required = len(evidence.encoded(report))
     if required > budget:
         # A small control record may exceed a tiny budget. It contains NO excerpts.
-        return {"format_version": 1, "kind": "selected-source-excerpts", "status": "budget-exceeded",
+        deferred = {"format_version": 1, "kind": "selected-source-excerpts", "status": "budget-exceeded",
                 "files": [], "required_output_bytes": required, "budget_bytes": budget,
                 "requested_spans": len(spans), "source_payload_emitted": False,
                 "evidence_sufficient": None, "checks_verified": False,
                 "next_step": "Review a narrower selection or explicitly raise the byte budget."}
+        if coverage is not None:
+            deferred["required_evidence"] = {**coverage, "emitted": False}
+            deferred["next_step"] = ("Keep declared required spans; remove optional spans or "
+                                     "explicitly raise the byte budget.")
+        return deferred
     return report
 
 
@@ -176,14 +213,20 @@ def main() -> int:
     parser.add_argument("--span", required=True, action="append", nargs=4,
                         metavar=("PATH", "START", "END", "SHA256"),
                         help="reviewed relative text path, inclusive LF line range, expected full-file hash")
+    parser.add_argument("--require-span", action="append", nargs=4, dest="required_spans",
+                        metavar=("PATH", "START", "END", "SHA256"),
+                        help="required evidence the --span selection must cover; never adds reads")
     parser.add_argument("--budget-bytes", type=int, default=DEFAULT_BUDGET)
     args = parser.parse_args()
     if evidence is None:
         print('{"kind":"source-excerpt-error","code":"reader-unavailable"}', file=sys.stderr)
         return 2
     try:
-        result = extract(args.root, args.span, args.budget_bytes)
+        result = extract(args.root, args.span, args.budget_bytes, required_spans=args.required_spans)
         output = evidence.encoded(result)
+    except RequiredEvidenceError:
+        print('{"kind":"source-excerpt-error","code":"required-spans-not-covered"}', file=sys.stderr)
+        return 2
     except (ExcerptError, evidence.SnapshotError, OSError, ValueError, TypeError, UnicodeError):
         print('{"kind":"source-excerpt-error","code":"invalid-or-stale-input"}', file=sys.stderr)
         return 2
