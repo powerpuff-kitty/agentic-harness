@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "7a82aafdaf692fc343e107708c67d6d1e67036a2"
+    "revision": "5cad9ec18b3eff329feab0423b4447c9d9967ec3"
   },
   "variant": "base",
   "packs": {
@@ -38,9 +38,11 @@
     ".agents/skills/agentic-app/references/repository-discovery.md": "993791cc5719f61d282be38c9f47201d9263929e4868ecdb38ff1703a893b614",
     ".agents/skills/agentic-improvement/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
     ".agents/skills/agentic-improvement/SKILL.md": "fb6f6d798aa420167debe34dac0f3b7af3859bb9bbcb220be5dcff631ecd9ab5",
-    ".agents/skills/agentic-improvement/bundle.json": "77daea53d8cbb981cdad31cb970e3c5a6bf7dcfaae80af9b1e3cb4c4f985793b",
-    ".agents/skills/agentic-improvement/references/efficiency.md": "41eb265e585c1298b9353a58165c0e75a29737121d086dbf24a5f10253b0e40a",
+    ".agents/skills/agentic-improvement/bundle.json": "e1d2daae06ea479b6326f9fbb4122c20547008f87c0e778ed540a3659967f9bc",
+    ".agents/skills/agentic-improvement/references/efficiency.md": "91598ad82d6babbfeb8704ebfca91c1bc8fcd6dd36cb5d54b4fbae4121cb66f6",
+    ".agents/skills/agentic-improvement/references/evidence-reuse.md": "8cf8347190007006c0c311c88605675bcbff80bf86691e95d0a331f3171b5976",
     ".agents/skills/agentic-improvement/scripts/compact_log.py": "fa7fb2465d330857348e16fe551d57299ebcbf14c0579d1880749909a81ab045",
+    ".agents/skills/agentic-improvement/scripts/evidence_snapshot.py": "0b0ad0d2256a9c447d34f5359e3c3a2aea17722a353be1538de67f1352a94b23",
     ".agents/skills/codebase-audit/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
     ".agents/skills/codebase-audit/SKILL.md": "d1580c2ea807b2c705acf275588525f26e9ff402512678a67a7ac6dcb7dbc606",
     ".agents/skills/codebase-audit/bundle.json": "c912b6c1c3a6e0b50d3ae3074b2a0df6cedecff9b80b31ea368bf72ed248db4b",

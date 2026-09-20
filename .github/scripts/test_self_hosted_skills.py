@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 30)
+        self.assertEqual(report['files_verified'], 32)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -212,6 +212,8 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertEqual(declaration['format_version'], 2)
         self.assertEqual(declaration['optional_scripts'][0]['path'], 'scripts/compact_log.py')
         self.assertEqual(declaration['optional_scripts'][0]['execution'], 'explicit-invocation-only')
+        self.assertEqual({item['path'] for item in declaration['optional_scripts']},
+                         {'scripts/compact_log.py', 'scripts/evidence_snapshot.py'})
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
     def test_actual_imported_helper_preserves_synthetic_log(self):
@@ -236,6 +238,33 @@ class SelfHostedSkills(unittest.TestCase):
         path = self.root / check.PREFIX / 'agentic-improvement/scripts/unreviewed.py'
         path.write_text('raise AssertionError("must not execute")\n')
         self.reject()
+
+    def test_actual_imported_freshness_helper_detects_changed_evidence(self):
+        check.verify(self.root)
+        helper = self.root / check.PREFIX / 'agentic-improvement/scripts/evidence_snapshot.py'
+        source = self.root / 'sample-evidence.md'
+        source.write_bytes(b'allow\n')
+        command = [sys.executable, str(helper), 'capture', '--root', str(self.root),
+                   '--scope', 'fixture', '--file', 'sample-evidence.md']
+        initial = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(initial.returncode, 0, initial.stderr)
+        snapshot = self.root.parent / 'snapshot.json'
+        snapshot.write_bytes(initial.stdout)  # Test-owned file, not a helper write.
+        command[2] = 'compare'
+        command.append(str(snapshot))
+        unchanged = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(unchanged.returncode, 0, unchanged.stderr)
+        self.assertEqual(json.loads(unchanged.stdout)['status'], 'unchanged-selected-bytes')
+        self.assertEqual(source.read_bytes(), b'allow\n')
+        source.write_bytes(b'deny!\n')
+        changed = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(changed.returncode, 1, changed.stderr)
+        result = json.loads(changed.stdout)
+        self.assertEqual(result['changed'][0]['path'], 'sample-evidence.md')
+        self.assertFalse(result['limits']['checks_verified'])
+        self.assertIsNone(result['limits']['model_tokens'])
+        self.assertEqual(source.read_bytes(), b'deny!\n')
+        self.assertEqual(snapshot.read_bytes(), initial.stdout)
 
 
 if __name__ == '__main__':
