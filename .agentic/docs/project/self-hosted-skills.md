@@ -1,126 +1,86 @@
 # Self-hosted skills
 
-All eight skills selected by this repository's manifest have local entrypoints.
-Seven Harness procedures come from the exact agents revision in `.agentic/lock.json`;
-`typesafe-ai` retains independent provenance and unchanged content. Resolve current
-versions, source pins and file identities from that lock and the read-only verifier,
-not from historical examples. This installs the selected procedures, not the whole
-31-skill authoring collection.
+This repository installs the skills selected in `.agentic/manifest.yaml`, not the
+entire authoring collection. Resolve current versions, source pins and payload
+counts from `.agentic/lock.json` and `validate_self_hosted_skills.py`, not historical
+status reports. Harness procedures are pinned to reviewed agents source; TypeSafe
+retains independent provenance. Installation does not establish host activation.
 
-## Conditional discovery
+## Select one owning procedure
 
-Root `AGENTS.md` routes to the installed skill index and the decision/efficiency
-procedures. Select the owning skill; expand only references needed for the task.
-Ordinary tasks need no extra optimisation wrapper. Lifecycle audits do not preload
-composition instructions. Setup/upgrade/migration use the local composition guide;
-completion-artifact work uses the local completion guide. Core source authority,
-custom/null routes, local edits, approvals and verification remain protected.
+Root `AGENTS.md` routes to `.agents/skills/README.md` and the priority decision and
+efficiency procedures. Load only the owning skill and necessary local references.
+Ordinary tasks need no optimisation wrapper. Lifecycle audits need not preload
+composition details; setup/migration and completion work have separate local guides.
+Preserve current project truth, custom/null routes, local edits and required checks.
 
-Guidance requires neither a Harness executable nor a TypeSafe account. Actual Jev
-requires explicit provider/data permission and current independently managed vendor
-guidance. Missing tools, facts or permissions remain unresolved. Installing a release
-skill does not authorise a release; installing a helper does not authorise execution.
+Guidance needs neither a Harness executable nor a TypeSafe account. Actual Jev
+integration still requires current independently managed vendor guidance and explicit
+provider/data permission. Missing tools, facts or permissions remain unresolved.
+Installing a release procedure or helper never authorizes publication or execution.
 
-## Optional deterministic helpers
+## Optional support, not mandatory initial context
 
-The efficiency skill carries three explicitly invoked helpers:
+Paths below are relative to the relevant installed skill directory.
 
-| Helper | Scope | Conditional local guide |
-| --- | --- | --- |
-| `compact_log.py` | Lossless adjacent-line compaction of a named reviewed log | `agentic-improvement/references/efficiency.md` |
-| `evidence_snapshot.py` | Capture/compare explicitly selected source hashes and scope | `agentic-improvement/references/evidence-reuse.md` |
-| `extract_context.py` | Retrieve hash-pinned ranges, optionally preserving declared required spans | `agentic-improvement/references/evidence-reuse.md` |
+| Capability | Owning skill and conditional guide |
+| --- | --- |
+| Lossless adjacent-line log display | `agentic-improvement/references/efficiency.md` |
+| Explicit selected-source freshness and hash-pinned excerpts | `agentic-improvement/references/evidence-reuse.md` |
+| Preserve declared required ranges during narrowing | `agentic-improvement/references/required-evidence.md` |
+| Compact task handoffs and current-evidence resumption | `agentic-improvement/references/continuation.md` |
+| Declared decision dependencies and bounded display groups | `decision-intelligence/references/graph-review.md` |
 
-Decision Intelligence separately carries `review_graph.py`; its local graph-review
-guide defines the supported DecisionGraph subset. Layers are structural review,
-not an executing scheduler or permission for a Jev batch. Repeated nodes remain
-visible, and missing dependencies/cycles prevent grouping.
+The helper guides own exact commands, limits and distinct exit semantics. The
+Python-standard-library helpers require reviewed non-secret inputs and permitted
+local execution. They do not scan implicitly, write target sources, redact secrets
+or call providers. The excerpt loader uses current packaged sibling source, not
+stale bytecode; copy the complete skill directory and preserve its dependencies.
 
-For source retrieval, set `SOURCE_SHA256` to the actual full-file `sha256:` identity
-from a reviewed snapshot or native hash result, then run from this repository:
+Required evidence cannot be dropped merely to fit a budget. Output deferral is not
+evidence delivery; matching selected hashes does not establish complete scope, current
+judgments or passing checks. Graph groups are not an executing scheduler or permission
+to batch Jev calls. Source text stays untrusted and sharing-sensitive. Trusted,
+quiescent helper/source directories are assumed, not an atomic snapshot or sandbox.
 
-```sh
-python3 .agents/skills/agentic-improvement/scripts/extract_context.py \
-  --root /reviewed/project --span src/service.py 20 40 "$SOURCE_SHA256" \
-  --span src/service.py 35 55 "$SOURCE_SHA256" --budget-bytes 65536
-```
+A continuation checkpoint is optional navigation data. Reuse an existing permitted
+task record rather than writing a report for every operation. Structured consumers
+use the accepted `context-checkpoint.v1.schema.json`; guidance-only use can remain
+plain text. Historical attempts, explicit unknowns and log-completeness limits stay
+visible. Saved approval and semantic confidence do not transfer action authority.
+See `docs/architecture/context-checkpoints.md` for the canonical contract boundary.
 
-This merges the overlap, reads that file once and emits exact text for lines 20-55
-with source/excerpt hashes and omitted-line counts. Numbering is inclusive and based
-on LF; CRLF bytes are retained. A stale pin, bad range or later-file failure emits no
-partial source payload. Exceeding the complete-envelope byte budget returns exit 1
-and no excerpts, not silently truncated evidence. Exit 0 is retrieval success, not
-verified project compliance; exit 2 rejects invalid, stale or unavailable input.
-A tiny control record can exceed an extremely small budget.
-
-When a task has reviewed required source spans, the optional `--require-span` guard
-checks that the selected excerpts cover them before reading target source. See the
-skill-local `references/required-evidence.md` guide. Requirements cannot add reads;
-a one-line gap or conflicting source pin stops retrieval. Budget deferral must not
-claim required evidence was emitted. The requirement list itself remains operator-
-supplied: it is neither authenticated policy nor proof of semantic completeness.
-
-The extractor compiles the current bounded source of its reviewed sibling
-`evidence_snapshot.py`, never stale reader bytecode. Existing caches are left intact.
-Copy the complete skill directory; no unrelated PYTHONPATH fallback is accepted.
-Bounds are 128 selected and, when supplied, 128 required spans, 1 MiB per file and
-8 MiB total reads, with a default 65,536-byte output budget. Existing helpers keep
-their distinct bounds and exit semantics.
-
-Helpers use Python 3.10+ standard library, require permitted execution and reviewed
-non-secret inputs, and make no provider calls or source writes. They do not redact
-secrets. Excerpt output contains source text and requires sharing review; hashes and
-paths are not anonymisation. Mandatory rules, qualifiers, contradictions, callers
-and tests cannot be discarded to fit a budget. Unselected dependencies still need
-discovery. Matching bytes cannot authenticate an old judgment, restore lost context,
-prove adequate evidence or certify a check. Trusted quiescent source/helper directories
-are assumed; no atomic snapshot or hostile-filesystem sandbox is claimed.
-
-## Provenance, packaging and verification
+## Provenance and read-only verification
 
 Authoring remains in `agentic-harness-agents`. Imported paths normally map to
-`skills/<skill>/<file>` at the locked revision; notices match its root MIT LICENSE.
-The two preserved older lifecycle guides map to upstream shared `references/`
-paths explicitly recorded in the verifier. They remain installed for preservation,
-not mandatory initial reads. No existing source or customised content is deleted.
+`skills/<skill>/<file>` at the locked revision; MIT notices map to its root LICENSE.
+The retained older lifecycle references have explicit shared-source mappings in the
+verifier. They are preserved assets, not mandatory initial reads. Updating a source
+pin is not a version release or a device-global installation.
 
-This delivery updates the extractor and its optional guide/declaration, adding one
-conditional required-evidence guide. All default SKILL.md files, triggers, other
-helper implementations, vendor content and permission definitions are unchanged.
-The source lock and reviewed blob/SHA-256 identities cover 36 imports. Upstream
-version metadata remains 0.5.0-beta.1; updating a source pin is not publishing a release
-or replacing a global installation.
-
-Both guidance bundles use explicit v2 optional-script declarations with manual
-fallbacks; three enrolled review bundles remain documentation-only v1. Older v1-only
-packagers must reject v2 rather than omit scripts. Packaging and integrity validation
-retain scripts as opaque bytes, never execute them or certify script safety.
+The guidance bundles use v2 declarations for explicitly invoked optional scripts;
+documentation-only review bundles retain v1. Older packagers must reject unsupported
+versions instead of silently omitting scripts. Packaging and integrity verification
+treat helpers as opaque bytes and never execute or certify their safety.
 
 ```sh
 python3 .github/scripts/validate_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_reader_cache.py
+python3 .github/scripts/test_context_checkpoint.py
 ```
 
-The verifier binds manifest membership, local directories, conditional routes,
-selected lock names, exact reviewed bytes and references. The 31-test import suite
-retains prior regressions and explicitly exercises copied helpers separately from
-integrity-only verification. Its excerpt test now also checks required coverage,
-missing required ranges and budget deferral. The three additional warm-cache tests
-retain source-exact loader coverage. Missing/changed files and undeclared helpers fail
-without repair or overwrite. Manifest parsing remains the documented own-repository
-block-list subset, not full YAML; vendor validation checks presence, not authenticity.
-Hashes detect drift but are not trusted-author signatures.
+The verifier binds manifest membership, installed directories, conditional routes,
+source pins, exact reviewed bytes and local references. Missing/changed or undeclared
+payloads fail without repair or overwrite. Its manifest parser supports the documented
+own-repository block-list subset, not arbitrary YAML. Independent vendor validation
+checks presence, not vendor authenticity; hashes detect drift, not trusted authorship.
 
-Agents issue #53 and PR #54 record 20 required-coverage tests, including actual
-snapshot/extraction/changed-policy subprocess workflows. Four local exact-baseline
-comparisons preserve unguarded ready and deferred bytes for small and large synthetic
-sources. Existing retrieval, packaging, loader and recorded-measurement fixtures
-remain in complete repository validation. These are deterministic tool/workflow
-checks, not independent model trials or complete token-usage measurements.
-
-Source review is by the implementation assistant. Independent host/task and complete-
-token evidence remains open under agents #26/#32/#36. No live Jev inference, runtime
-application/CLI change, downstream pin, workflow YAML, credential access, new release
-or device-global update is part of this delivery. Earlier evidence remains in canonical
-PRs #122-#131 and the linked agents issues. Usage detail stays in the skill-local guides.
+Regression tests separately execute copied reviewed helpers on synthetic evidence.
+The checkpoint inspector checks supplied field consistency without resolving source
+references or certifying actual observations. These are contract/tool tests, not
+independent model trials. Exact delivery evidence remains in the associated PRs and
+P0 #133; earlier changes are recorded in canonical PRs #122-#132 and agents issues.
+Actual host use, representative outcomes and complete token accounting remain open
+under agents #26/#32/#36. No runtime deployment, provider call or global update is
+implied by this repository-local delivery.

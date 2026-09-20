@@ -44,6 +44,8 @@ Next unresolved step:
 
 On resume, resolve current instructions and refresh changed/inaccessible evidence. Historical passes apply only to their recorded inputs. Retain failed/unexecuted checks. Do not persist private transcripts, secrets, guessed hashes or a new report for every trivial operation. A handoff cannot grant approval.
 
+For longer resumptions, use the conditional [continuation guide](references/continuation.md); keep historical evidence and current authority separate.
+
 ## Budget and evaluation
 
 Reduce optional background first. When required evidence exceeds the budget, expose the conflict and narrow unsupported scope rather than discard requirements. Extra summarisation, reranking, agents, Jev calls and retries can erase a saving.
