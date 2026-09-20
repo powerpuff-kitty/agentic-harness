@@ -15,7 +15,10 @@ class SelfHostedSkills(unittest.TestCase):
         self.addCleanup(temp.cleanup)
         self.root = Path(temp.name) / 'checkout'
         self.root.mkdir()
-        for relative in [*(check.PREFIX + p for p in check.EXPECTED), '.agentic/lock.json', 'AGENTS.md']:
+        paths = [*(check.PREFIX + p for p in check.EXPECTED), '.agentic/lock.json',
+                 '.agentic/manifest.yaml', 'AGENTS.md', check.INDEX,
+                 check.PREFIX + 'typesafe-ai/SKILL.md']
+        for relative in paths:
             source, target = check.ROOT / relative, self.root / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(source, target)
@@ -32,7 +35,10 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 8)
+        self.assertEqual(report['files_verified'], 27)
+        self.assertEqual(len(report['skills']), 7)
+        self.assertEqual(len(report['declared_skills']), 8)
+        self.assertEqual(report['missing_declared_skills'], [])
         self.assertEqual(report['network_calls'], 0)
         self.assertFalse(report['host_loading_verified'])
         self.assertFalse(report['token_savings_verified'])
@@ -71,8 +77,7 @@ class SelfHostedSkills(unittest.TestCase):
         self.reject()
 
     def test_missing_root_route(self):
-        path = self.root / 'AGENTS.md'
-        path.write_text('# Router with neither selected local link\n')
+        (self.root / 'AGENTS.md').write_text('# Router with no selected local links\n')
         self.reject()
 
     def test_symlink_file_and_parent_refused(self):
@@ -102,13 +107,92 @@ class SelfHostedSkills(unittest.TestCase):
         path.write_bytes(b'x' * (check.LIMIT + 1))
         self.reject()
 
-    def test_vendor_and_unselected_files_are_not_required_or_changed(self):
+    def test_independent_vendor_bytes_are_not_overwritten(self):
         path = self.root / check.PREFIX / 'typesafe-ai/SKILL.md'
-        path.parent.mkdir()
         path.write_bytes(b'unrelated custom vendor bytes\n')
         before = path.read_bytes()
         check.verify(self.root)
         self.assertEqual(path.read_bytes(), before)
+
+    def test_removed_selected_manifest_declaration_is_rejected(self):
+        """Regression failed before the fix with InvalidImport not raised."""
+        path = self.root / '.agentic/manifest.yaml'
+        text = path.read_text(encoding='utf-8')
+        self.assertIn('  - decision-intelligence\n', text)
+        path.write_text(text.replace('  - decision-intelligence\n', ''), encoding='utf-8')
+        self.reject()
+
+    def test_missing_manifest_rejected(self):
+        (self.root / '.agentic/manifest.yaml').unlink()
+        self.reject()
+
+    def test_every_removed_declaration_rejected(self):
+        path = self.root / '.agentic/manifest.yaml'
+        original = path.read_text(encoding='utf-8')
+        for name in [*check.SKILLS, *check.INDEPENDENT]:
+            path.write_text(original.replace('  - ' + name + '\n', ''), encoding='utf-8')
+            with self.subTest(skill=name):
+                self.reject()
+        path.write_text(original, encoding='utf-8')
+
+    def test_duplicate_unknown_and_missing_skill_sections_rejected(self):
+        path = self.root / '.agentic/manifest.yaml'
+        original = path.read_text(encoding='utf-8')
+        variants = [original.replace('skills:\n', 'skills:\n  - decision-intelligence\n'),
+                    original.replace('skills:\n', 'skills:\n  - unknown-skill\n'),
+                    original + '\nskills:\n  - documentation\n',
+                    original.replace('skills:\n', 'not_skills:\n')]
+        for value in variants:
+            path.write_text(value, encoding='utf-8')
+            self.reject()
+
+    def test_unsupported_yaml_forms_do_not_bypass_binding(self):
+        path = self.root / '.agentic/manifest.yaml'
+        original = path.read_text(encoding='utf-8')
+        variants = ['skills: [decision-intelligence]\n', 'skills: *shared\n',
+                    'skills:\n  - &name documentation\n', 'skills:\n  - "documentation"\n',
+                    original + '\n"skills": []\n', original + "\n'skills': []\n",
+                    original + '\n<<: *override\n', original + '\n---\n']
+        for value in variants:
+            path.write_text(value, encoding='utf-8')
+            self.reject()
+
+    def test_comments_do_not_change_selection(self):
+        path = self.root / '.agentic/manifest.yaml'
+        text = path.read_text().replace('skills:\n', 'skills: # selected\n')
+        text = text.replace('  - documentation\n', '  # scoped guide\n  - documentation # selected\n')
+        path.write_text(text)
+        self.assertEqual(check.verify(self.root)['missing_declared_skills'], [])
+
+    def test_missing_independent_entrypoint_rejected(self):
+        (self.root / check.PREFIX / 'typesafe-ai/SKILL.md').unlink()
+        self.reject()
+
+    def test_unreviewed_directory_rejected(self):
+        (self.root / check.PREFIX / 'unreviewed-skill').mkdir()
+        self.reject()
+
+    def test_missing_or_incomplete_index_rejected(self):
+        path = self.root / check.INDEX
+        original = path.read_text()
+        path.unlink()
+        self.reject()
+        path.write_text(original.replace('(codebase-audit/SKILL.md)', '(absent/SKILL.md)'))
+        self.reject()
+
+    def test_extra_lock_skill_rejected(self):
+        self.mutate_lock(lambda lock: lock['skills'].update({'unreviewed-skill': check.VERSION}))
+        self.reject()
+
+    def test_boolean_lock_version_rejected(self):
+        self.mutate_lock(lambda lock: lock.update(format_version=True))
+        self.reject()
+
+    def test_shared_lifecycle_guides_are_local_and_source_mapped(self):
+        for relative, upstream in check.SHARED_SOURCES.items():
+            self.assertTrue(upstream.startswith('references/'))
+            self.assertIn(relative, check.EXPECTED)
+            self.assertTrue((self.root / check.PREFIX / relative).is_file())
 
 
 if __name__ == '__main__':
