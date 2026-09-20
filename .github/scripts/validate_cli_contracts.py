@@ -13,14 +13,25 @@ schema = json.loads((root / 'catalog/schema/codebase-audit.v2.schema.json').read
 validator = Draft202012Validator(schema)
 fixture = json.loads((root / '.agentic/evals/fixtures/codebase-audit.v2.json').read_text())
 validator.validate(fixture)
-for key, value in [('overall', 101), ('scores', {}), ('scores', {'testing': 'good'}),
-                   ('format_version', 3), ('findings', [{}]), ('checks', {}),
+for key, value in [('overall', 101), ('scores', {}), ('findings', [{}]), ('checks', {}),
+                   ('scores', {'testing': 'good'}), ('format_version', 3),
                    ('architecture', {'compliance': {'deterministic_errors': -1, 'passed': True}})]:
     invalid = copy.deepcopy(fixture)
     invalid[key] = value
     assert not validator.is_valid(invalid), (key, value)
 assert not validator.is_valid({})
 print('CLI schemas and audit compatibility fixtures passed')
+
+context_schema = json.loads((root / 'catalog/schema/context-profiles.v1.schema.json').read_text())
+context_validator = Draft202012Validator(context_schema)
+context_validator.validate(json.loads((root / 'catalog/context/profiles.v1.json').read_text()))
+composition = json.loads((root / 'catalog/schema/manifest.schema.json').read_text())['properties']['composition']
+composition_validator = Draft202012Validator(composition)
+for mode in ['full', 'minimal']:
+    composition_validator.validate({'context_profile': mode})
+for invalid in [None, {}, {'context_profile': 'unknown'}, {'context_profile': True},
+                {'context_profile': 'minimal', 'prune': True}]:
+    assert not composition_validator.is_valid(invalid), invalid
 
 for name, fixture, invalid_field in [
     ('audit-gate.v1.schema.json', {'format_version': 1, 'kind': 'audit-gate', 'passed': False, 'failures': ['incomplete evidence']}, 'passed'),
@@ -36,4 +47,11 @@ for name, fixture, invalid_field in [
     assert not validator.is_valid(invalid), name
 print('Gate and comparison compatibility fixtures passed')
 
-subprocess.run([sys.executable, str(root / '.github/scripts/validate_check_contracts.py')], check=True)
+for script in ['validate_check_contracts.py', 'validate_execution_contracts.py', 'validate_completion_contracts.py',
+               'validate_decision_contracts.py', 'test_design_inventory.py', 'test_presentation_contract.py',
+               'validate_source_graph_contract.py', 'validate_context_plan_contract.py', 'validate_adapter_contracts.py',
+               'test_public_archive_names.py', 'test_public_surface.py', 'test_context_profiles.py',
+               'test_self_hosted_skills.py', 'test_self_hosted_reader_cache.py',
+               'test_context_checkpoint.py', 'test_checkpoint_refresh.py', 'test_decision_binding.py',
+               'test_ordinal_binding.py', 'test_rule_ir.py']:
+    subprocess.run([sys.executable, str(root / '.github/scripts' / script)], check=True)

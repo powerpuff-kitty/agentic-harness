@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "tooling/ruff/current",
+  "kind": "tooling",
+  "name": "Ruff",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Ruff linting/formatting capability for Python repositories that explicitly select it.",
+  "capabilities": ["detect", "analyze", "check", "fix"],
+  "rules": [
+    {
+      "id": "ruff.linting.native-diagnostics",
+      "title": "Preserve Ruff rule identity and project selection",
+      "category": "linting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Ruff diagnostics should retain native rule codes and project configuration when normalized by Harness.",
+      "source_refs": ["ruff.configuration"],
+      "tools": ["ruff"],
+      "autofix": "conditional",
+      "constraints": {
+        "preserve_native_code": true,
+        "fix_requires_authorization": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "ruff.configuration",
+      "title": "Ruff configuration",
+      "url": "https://docs.astral.sh/ruff/configuration/",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "format_version": 1,
+  "canonical_source": null,
+  "agents_source": null,
+  "variant": "web-app",
+  "packs": {},
+  "policies": {},
+  "skills": {},
+  "checksums": {}
+}

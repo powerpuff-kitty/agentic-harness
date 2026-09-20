@@ -1,0 +1,75 @@
+{
+  "format_version": 1,
+  "kind": "native-host-trial-observation",
+  "date": "2026-09-18",
+  "status": "blocked-authentication",
+  "host": {
+    "name": "Claude Code",
+    "version": "2.1.76",
+    "configured_model": "claude-opus-4-6[1m]",
+    "actual_model_response_observed": false
+  },
+  "invocation": {
+    "authorized": true,
+    "exit_code": 1,
+    "elapsed_seconds": 198.524,
+    "supervisor_timeout_seconds": 300,
+    "supervisor_timeout_reached": false,
+    "requested_max_budget_usd": 1,
+    "client_reported_cost_usd": 0,
+    "billing_independently_verified": false,
+    "failure_class": "API 401 authentication error"
+  },
+  "tools": {
+    "available": [
+      "Glob",
+      "Grep",
+      "Read",
+      "Edit",
+      "Write"
+    ],
+    "used": [],
+    "successful_context_reads": []
+  },
+  "workspace": {
+    "recorded_files_preserved": 70,
+    "changed_files": [],
+    "new_files": [],
+    "missing_or_replaced_files": [],
+    "links_unchanged": true
+  },
+  "evidence": {
+    "stdout_sha256": "145aefe960812be81609cce88ac679c39990f3550d16955844aa1c76e7f975b5",
+    "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "raw_transcript_published": false,
+    "cli_binary_sha256": "a5ab1faca2e0741496eb47049eefad5328c6d23c271f2d3496b70a01ea44f68c",
+    "cli_sources": {
+      "agents": {
+        "commit": "7e7d44e9f9d7e4579048c4e8c1073243f6bcf61c",
+        "repository": "powerpuff-kitty/agentic-harness-agents"
+      },
+      "canonical": {
+        "commit": "eac2d488407d495913e1b863b426b3e052588408",
+        "repository": "powerpuff-kitty/agentic-harness"
+      },
+      "format": 1,
+      "model_registry": {
+        "commit": "3b6635f036d4648dc7b4dc570df24ec1d509da51",
+        "repository": "powerpuff-kitty/agentic-harness"
+      }
+    }
+  },
+  "verification": {
+    "application_implementation": "not-produced",
+    "post_model_tests": "not-run-no-implementation",
+    "native_loading": "unverified",
+    "host_enforcement": "unverified",
+    "completion_verified": false
+  },
+  "limitations": [
+    "One failed host invocation; no successful model task or routing conclusion.",
+    "Client-reported zero cost is not independent billing evidence.",
+    "The result subtype and error flag must be interpreted together; result subtype success with is_error true is not success.",
+    "The earlier authored reference patch is preflight evidence only and was absent from this starting tree."
+  ]
+}

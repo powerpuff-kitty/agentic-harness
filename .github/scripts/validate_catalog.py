@@ -7,10 +7,13 @@ import sys
 from pathlib import Path
 
 from validate_public_surface import validate_public_surface
+from validate_context_profiles import validate as validate_context_profiles
 from validate_presentation_contract import validate_contract
+import json
 
 ROOT = Path(__file__).resolve().parents[2]
 errors = validate_public_surface(ROOT)
+errors.extend(validate_context_profiles(ROOT, json.loads((ROOT / "catalog/context/profiles.v1.json").read_text())))
 if errors:
     print("Public surface validation failed:", file=sys.stderr)
     for error in errors:
@@ -18,5 +21,5 @@ if errors:
     raise SystemExit(1)
 
 validate_contract(ROOT)
-# The original structural validator is retained byte-for-byte in this module.
+# Structural checks include materialized variants and synthetic context examples.
 runpy.run_path(str(Path(__file__).with_name("_validate_catalog_structure.py")), run_name="__main__")

@@ -29,6 +29,18 @@ decisions:
     status: accepted
     file: ADR-007-mit-licensing.md
   - id: ADR-008
+    title: Adopt a provider-neutral Decision Kernel contract
+    status: accepted
+    file: ADR-008-decision-kernel.md
+  - id: ADR-009
+    title: Separate context file selection from organization profiles
+    status: accepted
+    file: ADR-009-context-file-selection.md
+  - id: ADR-010
+    title: Begin imported evidence trust with caller-approved exact digests
+    status: accepted
+    file: ADR-010-caller-approved-evidence.md
+  - id: ADR-011
     title: Add an optional project presentation contract
     status: proposed
-    file: ADR-008-project-presentation-contract.md
+    file: ADR-011-project-presentation-contract.md

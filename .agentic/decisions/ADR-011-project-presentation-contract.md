@@ -1,4 +1,4 @@
-# ADR-008: Add an optional project presentation contract
+# ADR-011: Add an optional project presentation contract
 
 - Status: proposed
 - Date: 2026-09-12

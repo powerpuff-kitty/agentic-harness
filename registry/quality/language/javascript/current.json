@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "language/javascript/current",
+  "kind": "language",
+  "name": "JavaScript",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "JavaScript language quality profile. Formatting and lint policy remain tooling/project concerns rather than language semantics.",
+  "capabilities": ["detect", "analyze", "check"],
+  "rules": [
+    {
+      "id": "javascript.configuration.tooling-evidence",
+      "title": "Separate JavaScript tooling discovery from execution evidence",
+      "category": "configuration",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "harness",
+      "summary": "A JavaScript formatter, linter or package script being present does not prove that it executed successfully.",
+      "source_refs": ["harness.quality-evidence"],
+      "tools": ["eslint", "biome", "prettier"],
+      "autofix": "none",
+      "constraints": {"discovery_is_execution": false}
+    }
+  ],
+  "sources": [
+    {
+      "id": "harness.quality-evidence",
+      "title": "Agentic Harness quality evidence policy",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/issues/102",
+      "authority": "harness",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

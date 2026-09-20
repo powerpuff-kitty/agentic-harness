@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "language/rust/current",
+  "kind": "language",
+  "name": "Rust",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Rust language quality profile that composes with rustfmt and Clippy tooling without treating tool availability as execution evidence.",
+  "capabilities": ["detect", "analyze", "check"],
+  "rules": [
+    {
+      "id": "rust.configuration.tooling-evidence",
+      "title": "Keep Rust tooling evidence explicit",
+      "category": "configuration",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "harness",
+      "summary": "Rust quality reports should distinguish Cargo/rustfmt/Clippy configuration discovery from commands that were actually executed.",
+      "source_refs": ["harness.quality-evidence"],
+      "tools": ["cargo", "rustfmt", "clippy"],
+      "autofix": "none",
+      "constraints": {
+        "discovery_is_execution": false
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "harness.quality-evidence",
+      "title": "Agentic Harness quality evidence policy",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/issues/102",
+      "authority": "harness",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

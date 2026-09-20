@@ -1,0 +1,22 @@
+{
+  "format_version": 1,
+  "kind": "context-profiles",
+  "default": "full",
+  "minimal": {
+    "core_files": [
+      "README.md", "AGENTS.md", ".agentic/README.md", ".agentic/manifest.yaml",
+      ".agentic/lock.json", ".agentic/PRODUCT.md", ".agentic/ARCHITECTURE.md",
+      ".agentic/SECURITY.md", ".agentic/THIRD_PARTY_NOTICES.md",
+      ".agentic/decisions/README.md", ".agentic/decisions/index.yaml",
+      ".agentic/decisions/ADR-000-template.md"
+    ],
+    "design_variants": ["web-app", "saas"],
+    "design_packs": ["web-app", "design-system", "mobile"],
+    "design_fallback_variant": "web-app",
+    "module_routers": {
+      "packs": ".agentic/packs/README.md",
+      "policies": ".agentic/policies/README.md",
+      "skills": ".agents/skills/README.md"
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/quality-diff.schema.json",
+  "title": "Agentic Harness Quality Diff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "baseline", "current", "stale", "stale_reasons", "added", "removed", "unchanged", "coverage"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "quality-diff" },
+    "baseline": { "type": "string", "minLength": 1 },
+    "current": { "type": "string", "minLength": 1 },
+    "stale": { "type": "boolean" },
+    "stale_reasons": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "added": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "removed": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "unchanged": { "type": "integer", "minimum": 0 },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "not_checked", "unsupported"],
+      "properties": {
+        "performed": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "not_checked": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+        "unsupported": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    }
+  },
+  "$defs": {
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fingerprint", "rule_id", "severity", "path"],
+      "properties": {
+        "fingerprint": { "type": "string", "minLength": 1 },
+        "rule_id": { "type": "string", "minLength": 1 },
+        "native_code": { "type": ["string", "null"] },
+        "severity": { "type": "string", "enum": ["error", "warning", "recommendation"] },
+        "path": { "type": "string", "minLength": 1 },
+        "line": { "type": ["integer", "null"], "minimum": 1 }
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "format_version": 1,
+  "roots": ["src/presentation/components", "src/presentation/styles"],
+  "required_components": ["button", "text-field", "filter", "tokens"],
+  "aliases": { "text-field": "TextField" },
+  "exceptions": []
+}

@@ -33,6 +33,12 @@
       },
       "additionalProperties": true
     },
+    "composition": {
+      "type": "object",
+      "required": ["context_profile"],
+      "properties": {"context_profile": {"enum": ["full", "minimal"]}},
+      "additionalProperties": false
+    },
     "catalog": {"type": "object"},
     "modules": {
       "type": "object",

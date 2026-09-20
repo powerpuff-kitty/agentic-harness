@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "tooling/eslint/current",
+  "kind": "tooling",
+  "name": "ESLint",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "ESLint rule/configuration capability. A detected ESLint config is evidence of tooling presence, not proof that lint was executed or that every configured rule is appropriate.",
+  "capabilities": ["detect", "analyze", "check", "fix"],
+  "rules": [
+    {
+      "id": "eslint.configuration.rules",
+      "title": "Preserve configured ESLint rule semantics",
+      "category": "linting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "ESLint rules are configured with explicit severities/options in configuration files or comments; Harness adapters should preserve the native rule code and configured severity.",
+      "source_refs": ["eslint.configure-rules"],
+      "tools": ["eslint"],
+      "autofix": "conditional",
+      "constraints": {
+        "preserve_native_code": true,
+        "config_presence_is_execution": false,
+        "fix_requires_authorization": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "eslint.configure-rules",
+      "title": "ESLint: Configure Rules",
+      "url": "https://eslint.org/docs/latest/use/configure/rules",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "tooling/gofmt/current",
+  "kind": "tooling",
+  "name": "gofmt",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Canonical Go formatting capability.",
+  "capabilities": ["detect", "check", "fix"],
+  "rules": [
+    {
+      "id": "gofmt.formatting.check",
+      "title": "Check Go formatting before applying writes",
+      "category": "formatting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Use gofmt semantics for Go formatting checks and keep rewrite authorization separate.",
+      "source_refs": ["go.gofmt"],
+      "tools": ["gofmt"],
+      "autofix": "safe",
+      "constraints": {"check_before_fix": true, "fix_requires_authorization": true}
+    }
+  ],
+  "sources": [
+    {
+      "id": "go.gofmt",
+      "title": "gofmt command documentation",
+      "url": "https://pkg.go.dev/cmd/gofmt",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

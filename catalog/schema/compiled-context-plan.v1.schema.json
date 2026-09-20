@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/powerpuff-kitty/agentic-harness/catalog/schema/compiled-context-plan.v1.schema.json",
+  "title": "Agentic Harness compiled context plan v1",
+  "description": "Provider-neutral task-scoped context selection plan. Token counts are estimates unless the estimator explicitly records observed provider usage. Shape validity does not prove that selected context is sufficient for a task.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "target",
+    "task",
+    "compiler",
+    "budget",
+    "active_context_packs",
+    "items",
+    "coverage",
+    "not_checked"
+  ],
+  "properties": {
+    "format_version": { "const": 1 },
+    "kind": { "const": "compiled-context-plan" },
+    "target": { "$ref": "#/$defs/text" },
+    "task": { "$ref": "#/$defs/task" },
+    "compiler": { "$ref": "#/$defs/compiler" },
+    "budget": { "$ref": "#/$defs/budget" },
+    "active_context_packs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/id" },
+      "maxItems": 128,
+      "uniqueItems": true
+    },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" },
+      "maxItems": 200000
+    },
+    "coverage": { "$ref": "#/$defs/coverage" },
+    "not_checked": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/text" },
+      "maxItems": 128,
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[A-Za-z0-9_.:/+@-]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "intent"],
+      "properties": {
+        "text": { "$ref": "#/$defs/text" },
+        "intent": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "compiler": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "deterministic"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/text" },
+        "deterministic": { "type": "boolean" }
+      }
+    },
+    "budget_slice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["limit", "estimated"],
+      "properties": {
+        "limit": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1, "maximum": 1000000000 },
+            { "type": "null" }
+          ]
+        },
+        "estimated": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 1000000000 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimator", "input", "tool_output", "output", "over_budget"],
+      "properties": {
+        "estimator": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "version", "unit", "disclaimer"],
+          "properties": {
+            "id": { "$ref": "#/$defs/id" },
+            "version": { "$ref": "#/$defs/text" },
+            "unit": { "const": "estimated-tokens" },
+            "disclaimer": { "$ref": "#/$defs/text" }
+          }
+        },
+        "input": { "$ref": "#/$defs/budget_slice" },
+        "tool_output": { "$ref": "#/$defs/budget_slice" },
+        "output": { "$ref": "#/$defs/budget_slice" },
+        "over_budget": { "type": "boolean" }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path", "digest", "revision"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "router",
+            "manifest",
+            "policy",
+            "project-context",
+            "project-truth",
+            "repository-file",
+            "summary",
+            "symbol",
+            "diagnostic",
+            "event",
+            "rule"
+          ]
+        },
+        "path": { "$ref": "#/$defs/path" },
+        "digest": { "$ref": "#/$defs/digest" },
+        "revision": {
+          "oneOf": [
+            { "$ref": "#/$defs/text" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "relevance",
+        "confidence",
+        "freshness",
+        "dependency_distance"
+      ],
+      "properties": {
+        "relevance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["score", "method"],
+          "properties": {
+            "score": { "type": "number", "minimum": 0 },
+            "method": { "$ref": "#/$defs/id" }
+          }
+        },
+        "confidence": {
+          "oneOf": [
+            { "type": "number", "minimum": 0, "maximum": 1 },
+            { "type": "null" }
+          ]
+        },
+        "freshness": {
+          "enum": ["current", "stale", "unknown"]
+        },
+        "dependency_distance": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 1000000 },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "source",
+        "authority",
+        "mandatory",
+        "stability",
+        "disclosure",
+        "disposition",
+        "estimated_tokens",
+        "signals",
+        "context_packs",
+        "reasons"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" },
+        "source": { "$ref": "#/$defs/source" },
+        "authority": {
+          "enum": [
+            "mandatory-policy",
+            "project-truth",
+            "repository-evidence",
+            "generated-analysis"
+          ]
+        },
+        "mandatory": { "type": "boolean" },
+        "stability": { "enum": ["stable", "volatile", "unknown"] },
+        "disclosure": {
+          "enum": ["router", "summary", "symbol", "file", "artifact-reference"]
+        },
+        "disposition": {
+          "enum": ["included", "deferred", "omitted"]
+        },
+        "estimated_tokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000000000
+        },
+        "signals": { "$ref": "#/$defs/signals" },
+        "context_packs": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "maxItems": 128,
+          "uniqueItems": true
+        },
+        "reasons": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "minItems": 1,
+          "maxItems": 32,
+          "uniqueItems": true
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "mandatory": { "const": true } },
+            "required": ["mandatory"]
+          },
+          "then": {
+            "properties": { "disposition": { "const": "included" } }
+          }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete",
+        "files_discovered",
+        "supported_text_files",
+        "unsupported_files",
+        "unreadable_files",
+        "required_unavailable",
+        "errors"
+      ],
+      "properties": {
+        "complete": { "type": "boolean" },
+        "files_discovered": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "supported_text_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "unsupported_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "unreadable_files": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "required_unavailable": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10000000
+        },
+        "errors": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/text" },
+          "maxItems": 1024
+        }
+      }
+    }
+  }
+}
