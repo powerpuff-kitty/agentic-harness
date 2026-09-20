@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "6d5e19efa76d8be2ab42e34b8263a2703b93eb20"
+    "revision": "537f2e7d36b1bcbe21d2d6dd41c5de86ff792fec"
   },
   "variant": "base",
   "packs": {
@@ -58,7 +58,7 @@
     ".agents/skills/decision-intelligence/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
     ".agents/skills/decision-intelligence/SKILL.md": "63f16f287818cf6a021ad00e0a6349dba0e47ee0a123a66ce8083cb41631af69",
     ".agents/skills/decision-intelligence/bundle.json": "1a5b8274259c111b574b37e8ee01c6ef395ef1e533327727b83c6a599ac3aa4a",
-    ".agents/skills/decision-intelligence/references/decision-guide.md": "341eb9c9493744ab1ce027faa691346997b04ee33c97b4426aaef52b6ca982ef",
+    ".agents/skills/decision-intelligence/references/decision-guide.md": "bf9f50fc67d6621deb7962d67542e66b6a798cddb05a2501c0d5b80c0e11a220",
     ".agents/skills/decision-intelligence/references/graph-review.md": "b2443874f6a3fe106e0bdfa726a3c04c80533b749769fd577475a798875fba4e",
     ".agents/skills/decision-intelligence/scripts/review_graph.py": "9c20f8fbea25f57367725d7d9035c95e19c69a9a0c64d16faea875227364ae60",
     ".agents/skills/documentation/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
