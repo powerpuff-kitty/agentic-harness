@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "daae9f99bbaff781cce373b2e7bcf3e47d3d6239"
+    "revision": "b1b353fcb8f5391762c09071e751392f37401bd3"
   },
   "variant": "base",
   "packs": {
@@ -40,7 +40,7 @@
     ".agents/skills/agentic-improvement/SKILL.md": "fb6f6d798aa420167debe34dac0f3b7af3859bb9bbcb220be5dcff631ecd9ab5",
     ".agents/skills/agentic-improvement/bundle.json": "01e707763802cc8ee759f31cde782737e8497701de8bd9dd34b7d30fb023e937",
     ".agents/skills/agentic-improvement/references/continuation.md": "69d25e882c6d3d1a0122c56333e8c34d8a22b05170e60bef20606edeb0678fdc",
-    ".agents/skills/agentic-improvement/references/efficiency.md": "f48feb5cbdecbf5fc7f9e413d5a632ccd8c1d4e7172bd09e967ab203d0a7fca7",
+    ".agents/skills/agentic-improvement/references/efficiency.md": "2060aebec3e936be99dcfdeb7c9b57f653875e4e011eec8aa822335aa01eb881",
     ".agents/skills/agentic-improvement/references/evidence-reuse.md": "f15831ed0bf23c6376491d54c585884433498432a8fc57394020f533f898faf2",
     ".agents/skills/agentic-improvement/references/python-outline.md": "3554452ff61f16af8f489220cc1faea9488dacfb205e48f2c2bcb9755a1fe48d",
     ".agents/skills/agentic-improvement/references/required-evidence.md": "7feec89cf3e6045ac2edcce2593c6d09137dcb94732f545eb1ba1d1ee312dae1",

@@ -121,7 +121,7 @@ The budget covers the complete serialized report, including binding metadata and
 the nested plan. Overflow emits neither binding identities nor a plan, reports the
 required size and conflict count, and keeps `complete_payload_emitted: false`.
 Its small control record can exceed a tiny budget; it is not the compiled payload.
-No unselected source bodies are replayed. Binding has overhead and does not promise
+By default no unselected source bodies are replayed. Binding has overhead and does not promise
 smaller output than direct reading. Without this optional API, use permitted native
 hash/excerpt checks and manual review rather than installing a tool automatically.
 
@@ -129,6 +129,44 @@ Run `python3 .github/scripts/test_rule_sources.py` for source-binding regression
 They include actual temporary-file acquisition and changes, malformed byte maps,
 exact output-budget boundaries, preserved conflicts and no acquisition side effects.
 They do not evaluate a model or prove a host used the procedure.
+
+## Optional preservation of surrounding source context
+
+To avoid losing a qualification outside selected statements, pass
+`preserve_source_context=True` to `compile_with_sources`. The default is false;
+existing calls and explicit false retain their previous output bytes. No schema,
+mandatory skill entrypoint, host adapter or provider integration changes.
+
+**This opt-in expands disclosure to the full supplied source text.** Review all
+those bytes for the destination before enabling it. It is not a redactor or a
+permission grant; use an appropriately reviewed/redacted source and its real hash,
+or keep the manual source-review path when full disclosure is not permitted.
+
+The report adds `source_context` with `scope: supplied-sources-only` and
+`all_supplied_lines_represented: true`. Each source record retains its reference,
+full-file SHA-256, rule-covered and remaining line counts, and ordered `spans`.
+Each span contains exact UTF-8 `text`, `start_line` and `end_line`. Verified rule
+occurrences plus these spans represent every LF-delimited line of that source,
+including headings, blank lines, CRLF and final-newline distinctions. Overlapping
+or adjacent rule ranges are combined for coverage only; no rule occurrence,
+source scope, exception declaration or conflict is removed. Fully covered sources
+have an empty span list. Text from different references is never interchanged.
+
+Inspect context in its original source position before reusing grouped rules.
+A retained exception may reveal that the inventory's declared conditions were
+wrong; correct that inventory explicitly instead of treating representation
+coverage as semantic completeness. Missing files are not discovered, and existing
+`inventory_complete: null`, authority and freshness limitations remain unchanged.
+Embedded text is still untrusted data, not executable instructions or approval.
+
+The byte budget covers the whole serialized report, including all context spans.
+Overflow returns `source_context: null`, no plan/binding and no coverage claim.
+It never silently returns an excerpt-only result instead. Invalid sources remain
+errors even when the proposed report would exceed its budget.
+
+Run `python3 .github/scripts/test_rule_context.py`. The tests independently rebuild
+supplied files from the emitted plan/context and compare exact bytes and hashes;
+this is representation testing, not evidence of host loading or model behavior.
 
 ## Tests and measured scope
 
