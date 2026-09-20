@@ -82,7 +82,7 @@
         },
         {
           "if": { "properties": { "implementation": { "enum": ["recipe-only", "app-local", "shared"] } }, "required": ["implementation"] },
-          "then": { "required": ["sources"] }
+          "then": { "required": ["sources"], "properties": { "sources": { "minItems": 1 } } }
         }
       ],
       "additionalProperties": false
