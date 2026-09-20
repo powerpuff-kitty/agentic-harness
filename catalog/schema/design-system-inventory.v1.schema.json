@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/powerpuff-kitty/agentic-harness/catalog/schema/design-system-inventory.v1.schema.json",
+  "title": "Design-system inventory and evidence v1",
+  "description": "Machine-readable project design-system inventory. Design approval, implementation maturity, verification evidence and publication state are intentionally independent dimensions.",
+  "type": "object",
+  "required": ["format_version", "kind", "project", "catalogue_version", "items"],
+  "properties": {
+    "format_version": { "const": 1 },
+    "kind": { "const": "design-system-inventory" },
+    "project": {
+      "type": "object",
+      "required": ["id", "profile", "revision"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "profile": { "enum": ["marketing-site", "web-app", "data-heavy-app", "headless", "custom"] },
+        "revision": { "type": "string", "minLength": 7, "maxLength": 64 }
+      },
+      "additionalProperties": false
+    },
+    "catalogue_version": { "const": 1 },
+    "items": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/item" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "catalogueId": {
+      "enum": [
+        "tokens", "typography", "icon", "layout", "surface",
+        "app-shell", "header", "sidebar", "breadcrumb", "tabs", "pagination",
+        "button", "icon-button", "menu", "dropdown",
+        "form-field", "input", "textarea", "select", "checkbox", "radio", "switch", "combobox", "date-picker", "file-upload",
+        "alert", "toast", "progress", "spinner", "skeleton", "empty-state", "error-state",
+        "dialog", "drawer", "popover", "tooltip",
+        "table", "data-grid", "list", "card", "badge", "avatar", "stat", "chart",
+        "search", "filter", "command-palette"
+      ]
+    },
+    "sourceRef": {
+      "type": "object",
+      "required": ["path"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "export": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "item": {
+      "type": "object",
+      "required": ["id", "kind", "applicability", "implementation", "verification", "publication"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "kind": { "enum": ["foundation", "component", "pattern"] },
+        "catalogue_id": { "$ref": "#/$defs/catalogueId" },
+        "category": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "applicability": { "enum": ["required", "optional", "not-applicable"] },
+        "reason": { "type": "string", "minLength": 1 },
+        "implementation": { "enum": ["missing", "recipe-only", "app-local", "shared"] },
+        "verification": { "enum": ["not-run", "passed", "failed", "blocked", "not-applicable"] },
+        "publication": { "enum": ["private", "approved", "published"] },
+        "sources": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourceRef" },
+          "uniqueItems": true
+        },
+        "variants": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "states": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "tokens": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
+        "accessibility_notes": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "specimen": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "kind": { "enum": ["foundation", "component"] } }, "required": ["kind"] },
+          "then": { "required": ["catalogue_id"] }
+        },
+        {
+          "if": { "properties": { "applicability": { "const": "not-applicable" } }, "required": ["applicability"] },
+          "then": { "required": ["reason"] }
+        },
+        {
+          "if": { "properties": { "implementation": { "enum": ["recipe-only", "app-local", "shared"] } }, "required": ["implementation"] },
+          "then": { "required": ["sources"], "properties": { "sources": { "minItems": 1 } } }
+        }
+      ],
+      "additionalProperties": false
+    }
+  }
+}
