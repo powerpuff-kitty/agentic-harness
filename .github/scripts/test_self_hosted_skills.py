@@ -110,6 +110,15 @@ class SelfHostedSkills(unittest.TestCase):
         check.verify(self.root)
         self.assertEqual(path.read_bytes(), before)
 
+    def test_removed_selected_manifest_declaration_is_rejected(self):
+        """Must fail on the old verifier: manifest membership was never read."""
+        manifest = check.ROOT / '.agentic/manifest.yaml'
+        text = manifest.read_text(encoding='utf-8')
+        self.assertIn('  - decision-intelligence\n', text)
+        (self.root / '.agentic/manifest.yaml').write_text(
+            text.replace('  - decision-intelligence\n', ''), encoding='utf-8')
+        self.reject()
+
 
 if __name__ == '__main__':
     check.verify()  # Check the real checkout before testing isolated mutations.
