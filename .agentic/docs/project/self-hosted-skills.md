@@ -1,32 +1,73 @@
-# Self-hosted priority skills
+# Self-hosted skills
 
-This repository carries reviewed copies of `decision-intelligence` and `agentic-improvement` under `.agents/skills/`. Their authoring source remains `powerpuff-kitty/agentic-harness-agents`, pinned at `3bbafa3ee1c106edae94893e28b2760f5e3bc663`. This is repository-local delivery for #121 under the P0 #105/#114 workstreams, not a release or device-global update.
+All eight skills declared in this repository's own manifest now have local
+entrypoints. Seven Harness procedures come from reviewed agents revision
+`3bbafa3ee1c106edae94893e28b2760f5e3bc663`; `typesafe-ai` retains independent
+provenance and its existing bytes. This completes #123 after the two priority
+imports in #121. It does not install all 31 skills from the authoring collection.
 
-## Routing
+## Conditional discovery
 
-The root `AGENTS.md` routes bounded evidence-support judgments and typed task classification to `decision-intelligence`; context/instruction optimisation routes to `agentic-improvement`. Routine code or documentation work does not have to load either as an additional wrapper. Both use conditional local guides.
+Root `AGENTS.md` keeps the direct decision/efficiency routes and links to the
+local `.agents/skills/README.md` index for lifecycle, review, documentation and
+explicitly authorised release work. Load one owning procedure and expand its
+references only as needed. Installing the release skill does not authorise a
+release. Uninstalled specialist handoffs remain unavailable rather than silently
+triggering installations, extra agents or providers.
 
-Actual TypeSafe integration still routes to the separately maintained `typesafe-ai` skill. The vendor directory is unchanged by this import. Current-agent guidance never implies real Jev inference, provider credentials, free inference or permission to send repository context elsewhere. Existing project approval boundaries remain unchanged.
+## Exact source and local dependencies
 
-## Provenance and scope
+The lock retains the same agents revision and version `0.5.0-beta.1`, now with
+seven selected names and SHA-256 checksums for all 27 imported files. No target
+manifest/schema, vendor bytes, downstream source pins or runtime code changes.
+The 19 additional files complete agentic-app, codebase-audit, security-review,
+documentation and release, including necessary guides and exact MIT notices.
 
-`.agentic/lock.json` records the reviewed agents revision, the two imported skill versions and SHA-256 identities of all eight imported files, including their MIT notices. Version `0.5.0-beta.1` is retained from the source manifest; the commit and hashes identify these exact bytes. It is not a newly published distribution version.
+Source paths are `skills/<skill>/<file>` at the pinned agents revision, except
+LICENSE files come from its root LICENSE. Lifecycle's two guides are exact copies
+of upstream `references/repository-discovery.md` and
+`references/context-engineering.md`, placed under its local `references/` folder.
+Their source mapping is explicit in the verifier. The other review/priority guides
+already originate inside their skill directories. Authoring remains upstream;
+these are reviewed copies, not competing project truth.
 
-The lock's `agents_source` now identifies these installed Harness imports. Other pre-existing names in the project's `skills` list are preserved declarations, not proof that their directories are installed. In particular, this change does not materialise agentic-app, codebase-audit, security-review, documentation or release. The TypeSafe directory has independent upstream provenance and is outside the agents import pin. No downstream CLI source pin changes here.
+Bundle declarations are retained where supplied upstream. Lifecycle, documentation
+and release are ordinary local skill directories, not newly sealed archives.
+No new distribution version, release or device-global update is claimed.
 
-## Verify, do not overwrite
+## Read-only verification
 
 ```sh
 python3 .github/scripts/validate_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_skills.py
 ```
 
-The first command checks the actual files against reviewed Git blob identities and lock SHA-256 checksums, complete local bundle contents, licence bytes and root routes. It does not fetch sources, install files, execute a skill, open credentials or launch a model. The second verifies the real checkout before running mutation tests on temporary copies. The existing canonical contract-validation entrypoint also runs these regressions; no workflow YAML change is needed.
+Verification binds the own-project manifest selection, actual skill directories,
+conditional router/index links, exact selected lock names, reviewed Git blob
+identities, SHA-256 checksums and necessary local references. Vendor checking is
+limited to a present nonempty entrypoint; it does not certify vendor provenance.
+Missing/duplicate/unknown declarations, missing guides, source drift, wrong pins,
+extra imported files/directories and linked inputs fail without repair or overwrite.
 
-Missing guides, changed bytes, wrong pins/checksums, duplicate JSON keys, extra payload files, linked files/directories and absent routes fail. A failure never repairs or overwrites customised content. For a future update, review the source revision, compare all selected files, preserve local changes and update the lock and reviewed validator identities together. Do not change checksums merely to suppress a mismatch.
+The manifest-membership check deliberately supports this repository's simple
+unquoted top-level keys and two-space plain-name skills block list, with comments.
+Quoted/flow/anchor/merge/multi-document forms fail explicitly. This is a checked
+authoring subset, not a general YAML parser or replacement for catalog validation.
+Meaningful format or source changes require review of the verifier and tests.
 
-The validator assumes a trusted, quiescent checkout. Its Git hashes and SHA-256 inventory detect drift against reviewed values; they do not authenticate authorship. It checks only the two selected imports, not every declaration or the vendor payload. The bundle declarations are retained documentation metadata; these directories are not newly generated sealed ZIP archives.
+## Reproduced defect and evidence limits
 
-## Evidence limits
+At regression commit `1ae321dacdb85d33057e17dadbca1cc7d5286c7b`, existing CI run
+35478916477 failed exactly `test_removed_selected_manifest_declaration_is_rejected`:
+removing decision-intelligence from the manifest did not raise InvalidImport.
+The fix reads and binds the declarations rather than treating directory presence
+as sufficient. The unchanged failing assertion remains in the regression suite.
+Candidate and merged-main results are recorded in PR #124 and issue #123.
 
-The local regression run validates installation integrity, not a controlled skill trial. This continuation was assisted by the implementation agent with prior knowledge of the procedures and expected results; there is no independent or blinded baseline. Host automatic discovery/loading, observed model-token usage, actual Jev inference and empirical outcome improvement remain unverified under agents #26/#32/#36. Structural delivery is a prerequisite, not a substitute, for those measurements.
+The local staged imports were hashed against their retrieved upstream Git blobs;
+full checkout validation runs in the existing CI workflow. A trusted quiescent
+checkout is assumed. Hashes detect drift, not trusted authorship. This is an
+assisted engineering change with prior exposure, not an independent model trial,
+automatic host activation, actual Jev inference or empirical token-saving result.
+No credentials, paid providers, other project installs or downstream implementation
+are involved. Broader behavioural/usage gates remain under agents #26/#32/#36.

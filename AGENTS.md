@@ -14,5 +14,6 @@ This repository is a self-hosting Agentic Harness project and the canonical cata
 10. Follow the [public-surface policy](.agentic/docs/project/public-surface.md) for files and collaboration metadata; never identify internal consumers in public content or fixtures.
 11. For bounded evidence-support judgments or typed task classification, use [decision-intelligence](.agents/skills/decision-intelligence/SKILL.md); for instruction/context optimisation, use [agentic-improvement](.agents/skills/agentic-improvement/SKILL.md). These are conditional procedures, not mandatory wrappers for ordinary tasks.
 12. For actual TypeSafe/Jev integration, use the independently installed [TypeSafe skill](.agents/skills/typesafe-ai/SKILL.md) and its live-documentation workflow. Guidance alone does not require a provider call. Deterministic rules and authorisation remain project-owned.
+13. For lifecycle, review, documentation or explicitly approved release work, select the relevant procedure from the [installed skill index](.agents/skills/README.md); do not load the whole collection.
 
 Vendor adapters must remain thin and point back to this file and `.agentic/`; they may not redefine canonical architecture.
