@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "664ce345841d8fd2e35b234dfa8a735a9f4d3fec"
+    "revision": "cb1d8474405a0a54f3b02847ed43ffedabe1e1c6"
   },
   "variant": "base",
   "packs": {
@@ -20,6 +20,55 @@
     "quality-gates": "built-in",
     "security": "built-in"
   },
-  "skills": {},
-  "checksums": {}
+  "skills": {
+    "agentic-app": "0.5.0-beta.1",
+    "agentic-improvement": "0.5.0-beta.1",
+    "codebase-audit": "0.5.0-beta.1",
+    "decision-intelligence": "0.5.0-beta.1",
+    "documentation": "0.5.0-beta.1",
+    "release": "0.5.0-beta.1",
+    "security-review": "0.5.0-beta.1"
+  },
+  "checksums": {
+    ".agents/skills/agentic-app/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/agentic-app/SKILL.md": "fa1fcaea8e01d8b20110d33b91cf0dc78a74c45f780c39db638fd56c66681367",
+    ".agents/skills/agentic-app/references/completion.md": "c6756984f56ed8c79d8754c189157475af53d9aa32e3836195740f10955827c9",
+    ".agents/skills/agentic-app/references/composition.md": "ddf1f07f77af0b813b97dd50d3699674ff4f2fd90d11ba0522324a1afdd501c3",
+    ".agents/skills/agentic-app/references/context-engineering.md": "1f0dc43edcb8f5851a49a6391100194fea007354e72671160b09f158eadfe45a",
+    ".agents/skills/agentic-app/references/repository-discovery.md": "993791cc5719f61d282be38c9f47201d9263929e4868ecdb38ff1703a893b614",
+    ".agents/skills/agentic-improvement/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/agentic-improvement/SKILL.md": "fb6f6d798aa420167debe34dac0f3b7af3859bb9bbcb220be5dcff631ecd9ab5",
+    ".agents/skills/agentic-improvement/bundle.json": "01e707763802cc8ee759f31cde782737e8497701de8bd9dd34b7d30fb023e937",
+    ".agents/skills/agentic-improvement/references/continuation.md": "69d25e882c6d3d1a0122c56333e8c34d8a22b05170e60bef20606edeb0678fdc",
+    ".agents/skills/agentic-improvement/references/efficiency.md": "3f6b201d961155cf4a5957da04253a6eb7fe6dfe163cc308fa316a2ed2ba88e5",
+    ".agents/skills/agentic-improvement/references/evidence-reuse.md": "f15831ed0bf23c6376491d54c585884433498432a8fc57394020f533f898faf2",
+    ".agents/skills/agentic-improvement/references/python-outline.md": "3554452ff61f16af8f489220cc1faea9488dacfb205e48f2c2bcb9755a1fe48d",
+    ".agents/skills/agentic-improvement/references/required-evidence.md": "7feec89cf3e6045ac2edcce2593c6d09137dcb94732f545eb1ba1d1ee312dae1",
+    ".agents/skills/agentic-improvement/references/typescript-outline.md": "c0761fedbe61dd940a644c19536d45bad816f556d1d6a69da7f24c863ecef4d5",
+    ".agents/skills/agentic-improvement/scripts/compact_log.py": "fa7fb2465d330857348e16fe551d57299ebcbf14c0579d1880749909a81ab045",
+    ".agents/skills/agentic-improvement/scripts/evidence_snapshot.py": "0b0ad0d2256a9c447d34f5359e3c3a2aea17722a353be1538de67f1352a94b23",
+    ".agents/skills/agentic-improvement/scripts/extract_context.py": "040dcc6e5f9e39b75fb03eecb2a858102317d30a4fddeb8de274362638b8d9dc",
+    ".agents/skills/agentic-improvement/scripts/outline_typescript.py": "26b1a21774da07cc389a79ccf6dd93c74c6308739796ba47c786779bef6a5972",
+    ".agents/skills/codebase-audit/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/codebase-audit/SKILL.md": "d1580c2ea807b2c705acf275588525f26e9ff402512678a67a7ac6dcb7dbc606",
+    ".agents/skills/codebase-audit/bundle.json": "c912b6c1c3a6e0b50d3ae3074b2a0df6cedecff9b80b31ea368bf72ed248db4b",
+    ".agents/skills/codebase-audit/references/language-review-packs.md": "3d731cff199bc18114a96a6464bd105363ef60aa83fd29517734a06968b46b3f",
+    ".agents/skills/codebase-audit/references/report-template.md": "72eebf31219e73ef7fc7f00fd21b66069bc0a33a8de65b5cdea1e706f7181e82",
+    ".agents/skills/codebase-audit/references/review-guide.md": "cedbc8b26c3f2d96987403756f43028fe3770a1d1939457f4583d5e3ec6f5a92",
+    ".agents/skills/decision-intelligence/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/decision-intelligence/SKILL.md": "63f16f287818cf6a021ad00e0a6349dba0e47ee0a123a66ce8083cb41631af69",
+    ".agents/skills/decision-intelligence/bundle.json": "1a5b8274259c111b574b37e8ee01c6ef395ef1e533327727b83c6a599ac3aa4a",
+    ".agents/skills/decision-intelligence/references/decision-guide.md": "60b33f87a6754580e5d55c83a45521e24556ec385dfdc86bb5841c2e89784a3e",
+    ".agents/skills/decision-intelligence/references/graph-review.md": "b2443874f6a3fe106e0bdfa726a3c04c80533b749769fd577475a798875fba4e",
+    ".agents/skills/decision-intelligence/scripts/review_graph.py": "9c20f8fbea25f57367725d7d9035c95e19c69a9a0c64d16faea875227364ae60",
+    ".agents/skills/documentation/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/documentation/SKILL.md": "0118eea2f43135e5ecff924250b135850acd7e8a44dc57f9e1e2b15db7eb14e9",
+    ".agents/skills/release/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/release/SKILL.md": "ecec818a12f1d4251d3bc9a85f7bb0836514be749d4e71681c26e28907056a1f",
+    ".agents/skills/security-review/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/security-review/SKILL.md": "e8d9d7c26f1225a6b956c9c6cfcc1c2ad7c792f90024f0ce50e62ed533f67d68",
+    ".agents/skills/security-review/bundle.json": "b8409ca62735e0265e417328bb9b0d2e5f507ff1081bb3bed676961ff7b1ca10",
+    ".agents/skills/security-review/references/report-template.md": "05370ce48b7a279f1ac066bef10e0884209ba2f7ff1c75f8dfed5ad511d1b3d8",
+    ".agents/skills/security-review/references/review-guide.md": "7939d7648bc027f0ca51d615504b74275ae485ea9fb54b471dece493c4f03c2b"
+  }
 }
