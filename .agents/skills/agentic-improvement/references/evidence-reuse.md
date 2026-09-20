@@ -120,3 +120,7 @@ calls; selected byte reduction alone is not an end-to-end token-saving claim.
 When a task has reviewed required spans, use the optional
 [required-evidence guard](references/required-evidence.md) before narrowing the
 selection. It checks declared coverage, not policy completeness or semantic sufficiency.
+
+When a selected Python file's definition ranges are unknown, consult the optional
+[definition-outline guide](references/python-outline.md) before loading its bodies.
+The map is navigation metadata, not emitted required evidence or a dependency graph.
