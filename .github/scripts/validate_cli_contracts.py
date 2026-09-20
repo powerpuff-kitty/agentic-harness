@@ -13,8 +13,8 @@ schema = json.loads((root / 'catalog/schema/codebase-audit.v2.schema.json').read
 validator = Draft202012Validator(schema)
 fixture = json.loads((root / '.agentic/evals/fixtures/codebase-audit.v2.json').read_text())
 validator.validate(fixture)
-for key, value in [('overall', 101), ('scores', {}), ('scores', {'testing': 'good'}),
-                   ('format_version', 3), ('findings', [{}]), ('checks', {}),
+for key, value in [('overall', 101), ('scores', {}), ('findings', [{}]), ('checks', {}),
+                   ('scores', {'testing': 'good'}), ('format_version', 3),
                    ('architecture', {'compliance': {'deterministic_errors': -1, 'passed': True}})]:
     invalid = copy.deepcopy(fixture)
     invalid[key] = value
@@ -48,7 +48,7 @@ for name, fixture, invalid_field in [
 print('Gate and comparison compatibility fixtures passed')
 
 for script in ['validate_check_contracts.py', 'validate_execution_contracts.py', 'validate_completion_contracts.py',
-               'validate_decision_contracts.py', 'test_design_inventory.py',
+               'validate_decision_contracts.py', 'test_design_inventory.py', 'test_presentation_contract.py',
                'validate_source_graph_contract.py', 'validate_context_plan_contract.py', 'validate_adapter_contracts.py',
                'validate_workflow_graph_contracts.py',
                'test_public_archive_names.py', 'test_public_surface.py', 'test_context_profiles.py',

@@ -8,6 +8,7 @@ from pathlib import Path
 
 from validate_public_surface import validate_public_surface
 from validate_context_profiles import validate as validate_context_profiles
+from validate_presentation_contract import validate_contract
 import json
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -19,5 +20,6 @@ if errors:
         print(f"- {error}", file=sys.stderr)
     raise SystemExit(1)
 
+validate_contract(ROOT)
 # Structural checks include materialized variants and synthetic context examples.
 runpy.run_path(str(Path(__file__).with_name("_validate_catalog_structure.py")), run_name="__main__")

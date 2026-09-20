@@ -40,3 +40,7 @@ decisions:
     title: Begin imported evidence trust with caller-approved exact digests
     status: accepted
     file: ADR-010-caller-approved-evidence.md
+  - id: ADR-011
+    title: Add an optional project presentation contract
+    status: proposed
+    file: ADR-011-project-presentation-contract.md
