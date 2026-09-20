@@ -1,0 +1,126 @@
+{
+  "format_version": 1,
+  "kind": "context-checkpoint",
+  "id": "synthetic-counter-handoff",
+  "authority": "navigation-only",
+  "created_at": "2026-09-20T00:00:00Z",
+  "producer": "synthetic contract fixture; no model session",
+  "task": {
+    "id": "counter-fix",
+    "goal": "Correct the synthetic unread counter.",
+    "scope": "One synthetic view; no release or provider calls.",
+    "base_revision": null,
+    "status": "blocked"
+  },
+  "sources": [
+    {
+      "id": "rules",
+      "reference": "fixture://rules",
+      "role": "instruction",
+      "availability": "recorded",
+      "sha256": "sha256:d088b273d4209dd96a550aa002d460154d57af4dd64b1b0c0188e074735385a7"
+    },
+    {
+      "id": "before",
+      "reference": "fixture://before",
+      "role": "source",
+      "availability": "recorded",
+      "sha256": "sha256:f961ba134d068f53cd04b6fdd12d061798d87bb6d964b4d039e599f9de3d4f94"
+    },
+    {
+      "id": "after",
+      "reference": "fixture://after",
+      "role": "source",
+      "availability": "recorded",
+      "sha256": "sha256:a7cdf3fe7cefea647a747db464719d0bb729960728a7b5450f55a9364d7366f0"
+    },
+    {
+      "id": "failure-log",
+      "reference": "fixture://failure-log",
+      "role": "diagnostic",
+      "availability": "recorded",
+      "sha256": "sha256:78d836b19758f2678c382465c7aaa32ae7b6e8e8572a6cadfc1c487dc19d8b11"
+    },
+    {
+      "id": "passing-log",
+      "reference": "fixture://passing-log",
+      "role": "diagnostic",
+      "availability": "recorded",
+      "sha256": "sha256:ce83cfea780beacd7096cbd9bfce0f5b3304645ab1789cd57ea2f4010e4b93ff"
+    },
+    {
+      "id": "browser-log",
+      "reference": "fixture://missing-browser-log",
+      "role": "diagnostic",
+      "availability": "unavailable",
+      "sha256": null
+    }
+  ],
+  "notes": [
+    {
+      "id": "counter-observation",
+      "kind": "observation",
+      "statement": "The second recorded unit attempt passed for the after source.",
+      "source_ids": [
+        "after",
+        "passing-log"
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "id": "unit-1",
+      "name": "unit",
+      "attempt": 1,
+      "command": "synthetic-test counter",
+      "status": "failed",
+      "input_source_ids": [
+        "before",
+        "rules"
+      ],
+      "evidence_source_ids": [
+        "failure-log"
+      ]
+    },
+    {
+      "id": "unit-2",
+      "name": "unit",
+      "attempt": 2,
+      "command": "synthetic-test counter",
+      "status": "passed",
+      "input_source_ids": [
+        "after",
+        "rules"
+      ],
+      "evidence_source_ids": [
+        "passing-log"
+      ]
+    },
+    {
+      "id": "browser-1",
+      "name": "browser",
+      "attempt": 1,
+      "command": null,
+      "status": "not-run",
+      "input_source_ids": [
+        "after",
+        "rules"
+      ],
+      "evidence_source_ids": []
+    }
+  ],
+  "open_items": [
+    {
+      "id": "browser-needed",
+      "description": "Required browser verification has no observed result.",
+      "blocking": true,
+      "source_ids": [
+        "browser-log"
+      ]
+    }
+  ],
+  "next_steps": [
+    "Resolve current instructions and compare actual source before reusing this record.",
+    "Run the permitted browser check; do not inherit approval from this checkpoint."
+  ]
+}
