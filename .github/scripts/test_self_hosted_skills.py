@@ -35,7 +35,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 27)
+        self.assertEqual(report['files_verified'], 29)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -193,6 +193,15 @@ class SelfHostedSkills(unittest.TestCase):
             self.assertTrue(upstream.startswith('references/'))
             self.assertIn(relative, check.EXPECTED)
             self.assertTrue((self.root / check.PREFIX / relative).is_file())
+
+    def test_lifecycle_mode_guides_are_local_and_referenced(self):
+        skill = self.root / check.PREFIX / 'agentic-app'
+        body = (skill / 'SKILL.md').read_text(encoding='utf-8')
+        for name in ('composition', 'completion'):
+            relative = 'references/' + name + '.md'
+            self.assertIn('(' + relative + ')', body)
+            self.assertIn('agentic-app/' + relative, check.EXPECTED)
+            self.assertTrue((skill / relative).is_file())
 
 
 if __name__ == '__main__':

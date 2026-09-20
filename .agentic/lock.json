@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "9d029d60bec1ca827a278d0ab18a6ad3e4fc13dc"
+    "revision": "90d0c95a3ffc6b2676cf62b6f8f5a21be501069b"
   },
   "variant": "base",
   "packs": {
@@ -31,7 +31,9 @@
   },
   "checksums": {
     ".agents/skills/agentic-app/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
-    ".agents/skills/agentic-app/SKILL.md": "55f83201f520442103e6b8664ea4dab71c9e0c36f6b2edeefdc00cc60f0ac06c",
+    ".agents/skills/agentic-app/SKILL.md": "fa1fcaea8e01d8b20110d33b91cf0dc78a74c45f780c39db638fd56c66681367",
+    ".agents/skills/agentic-app/references/completion.md": "c6756984f56ed8c79d8754c189157475af53d9aa32e3836195740f10955827c9",
+    ".agents/skills/agentic-app/references/composition.md": "ddf1f07f77af0b813b97dd50d3699674ff4f2fd90d11ba0522324a1afdd501c3",
     ".agents/skills/agentic-app/references/context-engineering.md": "1f0dc43edcb8f5851a49a6391100194fea007354e72671160b09f158eadfe45a",
     ".agents/skills/agentic-app/references/repository-discovery.md": "993791cc5719f61d282be38c9f47201d9263929e4868ecdb38ff1703a893b614",
     ".agents/skills/agentic-improvement/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",

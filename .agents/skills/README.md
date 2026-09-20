@@ -16,11 +16,12 @@ Project-owned truth and approval boundaries remain authoritative.
 | Actual TypeSafe integration only | [typesafe-ai](typesafe-ai/SKILL.md) |
 
 The seven Harness procedures and their necessary guides are pinned to the agents
-revision in `.agentic/lock.json`. TypeSafe has independent provenance. Lifecycle's
-two shared source guides are copied inside its directory; interpret their paths
-relative to that skill, and consult only the guide relevant to an unresolved task.
-Uninstalled specialists mentioned by a procedure remain optional handoffs, not
-proof of local availability or permission to fetch tools or call providers.
+revision in `.agentic/lock.json`. TypeSafe has independent provenance. Lifecycle
+uses its local composition guide for setup/upgrade/migration and its completion
+guide for artifact-completion work; neither is blanket startup context. Its two
+older shared-reference copies are retained without changes, not required default
+reads. Uninstalled specialists remain optional handoffs, not proof of availability
+or permission to install tools or call providers.
 
 Use the documented repository checks to verify delivery. Source presence does not
 prove automatic host activation, instruction adherence, live inference or savings.
