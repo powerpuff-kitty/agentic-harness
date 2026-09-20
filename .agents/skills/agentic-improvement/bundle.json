@@ -1,0 +1,8 @@
+{
+  "format_version": 1,
+  "kind": "standalone-skill",
+  "name": "agentic-improvement",
+  "files": ["SKILL.md", "references/efficiency.md"],
+  "optional_tools": [],
+  "shared_references": {}
+}
