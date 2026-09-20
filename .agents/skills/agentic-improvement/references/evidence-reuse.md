@@ -116,3 +116,7 @@ redaction or authority. Unlike freshness snapshots, successful excerpt output
 contains source text and must be reviewed before sharing. The JSON envelope can
 cost more than a tiny direct read. Measure complete output and later tool/model
 calls; selected byte reduction alone is not an end-to-end token-saving claim.
+
+When a task has reviewed required spans, use the optional
+[required-evidence guard](references/required-evidence.md) before narrowing the
+selection. It checks declared coverage, not policy completeness or semantic sufficiency.

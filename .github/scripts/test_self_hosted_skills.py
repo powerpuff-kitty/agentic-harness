@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 35)
+        self.assertEqual(report['files_verified'], 36)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -323,6 +323,21 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertEqual(overflow.returncode, 1, overflow.stderr)
         self.assertEqual(json.loads(overflow.stdout)['files'], [])
         self.assertNotIn(b'necessary evidence', overflow.stdout)
+        self.assertEqual(source.read_bytes(), raw)
+        required = ['--require-span', 'source.txt', '2', '2', pin]
+        guarded = subprocess.run(command + required, capture_output=True, timeout=10)
+        self.assertEqual(guarded.returncode, 0, guarded.stderr)
+        self.assertTrue(json.loads(guarded.stdout)['required_evidence']['emitted'])
+        missing = subprocess.run(command + ['--require-span', 'source.txt', '1', '3', pin],
+                                 capture_output=True, timeout=10)
+        self.assertEqual(missing.returncode, 2)
+        self.assertEqual(missing.stdout, b'')
+        self.assertEqual(json.loads(missing.stderr)['code'], 'required-spans-not-covered')
+        deferred = subprocess.run(command + required + ['--budget-bytes', '1'],
+                                  capture_output=True, timeout=10)
+        self.assertEqual(deferred.returncode, 1, deferred.stderr)
+        self.assertFalse(json.loads(deferred.stdout)['required_evidence']['emitted'])
+        self.assertNotIn(b'necessary evidence', deferred.stdout)
         self.assertEqual(source.read_bytes(), raw)
         source.write_bytes(raw.replace(b'necessary', b'incorrect'))
         stale = subprocess.run(command, capture_output=True, timeout=10)
