@@ -1,66 +1,113 @@
 # Self-hosted skills
 
-All eight skills declared in this repository's own manifest have local entrypoints. Seven Harness procedures are pinned to agents revision `6dfb44af12d96b1a2b4681ab3fdecc17baf9ea07`; typesafe-ai retains independent provenance and unchanged content. This installs the selected procedures, not every skill in the 31-skill authoring collection.
+All eight skills selected by this repository's manifest have local entrypoints.
+Seven Harness procedures come from the exact agents revision in `.agentic/lock.json`;
+`typesafe-ai` retains independent provenance and unchanged content. Resolve current
+versions, source pins and file identities from that lock and the read-only verifier,
+not from historical examples. This installs the selected procedures, not the whole
+31-skill authoring collection.
 
-## Conditional discovery and lifecycle context
+## Conditional discovery
 
-Root AGENTS.md routes to the local skill index and the priority decision/efficiency procedures. Select one owner and expand only the references needed for the task. Broad lifecycle audit need not load composition details. Init, upgrade and migration consult agentic-app/references/composition.md; completion-artifact work consults its completion.md. The default entrypoint retains source authority, approval, preservation and verification limits.
+Root `AGENTS.md` routes to the installed skill index and the decision/efficiency
+procedures. Select the owning skill; expand only references needed for the task.
+Ordinary tasks need no extra optimisation wrapper. Lifecycle audits do not preload
+composition instructions. Setup/upgrade/migration use the local composition guide;
+completion-artifact work uses the local completion guide. Core source authority,
+custom/null routes, local edits, approvals and verification remain protected.
 
-Guidance requires neither a Harness executable nor a TypeSafe account. Missing tools or evidence stay unresolved. Actual Jev needs explicit provider/data permission and its independently maintained official skill/live docs. Installing a release skill does not authorize publication. None of the optional helpers runs merely because its skill was loaded.
+Guidance requires neither a Harness executable nor a TypeSafe account. Actual Jev
+requires explicit provider/data permission and current independently managed vendor
+guidance. Missing tools, facts or permissions remain unresolved. Installing a release
+skill does not authorise a release; installing a helper does not authorise execution.
 
-## Optional local helpers
+## Optional deterministic helpers
 
-All three helpers use Python 3.10+ standard library and must be explicitly invoked only when permitted. Review inputs for secrets before use. They neither redact sensitive data nor authorize actions, execute input text, call a provider or write source files. Manual review remains available without Python.
+The efficiency skill now carries three explicitly invoked helpers:
 
-### Lossless log display
+| Helper | Scope | Conditional local guide |
+| --- | --- | --- |
+| `compact_log.py` | Lossless adjacent-line compaction of a named reviewed log | `agentic-improvement/references/efficiency.md` |
+| `evidence_snapshot.py` | Capture/compare explicitly selected source hashes and scope | `agentic-improvement/references/evidence-reuse.md` |
+| `extract_context.py` | Retrieve explicit source line ranges against expected file hashes | `agentic-improvement/references/evidence-reuse.md` |
+
+Decision Intelligence separately carries `review_graph.py`; its local graph-review
+guide defines the supported DecisionGraph subset. Layers are structural review,
+not an executing scheduler or permission for a Jev batch. Repeated nodes remain
+visible, and missing dependencies/cycles prevent grouping.
+
+For source retrieval, set `SOURCE_SHA256` to the actual full-file `sha256:` identity
+from a reviewed snapshot or native hash result, then run from this repository:
 
 ```sh
-python3 .agents/skills/agentic-improvement/scripts/compact_log.py /reviewed/path/check.log --budget-bytes 65536
+python3 .agents/skills/agentic-improvement/scripts/extract_context.py \
+  --root /reviewed/project --span src/service.py 20 40 "$SOURCE_SHA256" \
+  --span src/service.py 35 55 "$SOURCE_SHA256" --budget-bytes 65536
 ```
 
-Adjacent identical lines are grouped with exact repetition counts, line endings, order and source identity. Reconstruction is verified. The 1 MiB input cap and advisory output budget are distinct: overflow returns the complete record and exit 1, not truncation. Exit 0 means helper success, not project-check success. Producer completeness and command exit remain unknown. Nonrepetitive logs can grow because of metadata; inspect the complete byte accounting.
+This merges the overlap, reads that file once and emits exact text for lines 20-55
+with source/excerpt hashes and omitted-line counts. Numbering is inclusive and based
+on LF; CRLF bytes are retained. A stale pin, bad range or later-file failure emits no
+partial source payload. Exceeding the complete-envelope byte budget returns exit 1
+and no excerpts, not silently truncated evidence. Exit 0 is retrieval success, not
+verified project compliance; exit 2 rejects invalid, stale or unavailable input.
+A tiny control record can exceed an extremely small budget.
 
-### Selected-evidence freshness
+The extractor reuses the reviewed sibling `evidence_snapshot.py`. Copy the complete
+skill directory; no unrelated PYTHONPATH fallback is accepted. Its bounds are 128
+span requests, 1 MiB per file and 8 MiB total reads, with a default 65,536-byte output
+budget. Existing helpers keep their existing distinct bounds and exit semantics.
 
-```sh
-python3 .agents/skills/agentic-improvement/scripts/evidence_snapshot.py capture \
-  --root . --scope 'review selected Harness guidance; criteria v1' \
-  --file AGENTS.md --file .agentic/manifest.yaml
-```
+Helpers use Python 3.10+ standard library, require permitted execution and reviewed
+non-secret inputs, and make no provider calls or source writes. They do not redact
+secrets. Excerpt output contains source text and requires sharing review; hashes and
+paths are not anonymisation. Mandatory rules, qualifiers, contradictions, callers
+and tests cannot be discarded to fit a budget. Unselected dependencies still need
+discovery. Matching bytes cannot authenticate an old judgment, restore lost context,
+prove adequate evidence or certify a check. Trusted quiescent source/helper directories
+are assumed; no atomic snapshot or hostile-filesystem sandbox is claimed.
 
-Capture emits a snapshot to stdout. Persist only to a reviewed new location when useful; compare with `compare /reviewed/snapshot.json` and a fresh explicit root/scope/file selection. Record paths cannot expand read authority. Same-size edits, changed policy, missing files and root/scope/selection changes require refresh. Output contains no source bodies, task text or absolute root paths. Limits are 128 files, 1 MiB each, an 8 MiB read allowance including rejected text, and a 128 KiB snapshot.
+## Provenance, packaging and verification
 
-Matching hashes are selected-byte evidence, not complete scope, authenticated previous judgments, retained model context, passing checks or a Jev-result cache. Unselected dependencies and newly applicable rules still need discovery. Hashes are not anonymisation; source inputs must be reviewed non-secret text.
+Authoring remains in `agentic-harness-agents`. Imported paths normally map to
+`skills/<skill>/<file>` at the locked revision; notices match its root MIT LICENSE.
+The two preserved older lifecycle guides map to upstream shared `references/`
+paths explicitly recorded in the verifier. They remain installed for preservation,
+not mandatory initial reads. No existing source or customised content is deleted.
 
-### Declared decision dependencies
+This delivery adds the extractor and updates its bundle and reuse guide. All default
+SKILL.md files, triggers, existing helpers, vendor content and permission definitions
+are unchanged. The source lock and reviewed blob/SHA-256 identities cover 35 imports.
+Upstream version metadata remains 0.5.0-beta.1; updating a source pin is not publishing
+a release or replacing a global installation.
 
-```sh
-python3 .agents/skills/decision-intelligence/scripts/review_graph.py /reviewed/path/graph.json --group-size 4
-```
-
-The optional graph reviewer consumes a bounded subset of existing DecisionGraph v1. It displays topological layers and bounded review groups, flags repeated spec references without deleting nodes, and identifies deterministic reducer prerequisites without executing them. Missing dependencies, self-links, cycles and invalid reducer inputs suppress all groups. Duplicate node/edge declarations are malformed. Unrecognized extension fields are unsupported, not silently ignored or declared invalid under the full canonical schema.
-
-Exit 0 means a reviewable declared structure, 1 means dependency defects, and 2 means unsupported/invalid/unavailable input. A same-layer group is not a provider batch authorization: compatible state, current sufficient evidence, actual spec semantics, provider support and permissions remain unchecked. Later judgments require accepted predecessor results; reducers must not convert missing results into success. Limits are 64 KiB input, 128 nodes, 32 reducers, 4096 dependency edges and a display width of 1 through 32. Source references in the graph are never followed.
-
-## Provenance and distribution
-
-This sync updates only decision-intelligence's guide and bundle declaration among existing imports, adds its graph-review guide and helper, and advances the own-project source pin. The inventory is 34 files. The other 30 existing imported files, all SKILL.md entrypoints, efficiency helpers, older lifecycle references, TypeSafe content and permission definitions are unchanged. No source files or customizations are deleted.
-
-The lock retains the exact agents commit, upstream version metadata and SHA-256 checksums; the read-only verifier separately pins Git blob identities. Version 0.5.0-beta.1 is not a new release. Source paths are skills/<skill>/<file>, except MIT notices match root LICENSE and retained lifecycle shared guides map to upstream references/. Authoring remains in agentic-harness-agents.
-
-Both guidance skills now use explicit v2 optional-script declarations with manual fallbacks. The three enrolled review bundles remain documentation-only v1. Older v1-only consumers must reject v2 rather than drop helpers. Packaging hashes opaque script bytes without executing or certifying them. Source installation is not host activation.
-
-## Verification and limits
+Both guidance bundles use explicit v2 optional-script declarations with manual
+fallbacks; three enrolled review bundles remain documentation-only v1. Older v1-only
+packagers must reject v2 rather than omit scripts. Packaging and integrity validation
+retain scripts as opaque bytes, never execute them or certify script safety.
 
 ```sh
 python3 .github/scripts/validate_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_skills.py
 ```
 
-Integrity checking binds manifest membership, installed directories, conditional routes, source pins, checksums and local references without executing helpers or repairing files. The 30-method regression suite additionally invokes copied reviewed helpers on synthetic inputs. The decision test uses the canonical schema before checking graph order, cycle refusal and explicitly unsupported additive fields. Test execution uses the existing catalog-test jsonschema dependency; the helpers themselves use only standard library.
+The verifier binds manifest membership, local directories, conditional routes,
+selected lock names, exact reviewed bytes and references. The 31-test import suite
+retains prior regressions and explicitly exercises copied helpers separately from
+integrity-only verification. The new excerpt test checks overlap, budget deferral
+and stale-pin refusal. Missing/changed files and undeclared helpers fail without
+repair or overwrite. Manifest parsing remains the documented own-repository block-list
+subset, not full YAML; vendor validation checks presence, not vendor authenticity.
+Hashes detect drift but are not trusted-author signatures.
 
-The manifest reader supports the own-repository plain block-list subset, not all YAML. Vendor verification establishes a nonempty entrypoint, not vendor provenance. File checks assume a trusted quiescent filesystem, not a sandbox or atomic snapshot. Hashes detect drift, not trusted authorship.
+Upstream PR #50 records 26 local retrieval tests and four complete-CI distribution
+checks. Reproducible synthetic outputs include both a large partial-source reduction
+and growth for tiny input. They are byte measurements, not a representative model
+benchmark. Source review is by the implementation assistant; independent host/task
+and complete-token evidence remains open under agents #26/#32/#36. No live Jev
+inference, runtime application/CLI change, downstream pin, workflow YAML, credential
+access, new release or device-global update is part of this delivery.
 
-Agents #47 tracks the graph review under #32/#36; #45 and #43 retain freshness/log measurements and regressions. Upstream graph tests include 34 local algorithm/file/subprocess checks and four distribution checks in complete CI. Native checks and author-exposed examples are not independent model trials. Actual host activation, representative outcomes and complete token usage remain open under #26/#32/#36. Fewer displayed groups are not measured provider calls or token savings.
-
-No CLI/application implementation, downstream source pin, workflow YAML, credential access, live inference, new release or device-global installation changes. Prior delivery and failure evidence remain in canonical #121/#123 and PRs #122 through #128; candidate and merged-main checks for this sync are recorded on its PR.
+Earlier delivery history and reproduced defects remain in canonical PRs #122-#129
+and agents #41/#43/#45/#47. Usage detail stays in the owning skill-local guides
+rather than being copied into this status document on every synchronization.
