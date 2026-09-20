@@ -26,15 +26,7 @@ An unavailable provider, changed evidence, conflicting sources, absent candidate
 
 ## Bind recorded results before considering reuse
 
-When reviewing an existing machine receipt, compare its spec ID/revision, input-schema identity and state fingerprint against the supplied current spec/request. A valid standalone receipt may answer another state or question. Repeated identical questions need separately recorded invocation provenance; v1 does not require a receipt request ID, so matching state/spec cannot establish which call produced it.
-
-Compare required coverage to the spec's required requirement IDs, not optional background or the receipt's claimed total alone. For produced Boolean/choice results, check the actual value type and declared alternatives without coercion. These are deterministic checks, not reasons for another model call. Preserve non-produced states; a provider failure is not Boolean false. Missing evidence remains unresolved even at high confidence or with a stored accepted disposition.
-
-For ordered results, the canonical inspector checks exact level names, finite numeric positions in `0..len(levels)-1` (including fractions), or distributions keyed by canonical zero-based decimal indexes. Reject booleans, out-of-range values and index aliases such as `01`; do not clamp, round or renormalize to force acceptance. A distribution-only result needs no invented point value. When both are present, check each but do not assume the value equals the mean or mode: that relationship remains unchecked. An ordinal position is not provider confidence or a calibrated outcome probability. This is canonical record review, not a prescription for raw vendor response mapping.
-
-When the target has the accepted canonical `decision_binding.inspect_binding(spec, request, receipt)` inspector, use it for these bounded cross-document checks. Otherwise compare manually and state what remains unchecked; do not install tooling or invent a receipt. Other result primitives, source-to-requirement mappings, source age, actual request provenance and calibration need separate evidence. Do not rewrite a historical receipt to make a mismatch disappear.
-
-Consistency never authorises cache reuse, provider calls or actions. Reconfirm current scope, source/spec immutability, policy and permissions independently. Keep only the binding failures and necessary source references in a compact handoff; do not replay entire receipts or attach an old result to new input hashes.
+For an existing machine receipt, load the [recorded-result guide](references/recorded-results.md) before interpreting or proposing reuse. Check request/spec/state identity, required evidence and typed results deterministically; retain failures and unknowns. A consistent receipt grants neither reuse nor action permission. Skip receipt-format details for a new current-agent finding with no receipt.
 
 For evaluation, use the same task, source revision, accepted rules and acceptance checks for baseline and candidate. Record all model calls, including auxiliary Jev calls and retries. Tool-result text already counted within a provider input must not be counted again. Missing usage remains unknown; billed cost and actual quality require separate evidence.
 

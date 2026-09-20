@@ -25,11 +25,19 @@ Paths below are relative to the relevant installed skill directory.
 
 | Capability | Owning skill and conditional guide |
 | --- | --- |
-| Lossless adjacent-line log display | `agentic-improvement/references/efficiency.md` |
+| Lossless adjacent-line log display | `agentic-improvement/references/log-compaction.md` |
+| Exact rule inventories and source-bound compilation | `agentic-improvement/references/rule-review.md` |
+| Recorded decision/spec/request comparison before considering reuse | `decision-intelligence/references/recorded-results.md` |
 | Explicit selected-source freshness and hash-pinned excerpts | `agentic-improvement/references/evidence-reuse.md` |
 | Preserve declared required ranges during narrowing | `agentic-improvement/references/required-evidence.md` |
 | Compact task handoffs and current-evidence resumption | `agentic-improvement/references/continuation.md` |
 | Declared decision dependencies and bounded display groups | `decision-intelligence/references/graph-review.md` |
+
+The parent efficiency/decision guides retain essential evidence and permission
+rules and route to specialised details only for their relevant operations. The
+original prose remains in the parent/deferred references. Reading every guide is
+more expensive than reading the previous parent alone; this is selective disclosure,
+not measured session-token savings. Default SKILL.md files and helpers are unchanged.
 
 The helper guides own exact commands, limits and distinct exit semantics. The
 Python-standard-library helpers require reviewed non-secret inputs and permitted
@@ -67,6 +75,7 @@ treat helpers as opaque bytes and never execute or certify their safety.
 python3 .github/scripts/validate_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_reader_cache.py
+python3 .github/scripts/test_self_hosted_guide_inventory.py
 python3 .github/scripts/test_context_checkpoint.py
 ```
 
@@ -75,6 +84,8 @@ source pins, exact reviewed bytes and local references. Missing/changed or undec
 payloads fail without repair or overwrite. Its manifest parser supports the documented
 own-repository block-list subset, not arbitrary YAML. Independent vendor validation
 checks presence, not vendor authenticity; hashes detect drift, not trusted authorship.
+Traversal is bounded by the reviewed file/directory inventory with a hard ceiling;
+extra files do not gain permission merely because the declared package grows.
 
 Regression tests separately execute copied reviewed helpers on synthetic evidence.
 The checkpoint inspector checks supplied field consistency without resolving source

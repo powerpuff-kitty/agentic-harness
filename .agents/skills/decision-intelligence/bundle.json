@@ -2,7 +2,7 @@
   "format_version": 2,
   "kind": "standalone-skill",
   "name": "decision-intelligence",
-  "files": ["SKILL.md", "references/decision-guide.md", "references/graph-review.md", "scripts/review_graph.py"],
+  "files": ["SKILL.md", "references/decision-guide.md", "references/graph-review.md", "scripts/review_graph.py", "references/recorded-results.md"],
   "optional_tools": [
     {
       "name": "typesafe-ai",
