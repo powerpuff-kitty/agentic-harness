@@ -1,10 +1,10 @@
 # Self-hosted skills
 
-All eight skills declared in this repository's own manifest now have local
+All eight skills declared in this repository's own manifest have local
 entrypoints. Seven Harness procedures come from reviewed agents revision
-`3bbafa3ee1c106edae94893e28b2760f5e3bc663`; `typesafe-ai` retains independent
-provenance and its existing bytes. This completes #123 after the two priority
-imports in #121. It does not install all 31 skills from the authoring collection.
+`9d029d60bec1ca827a278d0ab18a6ad3e4fc13dc`; `typesafe-ai` retains independent
+provenance and its existing bytes. The initial complete delivery was #123 after
+the two priority imports in #121. This does not install the full authoring collection.
 
 ## Conditional discovery
 
@@ -17,11 +17,10 @@ triggering installations, extra agents or providers.
 
 ## Exact source and local dependencies
 
-The lock retains the same agents revision and version `0.5.0-beta.1`, now with
-seven selected names and SHA-256 checksums for all 27 imported files. No target
-manifest/schema, vendor bytes, downstream source pins or runtime code changes.
-The 19 additional files complete agentic-app, codebase-audit, security-review,
-documentation and release, including necessary guides and exact MIT notices.
+The lock retains version `0.5.0-beta.1`, seven selected names and SHA-256 checksums
+for all 27 imported files. The exact commit, not the unchanged version label,
+identifies the reviewed content. No target manifest/schema, vendor bytes,
+downstream source pins or runtime code changes are part of this synchronization.
 
 Source paths are `skills/<skill>/<file>` at the pinned agents revision, except
 LICENSE files come from its root LICENSE. Lifecycle's two guides are exact copies
@@ -34,6 +33,37 @@ these are reviewed copies, not competing project truth.
 Bundle declarations are retained where supplied upstream. Lifecycle, documentation
 and release are ordinary local skill directories, not newly sealed archives.
 No new distribution version, release or device-global update is claimed.
+
+## Scope-preserving update from agents PR #38
+
+Only agentic-improvement's SKILL.md and conditional efficiency guide change from
+the previous agents pin `3bbafa3ee1c106edae94893e28b2760f5e3bc663`. The reviewed
+source blobs are `85e7e54d8bd40b8286cedbbba2039b4780da24f2` and
+`e7f7d28bbeb8c3109008f4fe2ccfb87e0df0c724`, respectively. All other imported
+payloads, vendor content, manifest permissions and the 27-file inventory remain unchanged.
+
+The procedure now makes applicability part of rule identity: equal text in
+separate directories does not authorise deleting or globally hoisting a rule.
+Diagnostic summaries retain check/test, location, phase and attempt. An unrelated
+pass or a passing retry cannot hide failure evidence. Policy changes invalidate
+policy-dependent findings even when source code and HEAD are unchanged.
+
+UTF-8 source bytes, before/after at the two reviewed pins:
+
+| File | Before | After |
+| --- | ---: | ---: |
+| SKILL.md | 3613 | 3731 |
+| Conditional efficiency guide | 4798 | 4113 |
+| Both files | 8411 | 7844 |
+
+The always-loaded procedure grows by 118 bytes to state the safeguard; the optional
+guide shrinks by 685 bytes. Their combined source is 567 bytes smaller (about 6.7%).
+This is not a per-session token or billing result: a routine task may not load the
+guide at all. Do not market the combined number as universally reduced context.
+
+Four author-exposed walkthroughs and six synthetic grader tests live upstream in
+agents PR #38. The prose records the implementation assistant's qualitative review;
+it is not an isolated task trial, authenticated host trace or independent assessment.
 
 ## Read-only verification
 
@@ -64,10 +94,9 @@ The fix reads and binds the declarations rather than treating directory presence
 as sufficient. The unchanged failing assertion remains in the regression suite.
 Candidate and merged-main results are recorded in PR #124 and issue #123.
 
-The local staged imports were hashed against their retrieved upstream Git blobs;
-full checkout validation runs in the existing CI workflow. A trusted quiescent
-checkout is assumed. Hashes detect drift, not trusted authorship. This is an
-assisted engineering change with prior exposure, not an independent model trial,
-automatic host activation, actual Jev inference or empirical token-saving result.
-No credentials, paid providers, other project installs or downstream implementation
-are involved. Broader behavioural/usage gates remain under agents #26/#32/#36.
+The staged imports are hashed against retrieved upstream Git blobs; full checkout
+validation runs in the existing CI workflow. A trusted quiescent checkout is
+assumed. Hashes detect drift, not trusted authorship. No credentials, paid providers,
+other project installs or downstream implementation are involved. Automatic host
+activation, real Jev inference and comparative behavioural/usage gates remain
+under agents #26/#32/#36.

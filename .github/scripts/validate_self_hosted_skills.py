@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = '3bbafa3ee1c106edae94893e28b2760f5e3bc663'
+REVISION = '9d029d60bec1ca827a278d0ab18a6ad3e4fc13dc'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -21,9 +21,9 @@ EXPECTED = {
     "agentic-app/references/context-engineering.md": "04679455159a19816b4613813d419163df00d786",
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
-    "agentic-improvement/SKILL.md": "def06766e3f27e2dc8e048b8356e38d23079850d",
+    "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
     "agentic-improvement/bundle.json": "22c849c8d25e6ddad13c8c910a187cdb8ca88b8d",
-    "agentic-improvement/references/efficiency.md": "987800d6785d680df412a2a39319bff5f43799a3",
+    "agentic-improvement/references/efficiency.md": "e7f7d28bbeb8c3109008f4fe2ccfb87e0df0c724",
     "codebase-audit/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "codebase-audit/SKILL.md": "b067587f94411fe4078d715899f3084f55b83ef1",
     "codebase-audit/bundle.json": "db8517805e844168fac766fc695d78274d7f11b9",

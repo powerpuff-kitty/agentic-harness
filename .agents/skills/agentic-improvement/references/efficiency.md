@@ -1,43 +1,43 @@
 # Evidence-preserving efficiency
 
-## Working set
+## Working set and freshness
 
-Start with task, scope, applicable rules, source locations and acceptance checks. Discover paths before fetching large bodies. Read the owning implementation/interface/test first, then expand to a caller, dependency, configuration or decision record when it can change the answer. Do not assume a lexical match is sufficient. Broad repository audits may legitimately need broad coverage; efficiency must not conceal that scope.
+Start with task, authorised scope, applicable rules and acceptance checks. Discover paths before expanding bodies. Inspect the owning implementation/interface/tests, then callers, dependencies or decisions that can change the answer. Lexical relevance is not evidence sufficiency; a broad audit may require broad coverage.
 
-Keep the smallest useful source spans and their exact references. A short extract must retain necessary surrounding conditions. A path or hash does not magically supply content to a model; expand it when the host cannot retrieve it. Mark stale summaries and refresh after changed source, configuration, dependencies or task scope. A commit hash alone does not describe uncommitted edits.
+Retain necessary source spans, qualifiers, contrary evidence and actual references. A path/hash cannot supply content the host cannot resolve. Reuse observations only while source, configuration, policy, dependencies and task scope match. Unchanged HEAD or source bytes do not cover changed working-tree rules. Refresh affected evidence and dependent conclusions; summaries remain navigation aids, not accepted truth.
 
-## Instructions
+## Rule identity, not just text identity
 
-Keep mandatory rules identifiable. Collapse exact duplicates with all sources retained; do not merge near-duplicates that differ in scope, exception or authority. Prefer narrow triggers and one specialised owner over additional overlapping skills. Put substantial examples behind conditional skill-local links. JSON/YAML is useful for validation but is not automatically smaller than prose.
+Deduplication applies to repeated presentation, not automatically to source files. Match authority, applicability, conditions and exceptions before combining rules; retain every source and its scope. Identical sentences in two nested AGENTS.md files may govern different directories. Do not delete either file or hoist the rule globally to save tokens. A reviewed compiled view may state the sentence once with both scopes; the original routing and authority must survive.
 
-## Checks and logs
+Near-duplicates may differ materially. Keep unresolved conflicts visible. Prefer narrow triggers and one specialist owner to overlapping skills. Put examples behind conditional local links. JSON/YAML can support validation but is not inherently shorter.
 
-Run a native formatter, linter, compiler or test where that is the authoritative mechanism. A semantic answer cannot substitute for an unexecuted check. Use command/scope, exit status, relevant failure IDs/locations and new versus repeated diagnostics in the working context. Retain a real log reference; never fabricate an artifact URI. Preserve omissions/truncation and all required failure evidence.
+## Native checks and compact logs
 
-## Handoff
+Use permitted formatters, linters, compilers and tests for exact questions. Preserve every required check; an unavailable tool or missing exit is not a pass. Retain invocation, input identity, scope, outcome, distinct failures, source locations, truncation and a real accessible log reference. Never invent artifact IDs or expose secrets.
 
-For a resumed nontrivial task, keep goal; accepted decisions; current source/revision references; changed files; checks actually run and their outcome; unresolved blockers; next evidence needed. Reuse the existing task record. Do not create permanent notes for every trivial operation or replay the whole conversation. Do not persist private data or summaries without the project's permission. A handoff cannot approve an action or override current source.
+Equal message text is not always the same diagnostic. Preserve check/test, file/location, phase and attempt; retain counts and causal order where relevant. A setup failure and an assertion failure with the same message are distinct. A later passing retry does not erase earlier failure evidence or its cost. Compress redundant display, not the only explanation of a failure.
 
-Use this compact shape only when a handoff is useful; it is not a mandatory file or machine schema:
+## Optional handoff
+
+Reuse an existing permitted task record only when a nontrivial continuation needs it:
 
 ```text
 Goal and authorised scope:
-Accepted decisions: source references, not new approvals
-Source state: base revision plus relevant changed-file identities
-Changes: actual paths and current status
-Checks: command, scope, outcome, actual evidence reference, truncation
-Unknown or contradictory evidence:
-Next action: smallest unresolved step
+Accepted decisions and their sources:
+Source state: base revision plus relevant working-tree changes
+Changed files and current status:
+Checks: invocation, inputs, outcome, log reference, truncation
+Missing or contradictory evidence:
+Next unresolved step:
 ```
 
-On resume, resolve applicable instructions first and check source/configuration identities against the current working tree. Refresh changed or inaccessible evidence before relying on a summary. A check from an older input set is historical evidence, not a pass for new bytes. Retain failed and unexecuted checks even when replacing a long transcript. Do not persist secrets, private transcript text or guessed hashes merely to fill this template.
+On resume, resolve current instructions and refresh changed/inaccessible evidence. Historical passes apply only to their recorded inputs. Retain failed/unexecuted checks. Do not persist private transcripts, secrets, guessed hashes or a new report for every trivial operation. A handoff cannot grant approval.
 
 ## Budget and evaluation
 
-Reduce optional examples/background first. When required evidence alone exceeds the working budget, report the conflict and narrow the task or obtain more context; do not silently drop requirements or claim completion. Extra model calls, reranking, summarisation and retries can erase a saving.
+Reduce optional background first. When required evidence exceeds the budget, expose the conflict and narrow unsupported scope rather than discard requirements. Extra summarisation, reranking, agents, Jev calls and retries can erase a saving.
 
-Compare the same starting task/source/rules and acceptance checks. Record context supplied, model output and extra provider calls when observable. Account for tool-result tokens once if already included in model input. Separate estimated source size from observed submitted tokens and cached-input pricing. Unknown usage stays unknown. Lower tokens with failed checks or omitted evidence is not a successful optimisation.
+For a context-only comparison, hold task, starting source/rules/checks, host/model/settings fixed and identify guidance separately. Include instruction loading and all input/output calls, retries and auxiliary providers with distinct identities. Tool text already counted in input is not counted again. Source bytes, estimated tokens, observed submitted tokens, cached-input pricing and billed cost are different measures; unknowns remain unknown.
 
-Keep host/model/settings fixed for a context-only comparison and identify the supplied guidance separately. Both baseline and candidate need the declared acceptance evidence; a broken baseline is not a valid control for preserved quality. Include every retry and auxiliary provider call with distinct call identity. Keep provider usage and check-log references, but do not treat a plausible reference or self-reported pass as authenticated evidence. Real behavioural claims need independently reviewed traces, repeated representative trials and retained failures. Fixture/grader tests are not those trials.
-
-Example: a failing test log has thousands of repeated lines. Keep each distinct failure and its source location in the working set, with an accessible full-log reference and truncation state. Do not replace it with 'tests passed' or a count that hides failures. Example: a changed service invalidates the previous service summary even when the repository's HEAD is unchanged.
+Both treatments need acceptance evidence; a broken baseline does not prove preserved quality. References and self-reported passes are not authenticated execution. Independently reviewed traces, representative repeated trials and retained failures are needed for general claims. Author-exposed walkthroughs and fixture/grader tests are not those trials.
