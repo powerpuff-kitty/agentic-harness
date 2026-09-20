@@ -6,6 +6,8 @@ Start with task, authorised scope, applicable rules and acceptance checks. Disco
 
 Retain necessary source spans, qualifiers, contrary evidence and actual references. A path/hash cannot supply content the host cannot resolve. Reuse observations only while source, configuration, policy, dependencies and task scope match. Unchanged HEAD or source bytes do not cover changed working-tree rules. Refresh affected evidence and dependent conclusions; summaries remain navigation aids, not accepted truth.
 
+For repeated selected-file inspection, the optional [freshness guide](references/evidence-reuse.md) describes a read-only hash helper and its limits. Matching bytes do not establish evidence sufficiency, retained model context or a valid cached decision.
+
 ## Rule identity, not just text identity
 
 Deduplication applies to repeated presentation, not automatically to source files. Match authority, applicability, conditions and exceptions before combining rules; retain every source and its scope. Identical sentences in two nested AGENTS.md files may govern different directories. Do not delete either file or hoist the rule globally to save tokens. A reviewed compiled view may state the sentence once with both scopes; the original routing and authority must survive.

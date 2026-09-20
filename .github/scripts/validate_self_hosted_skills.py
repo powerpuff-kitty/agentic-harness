@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = '7a82aafdaf692fc343e107708c67d6d1e67036a2'
+REVISION = '5cad9ec18b3eff329feab0423b4447c9d9967ec3'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -24,9 +24,11 @@ EXPECTED = {
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
-    "agentic-improvement/bundle.json": "9d2e3b093909037b1c604b43838820f959a850b2",
-    "agentic-improvement/references/efficiency.md": "0168195f27eecda66ded604df60bb8d023e6feb0",
+    "agentic-improvement/bundle.json": "eba5bab206d756b4b1654841e792d37de564e2dc",
+    "agentic-improvement/references/efficiency.md": "96d9c135ea6ff000f8489b3cf4baa43352e3b286",
+    "agentic-improvement/references/evidence-reuse.md": "08a7337443fc2889bace1f4fd2b33ac989c2be56",
     "agentic-improvement/scripts/compact_log.py": "39db1fee08fca6614605719c0acee0854965eeac",
+    "agentic-improvement/scripts/evidence_snapshot.py": "1c3fbdd1529b58a30deb91090e0d736ee27748c3",
     "codebase-audit/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "codebase-audit/SKILL.md": "b067587f94411fe4078d715899f3084f55b83ef1",
     "codebase-audit/bundle.json": "db8517805e844168fac766fc695d78274d7f11b9",

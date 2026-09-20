@@ -2,9 +2,9 @@
   "format_version": 2,
   "kind": "standalone-skill",
   "name": "agentic-improvement",
-  "files": ["SKILL.md", "references/efficiency.md", "scripts/compact_log.py"],
+  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py"],
   "optional_tools": [
-    {"name": "python3", "fallback": "Use the manual diagnostic procedure; never install or execute a helper automatically."}
+    {"name": "python3", "fallback": "Use the manual diagnostic and source-review procedures; never install or execute a helper automatically."}
   ],
   "shared_references": {},
   "optional_scripts": [
@@ -12,6 +12,11 @@
       "path": "scripts/compact_log.py",
       "execution": "explicit-invocation-only",
       "fallback": "Preserve each distinct diagnostic, its order, source and truncation manually. Missing helper execution is not a passed check or permission to discard evidence."
+    },
+    {
+      "path": "scripts/evidence_snapshot.py",
+      "execution": "explicit-invocation-only",
+      "fallback": "Inspect current selected source and applicable rules manually. Missing freshness evidence is not a cache hit, a current finding or permission to omit required checks."
     }
   ]
 }
