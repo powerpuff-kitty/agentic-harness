@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 34)
+        self.assertEqual(report['files_verified'], 35)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -213,7 +213,7 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertEqual(declaration['optional_scripts'][0]['path'], 'scripts/compact_log.py')
         self.assertEqual(declaration['optional_scripts'][0]['execution'], 'explicit-invocation-only')
         self.assertEqual({item['path'] for item in declaration['optional_scripts']},
-                         {'scripts/compact_log.py', 'scripts/evidence_snapshot.py'})
+                         {'scripts/compact_log.py', 'scripts/evidence_snapshot.py', 'scripts/extract_context.py'})
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
     def test_actual_imported_helper_preserves_synthetic_log(self):
@@ -301,6 +301,33 @@ class SelfHostedSkills(unittest.TestCase):
         run = subprocess.run(command, capture_output=True, timeout=10)
         self.assertEqual(run.returncode, 2)
         self.assertEqual(json.loads(run.stderr)['code'], 'unsupported-fields')
+        self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
+
+    def test_actual_excerpt_helper_preserves_pins_ranges_and_budget(self):
+        check.verify(self.root)
+        helper = self.root / check.PREFIX / 'agentic-improvement/scripts/extract_context.py'
+        source = self.root / 'source.txt'
+        raw = b'prefix\nnecessary evidence\nsuffix\n'
+        source.write_bytes(raw)
+        pin = 'sha256:' + hashlib.sha256(raw).hexdigest()
+        command = [sys.executable, str(helper), '--root', str(self.root),
+                   '--span', 'source.txt', '2', '2', pin, '--span', 'source.txt', '2', '2', pin]
+        run = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        record = json.loads(run.stdout)
+        self.assertEqual(record['files'][0]['excerpts'][0]['text'], 'necessary evidence\n')
+        self.assertEqual(record['measurement']['duplicate_lines_avoided'], 1)
+        self.assertEqual(record['files'][0]['omitted_lines'], 2)
+        self.assertIsNone(record['limits']['evidence_sufficient'])
+        overflow = subprocess.run(command + ['--budget-bytes', '1'], capture_output=True, timeout=10)
+        self.assertEqual(overflow.returncode, 1, overflow.stderr)
+        self.assertEqual(json.loads(overflow.stdout)['files'], [])
+        self.assertNotIn(b'necessary evidence', overflow.stdout)
+        self.assertEqual(source.read_bytes(), raw)
+        source.write_bytes(raw.replace(b'necessary', b'incorrect'))
+        stale = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(stale.returncode, 2)
+        self.assertEqual(stale.stdout, b'')
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
 

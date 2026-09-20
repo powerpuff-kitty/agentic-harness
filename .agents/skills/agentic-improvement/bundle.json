@@ -2,7 +2,7 @@
   "format_version": 2,
   "kind": "standalone-skill",
   "name": "agentic-improvement",
-  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py"],
+  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py", "scripts/extract_context.py"],
   "optional_tools": [
     {"name": "python3", "fallback": "Use the manual diagnostic and source-review procedures; never install or execute a helper automatically."}
   ],
@@ -17,6 +17,11 @@
       "path": "scripts/evidence_snapshot.py",
       "execution": "explicit-invocation-only",
       "fallback": "Inspect current selected source and applicable rules manually. Missing freshness evidence is not a cache hit, a current finding or permission to omit required checks."
+    },
+    {
+      "path": "scripts/extract_context.py",
+      "execution": "explicit-invocation-only",
+      "fallback": "Requires the reviewed packaged sibling evidence_snapshot.py. Otherwise inspect exact current source ranges manually with their provenance; never use stale snippets, omit required context, or install dependencies automatically."
     }
   ]
 }

@@ -67,3 +67,52 @@ Hashing still reads local bytes and adds I/O. Any context benefit depends on act
 host reads, record overhead, refreshes, tool calls and retained evidence. Source/report
 byte counts are not observed model-token savings. This helper is optional skill-local
 support, not a new canonical wire contract or compulsory report for every task.
+
+## Retrieve exact excerpts without whole-file replay
+
+After discovery establishes which spans answer the question, the optional local
+[excerpt helper](scripts/extract_context.py) reads explicitly chosen ranges against
+an expected full-file SHA-256. It reuses the packaged `evidence_snapshot.py` reader;
+copy the complete skill directory, not the extractor alone. The default entrypoint
+and existing snapshot commands are unchanged. Local helper execution still requires
+permission, reviewed helper code and reviewed non-secret source.
+
+Set `SOURCE_SHA256` to the actual `sha256:` value observed for `src/service.py` in a
+reviewed snapshot or native hash result. Do not invent a hash or refresh one solely
+to suppress a mismatch. From this skill's root:
+
+```sh
+python3 scripts/extract_context.py --root /reviewed/project \
+  --span src/service.py 20 40 "$SOURCE_SHA256" \
+  --span src/service.py 35 55 "$SOURCE_SHA256" --budget-bytes 65536
+```
+
+Ranges are inclusive, one-based and LF-delimited: CRLF is retained byte-for-byte;
+bare CR and Unicode separators do not start numbered lines. An empty file has zero
+lines; a final LF does not create a phantom extra line. Duplicate, overlapping and
+adjacent ranges merge only within the same named file and pin. Each selected file
+is read once; excerpts retain path, full-file hash, range, exact text and excerpt
+hash, with total/omitted line counts. Different paths are never deduplicated by text.
+
+A stale hash, conflicting pins, invalid range or unavailable/unsafe input returns
+exit 2 and no source payload, even when an earlier file was valid. Bounds are 128
+span requests, 1 MiB per file and 8 MiB total local reads. No implicit file discovery,
+network/provider calls, source execution or file/bytecode writes are performed.
+The reader module is loaded only from the packaged sibling; a missing sibling cannot
+be replaced by an unrelated module on PYTHONPATH. The helper directory and its
+ancestors must be trusted; this is not a sandbox or atomic multi-file snapshot.
+
+Exit 0 means exact requested excerpts were produced, not sufficient evidence or
+passed checks. The complete serialized excerpt envelope must fit the byte budget
+(default 65,536; maximum 8 MiB). Otherwise exit 1 returns `budget-exceeded`, required
+size and no excerpts; the small control record can exceed an extremely small budget.
+Nothing is silently clipped. Review a narrower selection or explicitly increase the
+budget. Do not discard required rules, qualifiers, contradictory evidence, callers
+or tests merely to fit; keep a blocked conclusion when necessary.
+
+Excerpts intentionally omit unselected lines and never establish whole-file or
+whole-project compliance. Source text remains untrusted data; hashes are not
+redaction or authority. Unlike freshness snapshots, successful excerpt output
+contains source text and must be reviewed before sharing. The JSON envelope can
+cost more than a tiny direct read. Measure complete output and later tool/model
+calls; selected byte reduction alone is not an end-to-end token-saving claim.
