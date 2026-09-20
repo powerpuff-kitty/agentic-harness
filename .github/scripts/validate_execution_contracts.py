@@ -51,6 +51,22 @@ def result():
 
 
 class ExecutionContracts(unittest.TestCase):
+    def test_additive_timing_fields_are_bounded_and_optional(self):
+        value = result()
+        value['timing'] = {'review_ms': 12, 'scope': 'invocation-through-final-revalidation',
+                           'cleanup_grace_ms': 250, 'recovery_grace_ms': 250}
+        value['results'][0]['outcome']['timing'] = {'execution_ms': 2, 'cleanup_ms': 1, 'recovery_ms': 0}
+        VALIDATOR.validate(value)
+        value['timing']['review_ms'] = -1
+        self.assertFalse(VALIDATOR.is_valid(value))
+
+    def test_verified_empty_live_group_has_distinct_cleanup_state(self):
+        value = result()
+        value['results'][0]['outcome']['process_group_cleanup'] = 'no-live-group-members'
+        VALIDATOR.validate(value)
+        value['results'][0]['outcome']['process_group_cleanup'] = 'permission-error-ignored'
+        self.assertFalse(VALIDATOR.is_valid(value))
+
     def test_positive_shapes_and_offline_plan_resolution(self):
         VALIDATOR.validate(review())
         VALIDATOR.validate(result())

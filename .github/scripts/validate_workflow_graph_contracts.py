@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate bounded workflow graph shapes and semantic invariants. No project commands execute."""
+"""Validate supplied workflow shapes and timelines. No project commands execute."""
 import copy
 import json
 from pathlib import Path
@@ -32,18 +32,68 @@ def workflow():
 def run():
     results = []
     for task in workflow()['tasks']:
+        start = {'verify': 1, 'aggregate': 2}.get(task['id'], 0)
         results.append({'id': task['id'], 'required': task['required'], 'status': 'passed',
-                        'attempts': 1, 'started_at_ms': 0, 'ended_at_ms': 1,
+                        'attempts': 1, 'started_at_ms': start, 'ended_at_ms': start + 1,
                         'evidence_refs': [], 'reason': None})
     return {'format_version': 1, 'kind': 'workflow-run', 'workflow_id': 'repo-audit',
-            'workflow_digest': D, 'source_digest': D, 'started_at_ms': 0, 'ended_at_ms': 1,
+            'workflow_digest': D, 'source_digest': D, 'started_at_ms': 0, 'ended_at_ms': 3,
             'complete': True, 'results': results,
             'coverage': {'total': 5, 'required': 5, 'executed': 5, 'passed': 5, 'failed': 0,
                          'skipped': 0, 'blocked': 0, 'unsupported': 0,
                          'execution_error': 0, 'unverified': 0}, 'not_checked': []}
 
 
+def timing_errors(definition, result):
+    """Compare supplied intervals, not process isolation or actual resource use."""
+    errors = []
+    start, end = result['started_at_ms'], result['ended_at_ms']
+    if end < start:
+        errors.append('run end precedes start')
+    if end - start > definition['limits']['max_elapsed_ms']:
+        errors.append('run exceeds elapsed-time limit')
+    rows = {item['id']: item for item in result['results']}
+    tasks = {task['id']: task for task in definition['tasks']}
+    events = []
+    for item in result['results']:
+        task_id = item['id']
+        left, right = item['started_at_ms'], item['ended_at_ms']
+        if item['attempts'] == 0:
+            if item['status'] in ('passed', 'failed', 'execution-error'):
+                errors.append('execution status without attempt: ' + task_id)
+            if left is not None or right is not None:
+                errors.append('unexecuted task has timing: ' + task_id)
+            continue
+        if left is None or right is None:
+            errors.append('execution timing missing: ' + task_id)
+            continue
+        if right < left:
+            errors.append('task end precedes start: ' + task_id)
+            continue
+        if left < start or right > end:
+            errors.append('task outside run interval: ' + task_id)
+        if left < right:
+            events.extend(((left, 1), (right, -1)))
+        for dep in tasks.get(task_id, {}).get('depends_on', []):
+            previous = rows.get(dep)
+            if previous is None or previous['ended_at_ms'] is None:
+                errors.append('dependency timing unavailable: ' + task_id)
+            elif previous['ended_at_ms'] > left:
+                errors.append('task starts before dependency ends: ' + task_id)
+    active = peak = 0
+    for _, delta in sorted(events):
+        active += delta
+        peak = max(peak, active)
+    if peak > definition['limits']['max_active_workers']:
+        errors.append('run exceeds active-worker limit')
+    return errors
+
+
 def semantic_errors(definition, result=None):
+    if not VALIDATOR.is_valid(definition) or definition.get('kind') != 'workflow-graph':
+        return ['invalid workflow shape']
+    if result is not None and (not VALIDATOR.is_valid(result) or result.get('kind') != 'workflow-run'):
+        return ['invalid run shape']
     errors = []
     tasks = definition['tasks']
     ids = [task['id'] for task in tasks]
@@ -75,10 +125,14 @@ def semantic_errors(definition, result=None):
         errors.append('task count exceeds max_total_tasks')
     if result is None:
         return errors
+    if result['workflow_id'] != definition['id']:
+        errors.append('workflow identity mismatch')
     by_id = {task['id']: task for task in tasks}
     result_ids = [item['id'] for item in result['results']]
     if len(result_ids) != len(set(result_ids)):
         errors.append('duplicate result id')
+    if known - set(result_ids):
+        errors.append('missing task results')
     for item in result['results']:
         task = by_id.get(item['id'])
         if task is None:
@@ -101,6 +155,7 @@ def semantic_errors(definition, result=None):
         counts[key] += 1
     if result['coverage'] != counts:
         errors.append('coverage mismatch')
+    errors.extend(timing_errors(definition, result))
     return errors
 
 
@@ -167,6 +222,83 @@ class WorkflowGraphContracts(unittest.TestCase):
         result = run()
         result['results'][0]['required'] = False
         self.assertIn('required mismatch: architecture', semantic_errors(definition, result))
+
+
+class WorkflowTimelineContracts(unittest.TestCase):
+    def test_workflow_identity(self):
+        result = run()
+        result['workflow_id'] = 'different-workflow'
+        self.assertIn('workflow identity mismatch', semantic_errors(workflow(), result))
+
+    def test_omitted_optional_result_is_still_visible(self):
+        definition, result = workflow(), run()
+        definition['tasks'][0]['required'] = False
+        result['results'].pop(0)
+        self.assertIn('missing task results', semantic_errors(definition, result))
+
+    def test_pass_without_execution_attempt_is_rejected(self):
+        result = run()
+        result['results'][0].update(attempts=0, started_at_ms=None, ended_at_ms=None)
+        result['coverage']['executed'] -= 1
+        self.assertIn('execution status without attempt: architecture', semantic_errors(workflow(), result))
+
+    def test_reversed_run_interval(self):
+        result = run()
+        result.update(started_at_ms=4, ended_at_ms=3)
+        self.assertIn('run end precedes start', semantic_errors(workflow(), result))
+
+    def test_reversed_task_interval(self):
+        result = run()
+        result['results'][0].update(started_at_ms=2, ended_at_ms=1)
+        self.assertIn('task end precedes start: architecture', semantic_errors(workflow(), result))
+
+    def test_missing_execution_timing(self):
+        for key in ('started_at_ms', 'ended_at_ms'):
+            result = run()
+            result['results'][0][key] = None
+            self.assertIn('execution timing missing: architecture', semantic_errors(workflow(), result))
+
+    def test_task_is_within_run_interval(self):
+        result = run()
+        result['results'][-1]['ended_at_ms'] = 4
+        self.assertIn('task outside run interval: aggregate', semantic_errors(workflow(), result))
+
+    def test_elapsed_budget(self):
+        definition = workflow()
+        definition['limits']['max_elapsed_ms'] = 2
+        self.assertIn('run exceeds elapsed-time limit', semantic_errors(definition, run()))
+
+    def test_dependencies_must_finish_before_start(self):
+        result = run()
+        result['results'][3]['started_at_ms'] = 0
+        self.assertIn('task starts before dependency ends: verify', semantic_errors(workflow(), result))
+
+    def test_concurrency_is_checked(self):
+        definition = workflow()
+        definition['limits']['max_active_workers'] = 2
+        self.assertIn('run exceeds active-worker limit', semantic_errors(definition, run()))
+
+    def test_touching_and_zero_duration_intervals_do_not_double_count(self):
+        definition, result = workflow(), run()
+        definition['limits']['max_active_workers'] = 1
+        for index, item in enumerate(result['results']):
+            item.update(started_at_ms=index, ended_at_ms=index + 1)
+        result['ended_at_ms'] = 5
+        original = copy.deepcopy((definition, result))
+        self.assertEqual([], semantic_errors(definition, result))
+        self.assertEqual(original, (definition, result))
+        for item in result['results']:
+            item.update(started_at_ms=0, ended_at_ms=0)
+        result['ended_at_ms'] = 0
+        self.assertEqual([], semantic_errors(definition, result))
+
+    def test_unexecuted_blocked_graph_can_report_incomplete(self):
+        result = run()
+        result['complete'] = False
+        for item in result['results']:
+            item.update(status='blocked', attempts=0, started_at_ms=None, ended_at_ms=None)
+        result['coverage'].update(executed=0, passed=0, blocked=5)
+        self.assertEqual([], semantic_errors(workflow(), result))
 
 
 if __name__ == '__main__':

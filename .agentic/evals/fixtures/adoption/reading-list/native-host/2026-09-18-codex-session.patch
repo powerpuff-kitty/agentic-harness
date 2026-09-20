@@ -1,0 +1,18 @@
+--- a/src/presentation/views/ReadingList.vue
++++ b/src/presentation/views/ReadingList.vue
+@@ -17,6 +17,7 @@
+ const filterField = ref<InstanceType<typeof Filter>>();
+ const list = ref<HTMLElement>();
+ const announcement = ref('');
++const unreadCount = computed(() => entries.value.filter(entry => !entry.read).length);
+ const visible = computed(() => entries.value.filter(entry => filter.value === 'all' || !entry.read));
+ 
+ async function add() {
+@@ -61,6 +62,7 @@
+     <p role="status" class="status">{{ announcement }}</p>
+     <section aria-labelledby="entries-heading">
+       <h2 id="entries-heading">Your entries</h2>
++      <p role="status" aria-label="Unread count" aria-live="polite" class="muted">Unread in this session: {{ unreadCount }}</p>
+       <Filter ref="filterField" v-model="filter" />
+       <p v-if="!entries.length">No entries yet. Add a title above to start your list.</p>
+       <p v-else-if="!visible.length">Nothing unread. Choose All to see your read entries.</p>

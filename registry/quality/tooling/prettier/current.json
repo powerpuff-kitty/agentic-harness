@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "tooling/prettier/current",
+  "kind": "tooling",
+  "name": "Prettier",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Prettier formatter capability. Harness should detect project configuration and use check mode for evidence unless an explicit write/fix action is authorized.",
+  "capabilities": ["detect", "check", "fix"],
+  "rules": [
+    {
+      "id": "prettier.formatting.project-config",
+      "title": "Use project Prettier configuration for formatting checks",
+      "category": "formatting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Prettier configuration should be shared through project configuration so CLI/editor integrations use the same formatting options.",
+      "source_refs": ["prettier.options"],
+      "tools": ["prettier"],
+      "autofix": "safe",
+      "constraints": {
+        "check_before_fix": true,
+        "fix_requires_authorization": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "prettier.options",
+      "title": "Prettier Options",
+      "url": "https://prettier.io/docs/options",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

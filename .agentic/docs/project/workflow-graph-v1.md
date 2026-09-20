@@ -49,7 +49,9 @@ Consumers must reject workflows that are structurally valid but semantically inv
 - attempts greater than the task's `max_attempts`;
 - execution beyond declared concurrency or elapsed-time bounds.
 
-A consumer should fail closed when it cannot establish these properties.
+The repository validator compares the supplied workflow ID, checks every declared task has a result, and checks recorded task intervals against run bounds, dependency completion and peak worker count. Executed tasks require a start/end pair; a zero-attempt result cannot claim a pass. Intervals are half-open: a task ending at a timestamp releases its slot before another starts there. Zero-duration intervals do not occupy a measurable slot. The task interval spans its recorded attempts; retry timing is not separately authenticated.
+
+These checks establish supplied-record consistency, not actual scheduling, trusted clocks, isolation or executed evidence. Workflow/source digests are opaque recorded identities, not recomputed here. Optional token/cost limits have no corresponding measured usage in this v1 run shape and are not enforced by this validator; runtime evidence must establish them separately. A consumer should fail closed when it cannot establish required properties.
 
 ## Completion and coverage
 

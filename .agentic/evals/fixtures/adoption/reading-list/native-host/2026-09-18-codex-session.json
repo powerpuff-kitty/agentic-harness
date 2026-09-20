@@ -1,0 +1,117 @@
+{
+  "format_version": 1,
+  "kind": "assisted-session-adoption-observation",
+  "date": "2026-09-18",
+  "agent": "Codex",
+  "mode": "existing-session",
+  "host_version": null,
+  "model": null,
+  "cost_usd": null,
+  "separate_host_invoked": false,
+  "claude_required": false,
+  "automatic_native_loading_verified": false,
+  "enforcement_verified": false,
+  "fixture_base_commit": "12e83802f569ad1acd404121a29d65f3fa655d07",
+  "cli_binary_sha256": "e49d5c71b7153db17a7806ceb2a5267e3fde57334812e644a9e8d8bb1bbb8e3d",
+  "cli_version": {
+    "format_version": 1,
+    "kind": "version",
+    "sources": {
+      "agents": {
+        "commit": "7e7d44e9f9d7e4579048c4e8c1073243f6bcf61c",
+        "repository": "powerpuff-kitty/agentic-harness-agents"
+      },
+      "canonical": {
+        "commit": "6b03603e9f0cfdb8348f5be4442622f8e8cdab0d",
+        "repository": "powerpuff-kitty/agentic-harness"
+      },
+      "format": 1,
+      "model_registry": {
+        "commit": "3b6635f036d4648dc7b4dc570df24ec1d509da51",
+        "repository": "powerpuff-kitty/agentic-harness"
+      }
+    },
+    "version": "0.1.0"
+  },
+  "context_delivery": "explicit-file-reads",
+  "context_files_read": [
+    "AGENTS.md",
+    ".agentic/README.md",
+    ".agentic/manifest.yaml",
+    ".agentic/PRODUCT.md",
+    ".agentic/ARCHITECTURE.md",
+    ".agentic/SECURITY.md",
+    ".agentic/DESIGN.md",
+    ".agentic/policies/quality-gates.md",
+    ".agentic/policies/ai-permissions.md",
+    "src/presentation/styles/tokens.css"
+  ],
+  "file_inventory": {
+    "changed": [
+      "src/presentation/views/ReadingList.vue"
+    ],
+    "added": [],
+    "removed": [],
+    "before_sha256": "c499ba53cd51e8a7d272e4aff31f1a3c92484f7caaac3889a8c6adb2ddc18663",
+    "after_sha256": "c0b08b385da473c6d6106483121303b4f72bcc4e02c859018cb1d7cd6e21ea28"
+  },
+  "dependency_link_preserved": true,
+  "baseline": {
+    "acceptance_passed": false,
+    "reason": "Named Unread count status element absent; expected assertion failed."
+  },
+  "implementation": {
+    "task_acceptance_passed": true,
+    "domain_tests_passed": 4,
+    "typecheck_passed": true,
+    "build_passed": true,
+    "browser_tests_passed": 5,
+    "browser": "Chromium 153.0.8010.12",
+    "adoption_probes_passed": 7
+  },
+  "executor": {
+    "commands": [
+      {
+        "id": "unit",
+        "status": "passed"
+      },
+      {
+        "id": "types",
+        "status": "passed"
+      },
+      {
+        "id": "build",
+        "status": "passed"
+      },
+      {
+        "id": "browser",
+        "status": "passed"
+      }
+    ],
+    "scoped_completion_verified": true,
+    "scope": "declared-checks-and-required-controls",
+    "producer_authenticated": false,
+    "required_controls": [],
+    "stale_completion_rejected": true,
+    "stale_review_rejected": true,
+    "missing_tool_rejected": true
+  },
+  "local_evidence_sha256": {
+    "baseline.log": "72beca4da93a9f7cc0cb2fbd2bf3678117d94dbb983b1b830bdf73aeb01ffd13",
+    "unit.log": "9028708dad022d7723ecfe21053b25877ce665a2839bf499b35935dad7d3a13e",
+    "build.log": "db6b042fc6c2727421f89ba5841b1e8e2ffd60c7c94a50a40ca9d6edd0da54a7",
+    "browser.log": "5c639bdfef2d8b7db6ae17db259ec943ea507a32a165863e784973cb18e3cbaf",
+    "adoption.log": "f770622783028c4de89f6063ac8c3e882d7ff258a9d558df6c84768cfb660948",
+    "execution.json": "8e5d46b4fe83d0f3601a423b2f62d6e9c5aaa0e70f5693fa27c26cd4a5aa7b43",
+    "edit-inventory.json": "1577b7e46a9feeda7b8e4b07224fd171d7c346e8cd07aeb11494fc69c1a71406"
+  },
+  "patch_sha256": "d41e3a6c2a3545bec4a840a23131def8c8e1129db60e6226ce5d38aeec116355",
+  "limitations": [
+    "One assisted existing-session task; prior fixture/reference exposure prevents a blinded or comparative evaluation claim.",
+    "Exact host/model version, billing and independent session transcript receipt are unavailable; installed Codex CLI was not the executing host.",
+    "Explicit context reads do not establish automatic native loading, scoped-rule selection or enforcement.",
+    "The current session has no separate process/API budget cap; no separate host or paid API invocation was launched.",
+    "App trial has no required governance controls; separate CLI probes cover required governance semantics.",
+    "Installed third-party/transitive bytes are not authenticated by the executor."
+  ]
+}

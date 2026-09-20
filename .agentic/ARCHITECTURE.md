@@ -25,6 +25,16 @@ Design Genome, Design Analysis and related public schemas live under `catalog/sc
 
 The implemented static workflow is analysis → review-required candidate → approved identity/task context compilation → measured drift comparison. Runtime analysis and additional compiler outputs remain planned unless the installed CLI contract explicitly supports them. External reference data and AI interpretations remain evidence, not accepted project intent.
 
+## Decision-intelligence boundary
+
+The provider-neutral [Decision Kernel contract](docs/architecture/decision-kernel.md), accepted in [ADR-008](decisions/ADR-008-decision-kernel.md), separates immutable state/evidence, atomic decision specifications, provider execution, policy, receipts, outcomes and side-effect-free evaluation.
+
+Jev, deterministic rules, statistical models, LLMs and humans may act as decision providers when their declared capabilities fit the DecisionSpec. Providers never own consequence authorization. Provider confidence, calibration, evidence coverage, evidence reliability, decision certainty and domain outcome probability are separate quantities.
+
+Decision graphs describe dependencies between atomic decisions and deterministic reducers; they do not replace workflow engines. DecisionPolicy remains application-owned, and high-consequence actions require separate authorization/review according to project policy. DecisionReceipt preserves what was known and produced at decision time; later observations append DecisionOutcome rather than rewriting history.
+
+The canonical schemas live under `catalog/schema/decision-*.v1.schema.json`. The CLI may implement deterministic validation, provider adapters, fan-out, cache/replay and executable policy checks, but published schemas alone are not evidence that those runtime capabilities are installed or enforced.
+
 ## Target-project contract
 
 ```text
@@ -60,6 +70,8 @@ Only the compact `AGENTS.md` router is mandatory at the project root. Vendor-req
 
 ## Composition and compatibility
 
+[Context selection v1](docs/project/context-selection-v1.md) adds catalog-owned full/minimal file selection, separate from organization profiles. Full remains the compatibility default; minimal retains core context and selected-module content. The optional manifest composition mapping persists selection. Existing files and routes are preserved across mode changes. See ADR-009; installed CLI support must be checked by version.
+
 Implemented composition selects a variant/preset/profile, installs context and selected modules, records source identities/checksums, preserves project-authored files and reports conflicts. Refer to the CLI's version-specific contract for exact behavior. Comprehensive generated vendor adapter synchronization is tracked work, not a current universal capability.
 
 Legacy root-level context can be inspected for compatibility. Automatic filesystem migration is not implemented in the current CLI. Use the [backup-first manual procedure](docs/project/migration-v1.md); the model-profile migration preview does not move files.
@@ -69,6 +81,8 @@ Legacy root-level context can be inspected for compatibility. Automatic filesyst
 Declared policy, delivered instructions, executed checks and enforced restrictions require distinct evidence. A manifest is not a sandbox. The current audit discovers checks without executing them; an artifact gate applies explicitly selected conditions and does not establish application test success.
 
 The planned evidence model and approved check runner must preserve source/config identity, freshness, failure/skip states and host limitations. Do not change existing artifact meanings silently while implementing them.
+
+The experimental [local execution contract](docs/project/check-execution-v1.md) also distinguishes invocation review time, execution and bounded cleanup/recovery. Its macOS `no-live-group-members` observation requires verified native inspection; it never treats arbitrary permission errors as successful cleanup. Consumers must use a compatible pinned schema. Local execution does not establish imported-evidence authenticity or global completion.
 
 ## Invariants
 
@@ -80,7 +94,13 @@ The planned evidence model and approved check runner must preserve source/config
 - Deterministic operations do not introduce unexplained drift.
 - Design identity becomes project truth only through explicit acceptance; observed drift alone is not a quality judgment.
 - Provider rights/retention restrictions must be verified before restricted ingestion or redistribution.
+- Decision providers cannot grant consequence authority; semantic/model output remains advisory input until deterministic project policy and any required human/authoritative review are satisfied.
+- Evaluation, shadow and counterfactual runs are side-effect free; recorded provider confidence is never silently reinterpreted as domain outcome probability.
 
 ## Authored-source licensing
 
 Authored CLI, catalog/registry and agent content use MIT, as accepted in [ADR-007](decisions/ADR-007-mit-licensing.md). Third-party licenses remain intact. Variants retain `.agentic/THIRD_PARTY_NOTICES.md` without assigning a license to independently authored application code. Composition preserves project license files and records copied-notice provenance.
+
+## Caller-approved imported evidence
+
+ADR-010 selects explicit caller-approved exact evidence digests for the first imported completion gate, with signed producers deferred. The [completion v1 contract](docs/project/check-completion-v1.md) adds a separate verdict scoped to declared checks and required governance controls. Approval is external to the manifest; producer authentication and whole-project readiness remain unverified.

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "language/go/current",
+  "kind": "language",
+  "name": "Go",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Go language quality profile that composes with gofmt and go vet.",
+  "capabilities": ["detect", "analyze", "check"],
+  "rules": [
+    {
+      "id": "go.formatting.gofmt",
+      "title": "Use canonical Go formatting semantics",
+      "category": "formatting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Go source formatting is standardized by gofmt rather than by an independent Harness style preference.",
+      "source_refs": ["go.gofmt"],
+      "tools": ["gofmt"],
+      "autofix": "safe",
+      "constraints": {"fix_requires_authorization": true}
+    }
+  ],
+  "sources": [
+    {
+      "id": "go.gofmt",
+      "title": "gofmt command documentation",
+      "url": "https://pkg.go.dev/cmd/gofmt",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/context-profiles.v1.schema.json",
+  "title": "Context file selection v1",
+  "type": "object",
+  "required": ["format_version", "kind", "default", "minimal"],
+  "additionalProperties": false,
+  "properties": {
+    "format_version": {"const": 1},
+    "kind": {"const": "context-profiles"},
+    "default": {"const": "full"},
+    "minimal": {
+      "type": "object",
+      "required": ["core_files", "design_variants", "design_packs", "design_fallback_variant", "module_routers"],
+      "additionalProperties": false,
+      "properties": {
+        "core_files": {"type": "array", "minItems": 12, "maxItems": 12, "uniqueItems": true, "items": {"$ref": "#/$defs/path"}},
+        "design_variants": {"$ref": "#/$defs/ids"},
+        "design_packs": {"$ref": "#/$defs/ids"},
+        "design_fallback_variant": {"type": "string", "minLength": 1},
+        "module_routers": {
+          "type": "object", "required": ["packs", "policies", "skills"], "additionalProperties": false,
+          "properties": {
+            "packs": {"const": ".agentic/packs/README.md"},
+            "policies": {"const": ".agentic/policies/README.md"},
+            "skills": {"const": ".agents/skills/README.md"}
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "path": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\\\:]+$"},
+    "ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^[a-z][a-z0-9-]*$"}}
+  }
+}
