@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = '5cad9ec18b3eff329feab0423b4447c9d9967ec3'
+REVISION = '6dfb44af12d96b1a2b4681ab3fdecc17baf9ea07'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -37,8 +37,10 @@ EXPECTED = {
     "codebase-audit/references/review-guide.md": "2d2b4213d5a75d4221bf4a0950edc4704768f37c",
     "decision-intelligence/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "decision-intelligence/SKILL.md": "4d5e80381ffad7d89d1c9ad2a7e4f21a512e8c90",
-    "decision-intelligence/bundle.json": "7d254235c570b1fbe284fffc4657240e1bff051e",
-    "decision-intelligence/references/decision-guide.md": "712c715546b631a4dae91620ec5d7d6b38ec66c2",
+    "decision-intelligence/bundle.json": "7cbd3953928beacb2caf9278675238d25eadbf45",
+    "decision-intelligence/references/decision-guide.md": "e72f03cb01568ab014447b33d069f229e24bc010",
+    "decision-intelligence/references/graph-review.md": "f749b9e51b9611d6f6ce58be21109fdc3735aebd",
+    "decision-intelligence/scripts/review_graph.py": "e9553f3271e68b14eddef7439bac8cf247ea80a4",
     "documentation/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "documentation/SKILL.md": "c419a26041754b7f57a1d0919390ac72bb4d1ca5",
     "release/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",

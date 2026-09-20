@@ -1,32 +1,26 @@
 # Self-hosted skills
 
-All eight skills declared in this repository's own manifest have local entrypoints. Seven Harness procedures are pinned to agents revision `5cad9ec18b3eff329feab0423b4447c9d9967ec3`; typesafe-ai retains independent provenance and unchanged content. This installs the selected procedures, not every skill in the 31-skill authoring collection.
+All eight skills declared in this repository's own manifest have local entrypoints. Seven Harness procedures are pinned to agents revision `6dfb44af12d96b1a2b4681ab3fdecc17baf9ea07`; typesafe-ai retains independent provenance and unchanged content. This installs the selected procedures, not every skill in the 31-skill authoring collection.
 
 ## Conditional discovery and lifecycle context
 
-Root AGENTS.md routes to the local skill index and the priority decision/efficiency procedures. Select one owner and expand only the references needed for the task. A broad lifecycle audit need not load composition details. Init, upgrade and migration consult agentic-app/references/composition.md. Completion-artifact work consults agentic-app/references/completion.md. The default entrypoint retains source authority, approval, preservation and verification limits.
+Root AGENTS.md routes to the local skill index and the priority decision/efficiency procedures. Select one owner and expand only the references needed for the task. Broad lifecycle audit need not load composition details. Init, upgrade and migration consult agentic-app/references/composition.md; completion-artifact work consults its completion.md. The default entrypoint retains source authority, approval, preservation and verification limits.
 
-Guidance does not require a Harness executable or TypeSafe account. Manual steps still need accepted canonical sources, edit authority and applicable validation. Missing tools or evidence remain unresolved; no fabricated verdict or schema replaces them. Actual Jev requires explicit provider/data permission. Installing the release skill does not authorise publishing a release.
+Guidance requires neither a Harness executable nor a TypeSafe account. Missing tools or evidence stay unresolved. Actual Jev needs explicit provider/data permission and its independently maintained official skill/live docs. Installing a release skill does not authorize publication. None of the optional helpers runs merely because its skill was loaded.
 
-## Optional lossless log helper
+## Optional local helpers
 
-The agentic-improvement skill includes `scripts/compact_log.py`, introduced only in its conditional efficiency guide. The default SKILL.md and all triggers remain unchanged. For an explicitly selected, reviewed log and permitted local helper execution, run from the repository root:
+All three helpers use Python 3.10+ standard library and must be explicitly invoked only when permitted. Review inputs for secrets before use. They neither redact sensitive data nor authorize actions, execute input text, call a provider or write source files. Manual review remains available without Python.
+
+### Lossless log display
 
 ```sh
 python3 .agents/skills/agentic-improvement/scripts/compact_log.py /reviewed/path/check.log --budget-bytes 65536
 ```
 
-The Python 3.10+ standard-library helper preserves supplied UTF-8 bytes, line endings, ordering and repetition counts; only adjacent identical lines are grouped. It retains a source hash/reference and checks reconstruction. It never executes log content, redacts secrets, infers a passed check, calls a provider or writes files. Review/redact input before use. Keep manual handling when the helper is unavailable or not permitted.
+Adjacent identical lines are grouped with exact repetition counts, line endings, order and source identity. Reconstruction is verified. The 1 MiB input cap and advisory output budget are distinct: overflow returns the complete record and exit 1, not truncation. Exit 0 means helper success, not project-check success. Producer completeness and command exit remain unknown. Nonrepetitive logs can grow because of metadata; inspect the complete byte accounting.
 
-The 1 MiB input cap is enforced. The output budget is advisory: overflow returns the complete record and exit 1, not truncated evidence. Exit 0 means helper success; original producer completeness and process exit stay unknown. The envelope can be larger for nonrepetitive logs, so inspect actual byte accounting instead of assuming savings. This is a display helper, not a canonical execution receipt or permission grant.
-
-The version-2 bundle declaration explicitly names optional Python scripts, manual fallbacks and no-auto-run boundaries. Upstream v1 bundles remain documentation-only; a v1-only packager cannot consume v2 and must not silently omit helpers. No generic installer or host execution hook is added here.
-
-## Optional selected-evidence freshness
-
-The same skill now includes `scripts/evidence_snapshot.py` and a conditional `references/evidence-reuse.md` guide. Capture and compare require a fresh explicit file selection and task/criteria scope; record paths cannot expand read authority. Hashes detect actual selected-byte changes, including same-size edits with restored timestamps and changed policy with unchanged code. Root/scope changes, missing files and removed selections require refresh. No file bodies, task text or absolute root paths are returned.
-
-From this repository, for an approved source selection:
+### Selected-evidence freshness
 
 ```sh
 python3 .agents/skills/agentic-improvement/scripts/evidence_snapshot.py capture \
@@ -34,33 +28,39 @@ python3 .agents/skills/agentic-improvement/scripts/evidence_snapshot.py capture 
   --file AGENTS.md --file .agentic/manifest.yaml
 ```
 
-The helper writes only stdout; persist it only to a reviewed new location when needed. Compare that snapshot with the same explicit selection and current scope using `compare /reviewed/snapshot.json` instead of `capture`. Exit 0 means matching selected bytes or successful capture, not a passed check. Exit 1 means refresh required; exit 2 means invalid input. Paths and hashes are not anonymisation, and files must already be reviewed non-secret text.
+Capture emits a snapshot to stdout. Persist only to a reviewed new location when useful; compare with `compare /reviewed/snapshot.json` and a fresh explicit root/scope/file selection. Record paths cannot expand read authority. Same-size edits, changed policy, missing files and root/scope/selection changes require refresh. Output contains no source bodies, task text or absolute root paths. Limits are 128 files, 1 MiB each, an 8 MiB read allowance including rejected text, and a 128 KiB snapshot.
 
-Up to 128 explicit files, 1 MiB each, with an 8 MiB read allowance and 128 KiB snapshot input. Rejected text reads also consume the allowance. No Git access, discovery, network/provider calls or source writes. Unselected/new dependencies and applicable policies still require scope discovery. Matching hashes neither prove completeness nor authenticate an earlier finding or restore forgotten context. Do not treat them as an automatic Jev-result cache. Hashing adds local I/O and report overhead; no measured token saving is asserted.
+Matching hashes are selected-byte evidence, not complete scope, authenticated previous judgments, retained model context, passing checks or a Jev-result cache. Unselected dependencies and newly applicable rules still need discovery. Hashes are not anonymisation; source inputs must be reviewed non-secret text.
 
-## Source provenance and preservation
+### Declared decision dependencies
 
-This sync updates only the efficiency guide and bundle declaration among existing payloads and adds the freshness helper and its local guide. The inventory increases from 30 to 32 imports. The other 28 imported files, including all SKILL.md entrypoints, the existing log helper, older lifecycle guides and TypeSafe content remain unchanged. No source files or customised content are removed.
+```sh
+python3 .agents/skills/decision-intelligence/scripts/review_graph.py /reviewed/path/graph.json --group-size 4
+```
 
-The own-project lock records version metadata, the exact agents commit and SHA-256 checksums. The read-only verifier separately records reviewed Git blob identities. Version 0.5.0-beta.1 remains upstream metadata, not a newly published release. Skill inventory and own-manifest permissions are unchanged.
+The optional graph reviewer consumes a bounded subset of existing DecisionGraph v1. It displays topological layers and bounded review groups, flags repeated spec references without deleting nodes, and identifies deterministic reducer prerequisites without executing them. Missing dependencies, self-links, cycles and invalid reducer inputs suppress all groups. Duplicate node/edge declarations are malformed. Unrecognized extension fields are unsupported, not silently ignored or declared invalid under the full canonical schema.
 
-Source paths are skills/<skill>/<file> at the pinned agents revision, except MIT notices match the root LICENSE. The retained older lifecycle references map to upstream references/repository-discovery.md and references/context-engineering.md. Composition/completion guides originate inside upstream skills/agentic-app/references/. Authoring ownership remains the agents repository.
+Exit 0 means a reviewable declared structure, 1 means dependency defects, and 2 means unsupported/invalid/unavailable input. A same-layer group is not a provider batch authorization: compatible state, current sufficient evidence, actual spec semantics, provider support and permissions remain unchecked. Later judgments require accepted predecessor results; reducers must not convert missing results into success. Limits are 64 KiB input, 128 nodes, 32 reducers, 4096 dependency edges and a display width of 1 through 32. Source references in the graph are never followed.
 
-## Read-only verification
+## Provenance and distribution
+
+This sync updates only decision-intelligence's guide and bundle declaration among existing imports, adds its graph-review guide and helper, and advances the own-project source pin. The inventory is 34 files. The other 30 existing imported files, all SKILL.md entrypoints, efficiency helpers, older lifecycle references, TypeSafe content and permission definitions are unchanged. No source files or customizations are deleted.
+
+The lock retains the exact agents commit, upstream version metadata and SHA-256 checksums; the read-only verifier separately pins Git blob identities. Version 0.5.0-beta.1 is not a new release. Source paths are skills/<skill>/<file>, except MIT notices match root LICENSE and retained lifecycle shared guides map to upstream references/. Authoring remains in agentic-harness-agents.
+
+Both guidance skills now use explicit v2 optional-script declarations with manual fallbacks. The three enrolled review bundles remain documentation-only v1. Older v1-only consumers must reject v2 rather than drop helpers. Packaging hashes opaque script bytes without executing or certifying them. Source installation is not host activation.
+
+## Verification and limits
 
 ```sh
 python3 .github/scripts/validate_self_hosted_skills.py
 python3 .github/scripts/test_self_hosted_skills.py
 ```
 
-The verifier binds manifest selection, actual directories, index/router links, selected lock names, reviewed source bytes and local references. It never imports or executes helpers. Its 29 regression methods cover each missing imported file, changed bytes, wrong pins/checksums, missing or duplicate declarations, unknown directories, links, lifecycle routes and optional-script boundaries. Explicit tests execute copied reviewed helpers on synthetic inputs separately from integrity checking, including snapshot capture, unchanged comparison and a same-size change. Failures do not repair or overwrite content. The original missing-manifest-declaration regression remains intact.
+Integrity checking binds manifest membership, installed directories, conditional routes, source pins, checksums and local references without executing helpers or repairing files. The 30-method regression suite additionally invokes copied reviewed helpers on synthetic inputs. The decision test uses the canonical schema before checking graph order, cycle refusal and explicitly unsupported additive fields. Test execution uses the existing catalog-test jsonschema dependency; the helpers themselves use only standard library.
 
-The checker uses this own-repository manifest authoring subset: unquoted top-level keys and two-space plain-name skills block lists. It is not a general YAML parser; unsupported forms fail rather than bypass binding. Vendor verification establishes a present nonempty entrypoint, not vendor byte provenance. A trusted quiescent checkout is assumed; hashes are not signatures of trusted authorship or a script-safety certification.
+The manifest reader supports the own-repository plain block-list subset, not all YAML. Vendor verification establishes a nonempty entrypoint, not vendor provenance. File checks assume a trusted quiescent filesystem, not a sandbox or atomic snapshot. Hashes detect drift, not trusted authorship.
 
-## Evidence limits
+Agents #47 tracks the graph review under #32/#36; #45 and #43 retain freshness/log measurements and regressions. Upstream graph tests include 34 local algorithm/file/subprocess checks and four distribution checks in complete CI. Native checks and author-exposed examples are not independent model trials. Actual host activation, representative outcomes and complete token usage remain open under #26/#32/#36. Fewer displayed groups are not measured provider calls or token savings.
 
-Agents #45 tracks the freshness helper under P0 #36/#26. Thirty-two helper/budget tests passed locally on the staged relevant-file snapshot; complete upstream CI additionally passed three standalone/collection/prepared-trial tests. Candidate and merged-main source identities are recorded on agents PR #46. These tests validate file handling and byte comparison, not independent model behaviour.
-
-Upstream agents #43 retains actual log-compactor subprocess measurements for synthetic repetitive and distinct logs, including the negative case where envelope overhead grows output. Source/output bytes are not provider tokens, billing savings or end-to-end model outcomes. Canonical import and actual-helper validation run in this repository's existing CI. Source review is by the implementation assistant, not an independent evaluator.
-
-No CLI/application implementation or downstream pin, workflow YAML, credentials, live Jev call, release or device-global installation changes. Automatic host loading, representative model outcomes and complete token usage remain open under agents #26/#32/#36. Earlier lifecycle/import evidence remains in agents #41/#43 and canonical #121/#123 and PRs #122 through #127.
+No CLI/application implementation, downstream source pin, workflow YAML, credential access, live inference, new release or device-global installation changes. Prior delivery and failure evidence remain in canonical #121/#123 and PRs #122 through #128; candidate and merged-main checks for this sync are recorded on its PR.

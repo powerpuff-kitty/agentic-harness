@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 32)
+        self.assertEqual(report['files_verified'], 34)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -265,6 +265,43 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertIsNone(result['limits']['model_tokens'])
         self.assertEqual(source.read_bytes(), b'deny!\n')
         self.assertEqual(snapshot.read_bytes(), initial.stdout)
+
+    def test_actual_decision_graph_helper_and_canonical_shape(self):
+        from jsonschema import Draft202012Validator
+        check.verify(self.root)
+        schema = json.loads((check.ROOT / 'catalog/schema/decision-graph.v1.schema.json').read_text())
+        validator = Draft202012Validator(schema)
+        value = {'format_version': 1, 'kind': 'decision-graph', 'id': 'review.fixture', 'revision': 1,
+                 'nodes': [{'id': name, 'spec_id': 'fixture.support', 'spec_revision': 1,
+                            'depends_on': ['b'] if name == 'c' else []} for name in ('a', 'b', 'c')],
+                 'reducers': [{'id': 'summary', 'type': 'deterministic', 'inputs': ['a', 'c']}]}
+        helper = self.root / check.PREFIX / 'decision-intelligence/scripts/review_graph.py'
+        source = self.root / 'graph.json'
+        command = [sys.executable, str(helper), str(source), '--group-size', '2']
+        validator.validate(value)
+        data = json.dumps(value).encode()
+        source.write_bytes(data)
+        run = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        result = json.loads(run.stdout)
+        self.assertEqual(result['layers'][0]['groups'], [['a', 'b']])
+        self.assertEqual(result['layers'][1]['groups'], [['c']])
+        self.assertEqual(len(result['repeated_spec_references'][0]['nodes']), 3)
+        self.assertFalse(result['boundaries']['consequence_authorized'])
+        self.assertEqual(source.read_bytes(), data)
+        value['nodes'][1]['depends_on'] = ['c']
+        validator.validate(value)  # Schema validity alone cannot rule out a cycle.
+        source.write_text(json.dumps(value))
+        run = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(run.returncode, 1, run.stderr)
+        self.assertEqual(json.loads(run.stdout)['layers'], [])
+        value['extension'] = 'metadata allowed by the canonical additive schema'
+        validator.validate(value)
+        source.write_text(json.dumps(value))
+        run = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(run.returncode, 2)
+        self.assertEqual(json.loads(run.stderr)['code'], 'unsupported-fields')
+        self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
 
 if __name__ == '__main__':
