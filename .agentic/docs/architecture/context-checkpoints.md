@@ -11,6 +11,10 @@ The repository's `context_checkpoint.py` supplies semantic inspection; its tests
 run through existing contract validation. No runtime, installer, host hook, model
 call, automatic memory store or cache is delivered by this contract.
 
+For continuations with two reviewed records, the optional
+[selective refresh planner](checkpoint-refresh.md) identifies affected dependencies
+without replaying note bodies or resolving embedded references.
+
 ## Write only what the next step needs
 
 Record the goal and scope, including explicit exclusions. A base revision can be
