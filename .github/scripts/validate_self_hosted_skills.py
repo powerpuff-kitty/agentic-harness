@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'cacd5136eb0653586b60161e89f85be974d04ed1'
+REVISION = 'b14f7e6dfea2a1a8de04b018e1d8ced2d6baf482'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -24,15 +24,17 @@ EXPECTED = {
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
-    "agentic-improvement/bundle.json": "3cd61cd710b017dbad0f5497c1af4750fe9a5668",
+    "agentic-improvement/bundle.json": "3a0a3ad6de4749df2fdcf20e4befc3c7a24dc956",
     "agentic-improvement/references/continuation.md": "b00e135a2448972abb1b95963b20bc925195f16d",
-    "agentic-improvement/references/efficiency.md": "3be75f2fca7c4d540e4fb5ec1dd2cf4b1b8be2c3",
+    "agentic-improvement/references/efficiency.md": "a5ef35811e44c8768500ff2d2254ebcb5ba6fe64",
     "agentic-improvement/references/evidence-reuse.md": "6ea9ad36d815b46566948193b5d1b8bc77b94f05",
     "agentic-improvement/references/python-outline.md": "462d7785c233a5d09732c3370821927d78d4ac2b",
     "agentic-improvement/references/required-evidence.md": "66943795ed64d98497781a5ee00fe1595b6ef667",
+    "agentic-improvement/references/typescript-outline.md": "87516e1c9f51bdd86fdb73fbf6dbacaca04ca266",
     "agentic-improvement/scripts/compact_log.py": "39db1fee08fca6614605719c0acee0854965eeac",
     "agentic-improvement/scripts/evidence_snapshot.py": "1c3fbdd1529b58a30deb91090e0d736ee27748c3",
     "agentic-improvement/scripts/extract_context.py": "2c49aa25c10f9546ac2fb37d887798132328b5fa",
+    "agentic-improvement/scripts/outline_typescript.py": "28fdefc0896e7e6916e057940cc1d5a3c4a27e25",
     "codebase-audit/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "codebase-audit/SKILL.md": "b067587f94411fe4078d715899f3084f55b83ef1",
     "codebase-audit/bundle.json": "db8517805e844168fac766fc695d78274d7f11b9",

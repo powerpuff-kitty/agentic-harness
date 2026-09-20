@@ -8,6 +8,8 @@ Retain necessary source spans, qualifiers, contrary evidence and actual referenc
 
 For repeated selected-file inspection, the optional [freshness guide](references/evidence-reuse.md) describes a read-only hash helper and its limits. Matching bytes do not establish evidence sufficiency, retained model context or a valid cached decision.
 
+For large selected JS/TS files with unknown definition locations, the optional [TypeScript navigation guide](references/typescript-outline.md) uses an explicitly reviewed installed parser. Prefer native navigation or direct reads when cheaper; never install tools automatically.
+
 ## Rule identity, not just text identity
 
 Deduplication applies to repeated presentation, not automatically to source files. Match authority, applicability, conditions and exceptions before combining rules; retain every source and its scope. Identical sentences in two nested AGENTS.md files may govern different directories. Do not delete either file or hoist the rule globally to save tokens. A reviewed compiled view may state the sentence once with both scopes; the original routing and authority must survive.

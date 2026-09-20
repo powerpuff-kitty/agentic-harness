@@ -2,9 +2,11 @@
   "format_version": 2,
   "kind": "standalone-skill",
   "name": "agentic-improvement",
-  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "references/required-evidence.md", "references/continuation.md", "references/python-outline.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py", "scripts/extract_context.py"],
+  "files": ["SKILL.md", "references/efficiency.md", "references/evidence-reuse.md", "references/required-evidence.md", "references/continuation.md", "references/python-outline.md", "references/typescript-outline.md", "scripts/compact_log.py", "scripts/evidence_snapshot.py", "scripts/extract_context.py", "scripts/outline_typescript.py"],
   "optional_tools": [
-    {"name": "python3", "fallback": "Use the manual diagnostic and source-review procedures; never install or execute a helper automatically."}
+    {"name": "python3", "fallback": "Use the manual diagnostic and source-review procedures; never install or execute a helper automatically."},
+    {"name": "node", "fallback": "Use native symbol navigation or inspect the selected JS/TS source manually; never install a runtime automatically."},
+    {"name": "typescript", "fallback": "Use native symbol navigation or direct source review. The JS/TS helper requires an explicitly reviewed existing compiler entry and hash; no npm/npx installation."}
   ],
   "shared_references": {},
   "optional_scripts": [
@@ -22,6 +24,11 @@
       "path": "scripts/extract_context.py",
       "execution": "explicit-invocation-only",
       "fallback": "Requires the reviewed packaged sibling evidence_snapshot.py. Otherwise inspect exact current source ranges manually with their provenance; never use stale snippets, omit required context, or install dependencies automatically."
+    },
+    {
+      "path": "scripts/outline_typescript.py",
+      "execution": "explicit-invocation-only",
+      "fallback": "Requires the packaged evidence_snapshot.py plus explicitly selected reviewed Node and TypeScript. Otherwise use native navigation or direct source reads; no automatic installation, provider call or target execution."
     }
   ]
 }

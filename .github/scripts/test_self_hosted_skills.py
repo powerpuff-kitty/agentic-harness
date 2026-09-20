@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 38)
+        self.assertEqual(report['files_verified'], 40)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -213,7 +213,8 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertEqual(declaration['optional_scripts'][0]['path'], 'scripts/compact_log.py')
         self.assertEqual(declaration['optional_scripts'][0]['execution'], 'explicit-invocation-only')
         self.assertEqual({item['path'] for item in declaration['optional_scripts']},
-                         {'scripts/compact_log.py', 'scripts/evidence_snapshot.py', 'scripts/extract_context.py'})
+                         {'scripts/compact_log.py', 'scripts/evidence_snapshot.py', 'scripts/extract_context.py',
+                          'scripts/outline_typescript.py'})
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
     def test_actual_imported_helper_preserves_synthetic_log(self):
@@ -376,6 +377,26 @@ class SelfHostedSkills(unittest.TestCase):
         stale = subprocess.run(command + ['--span', *span], capture_output=True, timeout=10)
         self.assertEqual(stale.returncode, 2)
         self.assertEqual(stale.stdout, b'')
+        self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
+
+    def test_actual_typescript_helper_refuses_unsupported_or_stale_parser(self):
+        check.verify(self.root)
+        helper = self.root / check.PREFIX / 'agentic-improvement/scripts/outline_typescript.py'
+        compiler = self.root / 'synthetic-parser.js'
+        compiler.write_bytes(b'throw new Error("must not execute");\n')
+        raw = b'export function read() {}\n'
+        (self.root / 'source.ts').write_bytes(raw)
+        source_pin = 'sha256:' + hashlib.sha256(raw).hexdigest()
+        command = [sys.executable, str(helper), '--root', str(self.root), '--node', sys.executable,
+                   '--typescript', str(compiler), 'sha256:' + '0' * 64]
+        for path, code in [('source.vue', 'unsupported-language'), ('source.ts', 'parser-changed')]:
+            run = subprocess.run(command + ['--file', path, source_pin], capture_output=True, timeout=10)
+            self.assertEqual(run.returncode, 2)
+            self.assertEqual(run.stdout, b'')
+            self.assertEqual(json.loads(run.stderr)['code'], code)
+        self.assertEqual((self.root / 'source.ts').read_bytes(), raw)
+        self.assertEqual(compiler.read_bytes(), b'throw new Error("must not execute");\n')
+        self.assertEqual(list(helper.parent.rglob('*.pyc')), [])
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
 
