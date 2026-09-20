@@ -38,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 37)
+        self.assertEqual(report['files_verified'], 38)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -341,6 +341,39 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertEqual(source.read_bytes(), raw)
         source.write_bytes(raw.replace(b'necessary', b'incorrect'))
         stale = subprocess.run(command, capture_output=True, timeout=10)
+        self.assertEqual(stale.returncode, 2)
+        self.assertEqual(stale.stdout, b'')
+        self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
+
+    def test_actual_python_outline_drives_exact_guarded_retrieval(self):
+        check.verify(self.root)
+        helper = self.root / check.PREFIX / 'agentic-improvement/scripts/extract_context.py'
+        raw = b'class Client:\n    @tag\n    async def fetch(self):\n        return 42\n'
+        source = self.root / 'source.py'
+        source.write_bytes(raw)
+        pin = 'sha256:' + hashlib.sha256(raw).hexdigest()
+        command = [sys.executable, str(helper), '--root', str(self.root)]
+        mapped = subprocess.run(command + ['--outline', 'source.py', pin],
+                                capture_output=True, timeout=10)
+        self.assertEqual(mapped.returncode, 0, mapped.stderr)
+        value = json.loads(mapped.stdout)
+        self.assertFalse(value['limits']['required_evidence_emitted'])
+        self.assertNotIn(b'return 42', mapped.stdout)
+        item = value['files'][0]['definitions'][1]
+        self.assertEqual(item['qualified_name'], 'Client.fetch')
+        self.assertEqual((item['start_line'], item['end_line']), (2, 4))
+        span = ['source.py', str(item['start_line']), str(item['end_line']), pin]
+        retrieved = subprocess.run(command + ['--span', *span, '--require-span', *span],
+                                   capture_output=True, timeout=10)
+        self.assertEqual(retrieved.returncode, 0, retrieved.stderr)
+        result = json.loads(retrieved.stdout)
+        self.assertTrue(result['required_evidence']['emitted'])
+        self.assertEqual(result['files'][0]['excerpts'][0]['text'].encode(),
+                         b'    @tag\n    async def fetch(self):\n        return 42\n')
+        self.assertEqual(source.read_bytes(), raw)
+        self.assertEqual(list(helper.parent.rglob('*.pyc')), [])
+        source.write_bytes(raw.replace(b'return 42', b'return 99'))
+        stale = subprocess.run(command + ['--span', *span], capture_output=True, timeout=10)
         self.assertEqual(stale.returncode, 2)
         self.assertEqual(stale.stdout, b'')
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')

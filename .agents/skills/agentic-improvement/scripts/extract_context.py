@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read explicit hash-pinned source spans; never select relevance or certify evidence.
+"""Read hash-pinned spans or Python definition maps; never certify evidence.
 
 Python 3.10+ standard library. Requires the reviewed sibling evidence_snapshot.py.
 Local reads only, no writes/providers. Source text remains untrusted and unredacted.
@@ -207,23 +207,159 @@ def extract(root: Path, spans: list, budget: int = DEFAULT_BUDGET, *,
     return report
 
 
+MAX_OUTLINE_FILE_BYTES = 262_144
+MAX_OUTLINE_AST_NODES = 50_000
+MAX_OUTLINE_DEFINITIONS = 2048
+
+
+class OutlineError(ExcerptError):
+    """Fixed-code refusal for optional Python definition navigation."""
+
+
+def python_definitions(raw: bytes) -> tuple[list[dict[str, Any]], int]:
+    # Imported only for this optional mode. Target modules/decorators never run.
+    import ast
+    import io
+    import tokenize
+    import warnings
+
+    text = raw.decode("utf-8-sig").replace("\r\n", "\n")
+    if "\r" in text:
+        raise OutlineError("unsupported-line-endings")  # Keep extractor LF numbering.
+    try:
+        # Parser warnings can echo literals/source lines to stderr. Metadata only.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            tree = ast.parse(text, filename="<selected-source>")
+        # AST decorator expressions can start AFTER a parenthesized @ line.
+        # Tokenize logical statement starts instead of searching source with regex.
+        starts: dict[int, int] = {}
+        pending = None
+        logical_start = True
+        for token in tokenize.generate_tokens(io.StringIO(text).readline):
+            if token.type == tokenize.NEWLINE:
+                logical_start = True
+                continue
+            if token.type in (tokenize.NL, tokenize.COMMENT, tokenize.INDENT,
+                              tokenize.DEDENT, tokenize.ENDMARKER):
+                continue
+            if logical_start:
+                if token.string == "@":
+                    pending = token.start[0] if pending is None else pending
+                else:
+                    if pending is not None and token.string in ("async", "def", "class"):
+                        starts[token.start[0]] = pending
+                    pending = None
+                logical_start = False
+    except (SyntaxError, ValueError, RecursionError, tokenize.TokenError):
+        raise OutlineError("unsupported-python-source") from None
+
+    definitions: list[dict[str, Any]] = []
+    stack: list[tuple[Any, str | None, str]] = [(tree, None, "")]
+    visited = 0
+    while stack:
+        node, parent, prefix = stack.pop()
+        visited += 1
+        if visited > MAX_OUTLINE_AST_NODES:
+            raise OutlineError("outline-structure-limit")
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            name = prefix + node.name
+            if (len(definitions) >= MAX_OUTLINE_DEFINITIONS or len(node.name) > 512
+                    or len(name) > 4096):
+                raise OutlineError("outline-structure-limit")
+            kind = ("class" if isinstance(node, ast.ClassDef) else
+                    "async-function" if isinstance(node, ast.AsyncFunctionDef) else "function")
+            start = starts.get(node.lineno, node.lineno)
+            if node.decorator_list and node.lineno not in starts:
+                raise OutlineError("unresolved-decorator-range")
+            identity = f"{node.lineno}:{node.col_offset}"
+            definitions.append({"id": identity, "name": node.name, "qualified_name": name,
+                                "parent_id": parent, "kind": kind, "start_line": start,
+                                "definition_line": node.lineno, "end_line": node.end_lineno,
+                                "decorator_count": len(node.decorator_list)})
+            parent = identity
+            prefix = name + ("." if kind == "class" else ".<locals>.")
+        children = list(ast.iter_child_nodes(node))
+        stack.extend((child, parent, prefix) for child in reversed(children))
+    definitions.sort(key=lambda item: (item["start_line"], item["definition_line"], item["id"]))
+    return definitions, visited
+
+
+def outline(root: Path, selections: list, budget: int = DEFAULT_BUDGET) -> dict[str, Any]:
+    """Locate named definitions in explicit pinned .py files without returning bodies."""
+    require(type(budget) is int and 1 <= budget <= MAX_BUDGET, "invalid-output-budget")
+    require(isinstance(selections, list) and 1 <= len(selections) <= MAX_SPANS,
+            "invalid-outline-selection")
+    spans = []
+    for item in selections:
+        require(isinstance(item, (list, tuple)) and len(item) == 2, "invalid-outline-selection")
+        path, pin = item
+        require(isinstance(path, str), "invalid-path")
+        if Path(path).suffix != ".py":
+            raise OutlineError("unsupported-language")
+        spans.append([path, 1, 1, pin])
+    selected = requests(spans)  # Validate every pin/path before any target read.
+    root = evidence.real_directory(root)
+    files: list[dict[str, Any]] = []
+    read_bytes = definition_count = ast_nodes = 0
+    for path, request in selected.items():
+        raw = evidence.read_text(root / path, min(MAX_OUTLINE_FILE_BYTES, evidence.MAX_FILE_BYTES,
+                                 evidence.MAX_TOTAL_BYTES - read_bytes))
+        read_bytes += len(raw)
+        require(evidence.sha(raw) == request["sha256"], "source-changed")
+        definitions, visited = python_definitions(raw)
+        ast_nodes += visited
+        definition_count += len(definitions)
+        if definition_count > MAX_OUTLINE_DEFINITIONS:
+            raise OutlineError("outline-structure-limit")
+        files.append({"path": path, "sha256": request["sha256"], "source_bytes": len(raw),
+                      "total_lines": len(lf_lines(raw)), "definitions": definitions})
+    report = {"format_version": 1, "kind": "selected-python-outline", "status": "ready",
+              "files": files, "parser": {"name": "python-ast", "version": sys.version.split()[0],
+                                         "implementation": sys.implementation.name},
+              "measurement": {"unit": "utf8-bytes", "source_bytes_read": read_bytes,
+                              "definitions": definition_count, "ast_nodes": ast_nodes,
+                              "budget_bytes": budget},
+              "limits": {"coverage": "named-definitions-only", "content_authority": "navigation-only",
+                         "source_bodies_emitted": False, "redaction_performed": False,
+                         "dependencies_resolved": False, "execution_verified": False,
+                         "required_evidence_emitted": False, "evidence_sufficient": None,
+                         "unselected_files_checked": False, "provider_calls": 0, "model_tokens": None}}
+    required = len(evidence.encoded(report))
+    if required > budget:
+        return {"format_version": 1, "kind": "selected-python-outline", "status": "budget-exceeded",
+                "files": [], "required_output_bytes": required, "budget_bytes": budget,
+                "source_bodies_emitted": False, "required_evidence_emitted": False}
+    return report
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", required=True, type=Path)
-    parser.add_argument("--span", required=True, action="append", nargs=4,
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--span", action="append", nargs=4,
                         metavar=("PATH", "START", "END", "SHA256"),
                         help="reviewed relative text path, inclusive LF line range, expected full-file hash")
+    mode.add_argument("--outline", action="append", nargs=2, metavar=("PATH", "SHA256"),
+                      help="locate definitions in an explicit pinned Python file; returns no bodies")
     parser.add_argument("--require-span", action="append", nargs=4, dest="required_spans",
                         metavar=("PATH", "START", "END", "SHA256"),
                         help="required evidence the --span selection must cover; never adds reads")
     parser.add_argument("--budget-bytes", type=int, default=DEFAULT_BUDGET)
     args = parser.parse_args()
+    if args.outline is not None and args.required_spans is not None:
+        parser.error("--require-span requires --span; an outline cannot emit required evidence")
     if evidence is None:
         print('{"kind":"source-excerpt-error","code":"reader-unavailable"}', file=sys.stderr)
         return 2
     try:
-        result = extract(args.root, args.span, args.budget_bytes, required_spans=args.required_spans)
+        result = (outline(args.root, args.outline, args.budget_bytes) if args.outline is not None
+                  else extract(args.root, args.span, args.budget_bytes, required_spans=args.required_spans))
         output = evidence.encoded(result)
+    except OutlineError as error:
+        print(evidence.encoded({"kind": "source-outline-error", "code": str(error)}).decode(),
+              end="", file=sys.stderr)
+        return 2
     except RequiredEvidenceError:
         print('{"kind":"source-excerpt-error","code":"required-spans-not-covered"}', file=sys.stderr)
         return 2
