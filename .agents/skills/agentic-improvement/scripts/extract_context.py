@@ -8,26 +8,50 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
+import os
 from pathlib import Path
 import re
 import stat
 import sys
 from typing import Any
 
-# Import only the packaged sibling, not a namesake on PYTHONPATH. Do not create pyc.
-sys.dont_write_bytecode = True
+# Import current sibling SOURCE, never an old pyc or a namesake on PYTHONPATH.
+MAX_READER_BYTES = 65_536
 
 
 def load_reader():
     path = Path(__file__).absolute().with_name("evidence_snapshot.py")
-    meta = path.lstat()
-    if not stat.S_ISREG(meta.st_mode) or bool(getattr(meta, "st_file_attributes", 0) & 0x400):
+
+    def identity(meta):
+        if not stat.S_ISREG(meta.st_mode) or bool(getattr(meta, "st_file_attributes", 0) & 0x400):
+            raise ImportError("reader-unavailable")
+        return (meta.st_dev, meta.st_ino, meta.st_size, meta.st_mtime_ns, meta.st_ctime_ns)
+
+    before = path.lstat()
+    expected = identity(before)
+    if before.st_size > MAX_READER_BYTES:
+        raise ImportError("reader-unavailable")
+    flags = (os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0) |
+             getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0))
+    with os.fdopen(os.open(path, flags), "rb") as stream:
+        if identity(os.fstat(stream.fileno())) != expected:
+            raise ImportError("reader-unavailable")
+        source = stream.read(MAX_READER_BYTES + 1)
+        after = identity(os.fstat(stream.fileno()))
+    if after != expected or identity(path.lstat()) != expected or len(source) != before.st_size:
         raise ImportError("reader-unavailable")
     spec = importlib.util.spec_from_file_location("_excerpt_evidence_reader", path)
     if spec is None or spec.loader is None:
         raise ImportError("reader-unavailable")
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # exec_module may read a timestamp-valid or unchecked-hash cache even with -B.
+    code = compile(source, str(path), "exec", dont_inherit=True)
+    previous = sys.dont_write_bytecode
+    try:
+        sys.dont_write_bytecode = True
+        exec(code, module.__dict__)
+    finally:
+        sys.dont_write_bytecode = previous
     return module
 
 

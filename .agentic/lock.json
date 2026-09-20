@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "0f99ebd418742370334427cc426fa962e35b5508"
+    "revision": "a9e80039d83f655113b984a7e713041070e60a75"
   },
   "variant": "base",
   "packs": {
@@ -43,7 +43,7 @@
     ".agents/skills/agentic-improvement/references/evidence-reuse.md": "db9c1dcbf4e9f7c514f8a5c175ecb92cb840b2a5f58535242fa01aae20c8bda5",
     ".agents/skills/agentic-improvement/scripts/compact_log.py": "fa7fb2465d330857348e16fe551d57299ebcbf14c0579d1880749909a81ab045",
     ".agents/skills/agentic-improvement/scripts/evidence_snapshot.py": "0b0ad0d2256a9c447d34f5359e3c3a2aea17722a353be1538de67f1352a94b23",
-    ".agents/skills/agentic-improvement/scripts/extract_context.py": "e79dac3b2bea0c7fd2f88197a2968b6abd41966ecb3b04bbdc73f4ad5b9a3945",
+    ".agents/skills/agentic-improvement/scripts/extract_context.py": "d42b27c6e1df9c1c2ca9a92f7c975349164b79a8fc7c6d43cd824a7745a93d49",
     ".agents/skills/codebase-audit/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
     ".agents/skills/codebase-audit/SKILL.md": "d1580c2ea807b2c705acf275588525f26e9ff402512678a67a7ac6dcb7dbc606",
     ".agents/skills/codebase-audit/bundle.json": "c912b6c1c3a6e0b50d3ae3074b2a0df6cedecff9b80b31ea368bf72ed248db4b",
