@@ -1,0 +1,13 @@
+{
+  "format_version": 1,
+  "kind": "standalone-skill",
+  "name": "decision-intelligence",
+  "files": ["SKILL.md", "references/decision-guide.md"],
+  "optional_tools": [
+    {
+      "name": "typesafe-ai",
+      "fallback": "Use only explicitly permitted current-agent guidance, without calling it Jev or inventing probabilities. If the task requires an actual Jev response and no authorised provider is available, report provider-unavailable and abstain. Never install the optional skill or obtain credentials automatically."
+    }
+  ],
+  "shared_references": {}
+}

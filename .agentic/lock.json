@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "664ce345841d8fd2e35b234dfa8a735a9f4d3fec"
+    "revision": "3bbafa3ee1c106edae94893e28b2760f5e3bc663"
   },
   "variant": "base",
   "packs": {
@@ -20,6 +20,18 @@
     "quality-gates": "built-in",
     "security": "built-in"
   },
-  "skills": {},
-  "checksums": {}
+  "skills": {
+    "agentic-improvement": "0.5.0-beta.1",
+    "decision-intelligence": "0.5.0-beta.1"
+  },
+  "checksums": {
+    ".agents/skills/agentic-improvement/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/agentic-improvement/SKILL.md": "9af33cec2f79ec0604fa42822130ba8f789ff1c968c4297cb8070d704a0b6848",
+    ".agents/skills/agentic-improvement/bundle.json": "7acfa6e9ea7114c1d27fad66db2fa52367a4715299028989f447b2e244f57ea4",
+    ".agents/skills/agentic-improvement/references/efficiency.md": "154f1dd145e1ad9a3cbf85c74621d694f8db9602c7f06c003303aa3d504f97ae",
+    ".agents/skills/decision-intelligence/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/decision-intelligence/SKILL.md": "63f16f287818cf6a021ad00e0a6349dba0e47ee0a123a66ce8083cb41631af69",
+    ".agents/skills/decision-intelligence/bundle.json": "a76264ca1b549369cc621dffdf18fdae4c9111875da2a699869dffabe8677fc5",
+    ".agents/skills/decision-intelligence/references/decision-guide.md": "2baf9ea96c21fb98289df7555c0e3a091b06472e468e6678194bac0f43b4a294"
+  }
 }
