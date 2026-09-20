@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "pattern/maintainability/1",
+  "kind": "pattern",
+  "name": "Maintainability evidence",
+  "version_selector": "1",
+  "authority": "harness",
+  "reviewed_at": "2026-09-18",
+  "description": "Harness-owned semantics for complexity, duplication, dead-code and naming evidence without universal taste thresholds.",
+  "capabilities": ["analyze", "check", "baseline", "diff"],
+  "rules": [
+    {
+      "id": "maintainability.thresholds.project-context",
+      "title": "Use project-selected thresholds for maintainability gates",
+      "category": "complexity",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "harness",
+      "summary": "Function size, complexity, nesting, duplication and similar thresholds should come from an accepted project/profile contract rather than an arbitrary global default.",
+      "source_refs": ["harness.quality-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {"universal_thresholds": false}
+    },
+    {
+      "id": "maintainability.baseline.debt-visible",
+      "title": "Keep historical debt visible under quality ratchets",
+      "category": "configuration",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "A baseline may prevent new regressions but must not transform historical findings into a clean quality result.",
+      "source_refs": ["harness.quality-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {"baseline_hides_existing_findings": false}
+    }
+  ],
+  "sources": [
+    {
+      "id": "harness.quality-epic",
+      "title": "Agentic Harness Code Quality Intelligence epic",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/issues/102",
+      "authority": "harness",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

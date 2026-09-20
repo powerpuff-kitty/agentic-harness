@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "tooling/go-vet/current",
+  "kind": "tooling",
+  "name": "go vet",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Go vet static-analysis capability.",
+  "capabilities": ["detect", "check"],
+  "rules": [
+    {
+      "id": "go-vet.linting.native-diagnostics",
+      "title": "Preserve go vet diagnostics as executed evidence",
+      "category": "linting",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "go vet reports suspicious constructs; Harness should record its actual execution and diagnostics rather than infer a pass from Go source presence.",
+      "source_refs": ["go.vet"],
+      "tools": ["go-vet"],
+      "autofix": "none",
+      "constraints": {"config_presence_is_execution": false}
+    }
+  ],
+  "sources": [
+    {
+      "id": "go.vet",
+      "title": "go vet command documentation",
+      "url": "https://pkg.go.dev/cmd/vet",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}
