@@ -212,6 +212,8 @@ class SelfHostedSkills(unittest.TestCase):
         self.assertEqual(declaration['format_version'], 2)
         self.assertEqual(declaration['optional_scripts'][0]['path'], 'scripts/compact_log.py')
         self.assertEqual(declaration['optional_scripts'][0]['execution'], 'explicit-invocation-only')
+        self.assertEqual({item['path'] for item in declaration['optional_scripts']},
+                         {'scripts/compact_log.py', 'scripts/evidence_snapshot.py'})
         self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
 
     def test_actual_imported_helper_preserves_synthetic_log(self):
