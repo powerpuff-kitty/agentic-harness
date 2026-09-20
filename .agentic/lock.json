@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "b1b353fcb8f5391762c09071e751392f37401bd3"
+    "revision": "cb1739c74c95c1d78ae110c01756a80b34c42c9d"
   },
   "variant": "base",
   "packs": {
@@ -38,9 +38,9 @@
     ".agents/skills/agentic-app/references/repository-discovery.md": "993791cc5719f61d282be38c9f47201d9263929e4868ecdb38ff1703a893b614",
     ".agents/skills/agentic-improvement/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
     ".agents/skills/agentic-improvement/SKILL.md": "fb6f6d798aa420167debe34dac0f3b7af3859bb9bbcb220be5dcff631ecd9ab5",
-    ".agents/skills/agentic-improvement/bundle.json": "01e707763802cc8ee759f31cde782737e8497701de8bd9dd34b7d30fb023e937",
+    ".agents/skills/agentic-improvement/bundle.json": "3c6283bce299a9868791320df6b19d1b9c50682f9788d2538f4f0a45daedf2d8",
     ".agents/skills/agentic-improvement/references/continuation.md": "69d25e882c6d3d1a0122c56333e8c34d8a22b05170e60bef20606edeb0678fdc",
-    ".agents/skills/agentic-improvement/references/efficiency.md": "2060aebec3e936be99dcfdeb7c9b57f653875e4e011eec8aa822335aa01eb881",
+    ".agents/skills/agentic-improvement/references/efficiency.md": "8644bd74a09702dee5df6613d6aac3580d95afeed096fe12d6de72ae45bb1aca",
     ".agents/skills/agentic-improvement/references/evidence-reuse.md": "f15831ed0bf23c6376491d54c585884433498432a8fc57394020f533f898faf2",
     ".agents/skills/agentic-improvement/references/python-outline.md": "3554452ff61f16af8f489220cc1faea9488dacfb205e48f2c2bcb9755a1fe48d",
     ".agents/skills/agentic-improvement/references/required-evidence.md": "7feec89cf3e6045ac2edcce2593c6d09137dcb94732f545eb1ba1d1ee312dae1",
@@ -57,8 +57,8 @@
     ".agents/skills/codebase-audit/references/review-guide.md": "cedbc8b26c3f2d96987403756f43028fe3770a1d1939457f4583d5e3ec6f5a92",
     ".agents/skills/decision-intelligence/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
     ".agents/skills/decision-intelligence/SKILL.md": "63f16f287818cf6a021ad00e0a6349dba0e47ee0a123a66ce8083cb41631af69",
-    ".agents/skills/decision-intelligence/bundle.json": "1a5b8274259c111b574b37e8ee01c6ef395ef1e533327727b83c6a599ac3aa4a",
-    ".agents/skills/decision-intelligence/references/decision-guide.md": "60b33f87a6754580e5d55c83a45521e24556ec385dfdc86bb5841c2e89784a3e",
+    ".agents/skills/decision-intelligence/bundle.json": "2e339d864f8400df315c7ebc3534e984ca2940b904c68eaddf2ffc271ca7b9af",
+    ".agents/skills/decision-intelligence/references/decision-guide.md": "1f166584143a8a10a14f61195892f0166db2485cdda2bf5d7baf3f09e8678f0d",
     ".agents/skills/decision-intelligence/references/graph-review.md": "b2443874f6a3fe106e0bdfa726a3c04c80533b749769fd577475a798875fba4e",
     ".agents/skills/decision-intelligence/scripts/review_graph.py": "9c20f8fbea25f57367725d7d9035c95e19c69a9a0c64d16faea875227364ae60",
     ".agents/skills/documentation/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
@@ -69,6 +69,9 @@
     ".agents/skills/security-review/SKILL.md": "e8d9d7c26f1225a6b956c9c6cfcc1c2ad7c792f90024f0ce50e62ed533f67d68",
     ".agents/skills/security-review/bundle.json": "b8409ca62735e0265e417328bb9b0d2e5f507ff1081bb3bed676961ff7b1ca10",
     ".agents/skills/security-review/references/report-template.md": "05370ce48b7a279f1ac066bef10e0884209ba2f7ff1c75f8dfed5ad511d1b3d8",
-    ".agents/skills/security-review/references/review-guide.md": "7939d7648bc027f0ca51d615504b74275ae485ea9fb54b471dece493c4f03c2b"
+    ".agents/skills/security-review/references/review-guide.md": "7939d7648bc027f0ca51d615504b74275ae485ea9fb54b471dece493c4f03c2b",
+    ".agents/skills/agentic-improvement/references/log-compaction.md": "5b9a9708ecd88f21b9ca41a5487ecdfcc5442ac0e1df167ca8f7a86e4fa0a257",
+    ".agents/skills/agentic-improvement/references/rule-review.md": "cafed3ac609013523c1e4636ba672abeb1e55fa529394fcf07bf14e0adebcef4",
+    ".agents/skills/decision-intelligence/references/recorded-results.md": "9180c244853815d3eca4749ad8fb5d86fb7be0b571858e55a8fb27b53e379a72"
   }
 }

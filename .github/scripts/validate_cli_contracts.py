@@ -53,6 +53,7 @@ for script in ['validate_check_contracts.py', 'validate_execution_contracts.py',
                'validate_workflow_graph_contracts.py',
                'test_public_archive_names.py', 'test_public_surface.py', 'test_context_profiles.py',
                'test_self_hosted_skills.py', 'test_self_hosted_reader_cache.py',
+               'test_self_hosted_guide_inventory.py',
                'test_context_checkpoint.py', 'test_checkpoint_refresh.py', 'test_decision_binding.py',
                'test_ordinal_binding.py', 'test_rule_ir.py', 'test_rule_sources.py', 'test_rule_context.py']:
     subprocess.run([sys.executable, str(root / '.github/scripts' / script)], check=True)

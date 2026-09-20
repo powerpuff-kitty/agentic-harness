@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'b1b353fcb8f5391762c09071e751392f37401bd3'
+REVISION = 'cb1739c74c95c1d78ae110c01756a80b34c42c9d'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -24,12 +24,14 @@ EXPECTED = {
     "agentic-app/references/repository-discovery.md": "4f636266e280c4dd8eae30327cd5f9c493a14df7",
     "agentic-improvement/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "agentic-improvement/SKILL.md": "85e7e54d8bd40b8286cedbbba2039b4780da24f2",
-    "agentic-improvement/bundle.json": "3a0a3ad6de4749df2fdcf20e4befc3c7a24dc956",
+    "agentic-improvement/bundle.json": "e1024edaf216c5668dbc77c3cf8ee440c0d8d708",
     "agentic-improvement/references/continuation.md": "92adf3bd7e5fb5c9ef6b677b8cd75f1bc24385c3",
-    "agentic-improvement/references/efficiency.md": "954941285a3d3a962bc57b88b52ed681d92caf89",
+    "agentic-improvement/references/efficiency.md": "d58f485371f0e564c5ba93209916ebfa4823e657",
     "agentic-improvement/references/evidence-reuse.md": "6ea9ad36d815b46566948193b5d1b8bc77b94f05",
+    "agentic-improvement/references/log-compaction.md": "3ddfbf46313132d23fb962fa7a56a7034a619f07",
     "agentic-improvement/references/python-outline.md": "462d7785c233a5d09732c3370821927d78d4ac2b",
     "agentic-improvement/references/required-evidence.md": "66943795ed64d98497781a5ee00fe1595b6ef667",
+    "agentic-improvement/references/rule-review.md": "3383f9651258612c320419c3ae9c3fe2a0f791e0",
     "agentic-improvement/references/typescript-outline.md": "87516e1c9f51bdd86fdb73fbf6dbacaca04ca266",
     "agentic-improvement/scripts/compact_log.py": "39db1fee08fca6614605719c0acee0854965eeac",
     "agentic-improvement/scripts/evidence_snapshot.py": "1c3fbdd1529b58a30deb91090e0d736ee27748c3",
@@ -43,9 +45,10 @@ EXPECTED = {
     "codebase-audit/references/review-guide.md": "2d2b4213d5a75d4221bf4a0950edc4704768f37c",
     "decision-intelligence/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "decision-intelligence/SKILL.md": "4d5e80381ffad7d89d1c9ad2a7e4f21a512e8c90",
-    "decision-intelligence/bundle.json": "7cbd3953928beacb2caf9278675238d25eadbf45",
-    "decision-intelligence/references/decision-guide.md": "452ed2f0fdbdfca853ae429e0a06dce33ea0549a",
+    "decision-intelligence/bundle.json": "c5a33628b85634b731153695ca3e51cb98af56ed",
+    "decision-intelligence/references/decision-guide.md": "3696bd842a16ed877f1faeb19d3d8447184ac352",
     "decision-intelligence/references/graph-review.md": "f749b9e51b9611d6f6ce58be21109fdc3735aebd",
+    "decision-intelligence/references/recorded-results.md": "ad43257a1e3f7525cb12bc91653df732e59a6e62",
     "decision-intelligence/scripts/review_graph.py": "e9553f3271e68b14eddef7439bac8cf247ea80a4",
     "documentation/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
     "documentation/SKILL.md": "c419a26041754b7f57a1d0919390ac72bb4d1ca5",
@@ -156,6 +159,12 @@ def inventory(folder: Path, prefix: str = '') -> set[str]:
     """Bound selected skill traversal and refuse linked directories."""
     found = set()
     visited = 0
+    # The reviewed inventory, not the filesystem, owns the traversal allowance.
+    selected = {p.split('/', 1)[1] for p in EXPECTED if p.startswith(folder.name + '/')}
+    directories = {parent.as_posix() for p in selected for parent in Path(p).parents
+                   if parent != Path('.')}
+    entry_limit = len(selected) + len(directories)
+    require(0 < entry_limit <= 64, 'unexpected declared entry count')
 
     def walk(path, relative, depth):
         nonlocal visited
@@ -163,10 +172,11 @@ def inventory(folder: Path, prefix: str = '') -> set[str]:
         try:
             entries = []
             for entry in path.iterdir():
-                require(visited + len(entries) < 16, 'unexpected directory entries')
+                require(visited + len(entries) < entry_limit, 'unexpected directory entries')
                 entries.append(entry)
             for entry in sorted(entries):
                 visited += 1
+                require(visited <= entry_limit, 'unexpected directory entries')
                 meta = entry.lstat()
                 require(not linked(meta), 'linked input refused')
                 name = relative + entry.name
