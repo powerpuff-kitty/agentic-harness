@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "id": "language/typescript/current",
+  "kind": "language",
+  "name": "TypeScript",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "TypeScript language-level quality controls that can be established from project configuration without inventing style policy.",
+  "capabilities": ["detect", "analyze", "check"],
+  "rules": [
+    {
+      "id": "typescript.type-safety.strict-mode",
+      "title": "Track TypeScript strict-mode posture",
+      "category": "type-safety",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "The strict compiler option enables the strict-mode family of type checking behavior; project analysis should record whether it is enabled or explicitly weakened.",
+      "source_refs": ["typescript.strict"],
+      "tools": ["typescript"],
+      "autofix": "none",
+      "constraints": {
+        "config_key": "compilerOptions.strict",
+        "report_explicit_false": true,
+        "project_policy_required_for_error": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "typescript.strict",
+      "title": "TypeScript TSConfig: strict",
+      "url": "https://www.typescriptlang.org/tsconfig/strict.html",
+      "authority": "official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "id": "language/python/current",
+  "kind": "language",
+  "name": "Python",
+  "version_selector": "current",
+  "authority": "official",
+  "reviewed_at": "2026-09-18",
+  "description": "Python quality profile that recognizes project/tool configuration without selecting a formatter, linter or type checker on the project's behalf.",
+  "capabilities": ["detect", "analyze", "check"],
+  "rules": [
+    {
+      "id": "python.configuration.project-tooling",
+      "title": "Respect project-declared Python tooling configuration",
+      "category": "configuration",
+      "severity": "recommendation",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Python project tooling may be configured under pyproject.toml; Harness should detect declared tooling without assuming an undeclared tool is required.",
+      "source_refs": ["python.pyproject"],
+      "tools": ["ruff"],
+      "autofix": "none",
+      "constraints": {"do_not_invent_tooling": true}
+    }
+  ],
+  "sources": [
+    {
+      "id": "python.pyproject",
+      "title": "PyPA pyproject.toml specification",
+      "url": "https://packaging.python.org/en/latest/specifications/pyproject-toml/",
+      "authority": "ecosystem-official",
+      "reviewed_at": "2026-09-18"
+    }
+  ]
+}
