@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """Import and mutation tests, not empirical model trials or host activation."""
+import hashlib
 import json
 from pathlib import Path
 import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -35,7 +38,7 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 29)
+        self.assertEqual(report['files_verified'], 30)
         self.assertEqual(len(report['skills']), 7)
         self.assertEqual(len(report['declared_skills']), 8)
         self.assertEqual(report['missing_declared_skills'], [])
@@ -202,6 +205,37 @@ class SelfHostedSkills(unittest.TestCase):
             self.assertIn('(' + relative + ')', body)
             self.assertIn('agentic-app/' + relative, check.EXPECTED)
             self.assertTrue((skill / relative).is_file())
+
+    def test_optional_helper_declaration_and_no_auto_execution(self):
+        folder = self.root / check.PREFIX / 'agentic-improvement'
+        declaration = json.loads((folder / 'bundle.json').read_text())
+        self.assertEqual(declaration['format_version'], 2)
+        self.assertEqual(declaration['optional_scripts'][0]['path'], 'scripts/compact_log.py')
+        self.assertEqual(declaration['optional_scripts'][0]['execution'], 'explicit-invocation-only')
+        self.assertEqual(check.verify(self.root)['script_execution'], 'not-performed')
+
+    def test_actual_imported_helper_preserves_synthetic_log(self):
+        check.verify(self.root)
+        helper = self.root / check.PREFIX / 'agentic-improvement/scripts/compact_log.py'
+        source = self.root / 'synthetic.log'
+        raw = b'check=unit attempt=1\n' + b'waiting\n' * 1000 + b'FAIL rare assertion\n'
+        source.write_bytes(raw)
+        run = subprocess.run([sys.executable, str(helper), str(source)],
+                             capture_output=True, timeout=10)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        output = json.loads(run.stdout)
+        restored = ''.join(text * count for text, count in output['payload']['runs']).encode()
+        self.assertEqual(restored, raw)
+        self.assertEqual(source.read_bytes(), raw)
+        self.assertEqual(output['source']['sha256'], 'sha256:' + hashlib.sha256(raw).hexdigest())
+        self.assertIsNone(output['evidence']['command_exit_code'])
+        self.assertIsNone(output['evidence']['producer_output_complete'])
+        self.assertEqual(output['measurement']['output_bytes'], len(run.stdout))
+
+    def test_unreviewed_helper_file_rejected(self):
+        path = self.root / check.PREFIX / 'agentic-improvement/scripts/unreviewed.py'
+        path.write_text('raise AssertionError("must not execute")\n')
+        self.reject()
 
 
 if __name__ == '__main__':
