@@ -190,7 +190,7 @@ class DecisionBinding(unittest.TestCase):
         self.assertTrue(self.report()['consistent'])
 
     def test_other_primitives_are_not_presented_as_typed_result_validation(self):
-        self.spec.update(decision_kind='ordinal', levels=['low', 'high'])
+        self.spec.update(decision_kind='ranking')
         self.receipt['result'] = {'value': 'high'}
         result = self.report()
         self.assertTrue(result['consistent'])

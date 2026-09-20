@@ -37,6 +37,27 @@ allowed Boolean/choice labels. Sparse distributions are not forbidden by v1.
 Coverage arithmetic uses absolute tolerance 1e-9. Missing distributions and
 confidence stay missing; no probabilities are inferred.
 
+### Ordered results
+
+For produced ordinal decisions, the inspector supports the representations already
+used by recorded-result evaluation: an exact declared level name, a finite numeric
+position in the inclusive interval `0..len(levels)-1`, or a distribution over level
+indexes. Fractional positions are allowed; an ordered position is not a probability
+or a confidence score. Booleans, null, containers, unknown names and out-of-range
+positions are rejected without coercion, rounding, clamping or renormalization.
+
+Distribution keys must be canonical zero-based decimal indexes (`"0"`, `"1"`, ...),
+not level names or aliases such as `"01"`, `"+1"`, whitespace or Unicode digits.
+This optional inspector is deliberately stricter than permissive runtime readers;
+existing schemas/readers remain unchanged. Historical receipts are not rewritten.
+A string that looks numeric is a level name only when declared exactly in `levels`.
+
+A distribution-only ordinal result is supported without inventing a point value.
+When both fields are present, each is validated: a valid distribution cannot hide
+an invalid value. The generic receipt does not specify whether the value is a mean,
+mode or another statistic. Their relationship remains explicitly unchecked through
+`ordinal-value-distribution-relationship`; no evaluator or policy is selected here.
+
 Other decision primitives retain identity/coverage checks, but their result domain
 is not validated here. `result_domain_checked` makes that distinction explicit.
 Additive extension semantics and policy dispositions are not interpreted. The
@@ -68,7 +89,8 @@ an optional route to this API when the target has accepted it. Ordinary judgment
 need no extra wrapper, model or provider. A bare current-agent answer must not be
 relabeled a DecisionReceipt or assigned invented hashes/confidence.
 
-Run `python3 .github/scripts/test_decision_binding.py` for the focused regressions.
+Run `python3 .github/scripts/test_decision_binding.py` and
+`python3 .github/scripts/test_ordinal_binding.py` for the focused regressions.
 Existing contract validation invokes the same tests. Fixtures are synthetic and do
 not contain real Jev calls. Tests include individually schema-valid mismatches,
 ambiguous questions, missing evidence, invalid finite outcomes, malformed input,

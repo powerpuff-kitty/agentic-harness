@@ -70,7 +70,7 @@ def _same(left, right):
 
 
 def inspect_binding(spec: Any, request: Any, receipt: Any) -> dict[str, Any]:
-    """Check core cross-document identity and Boolean/choice domains, not truth."""
+    """Check core cross-document identity and finite result domains, not truth."""
     errors: set[str] = set()
     review: set[str] = set()
     domain_checked = False
@@ -146,6 +146,25 @@ def inspect_binding(spec: Any, request: Any, receipt: Any) -> dict[str, Any]:
                 allowed = set(spec['options'])
                 if type(result.get('value')) is not str or result['value'] not in allowed:
                     errors.add('undeclared-choice-result')
+            elif kind == 'ordinal':
+                domain_checked = True
+                levels = spec['levels']
+                # Index keys are exact decimal strings: aliases must not split mass.
+                allowed = {str(index) for index in range(len(levels))}
+                if 'value' in result:
+                    value = result['value']
+                    if type(value) is str:
+                        if value not in levels:
+                            errors.add('undeclared-ordinal-level')
+                    elif type(value) in (int, float):
+                        # No float conversion: huge integers cannot overflow here.
+                        # Fractional positions are valid; booleans are not numbers.
+                        if not 0 <= value <= len(levels) - 1:
+                            errors.add('ordinal-position-out-of-range')
+                    else:
+                        errors.add('invalid-ordinal-value')
+                elif 'distribution' not in result:
+                    errors.add('ordinal-result-required')
             distribution = result.get('distribution')
             if distribution is not None:
                 if not distribution:
@@ -161,7 +180,9 @@ def inspect_binding(spec: Any, request: Any, receipt: Any) -> dict[str, Any]:
         'scope': 'supplied-core-identity-and-finite-results',
         'not_checked': ['request-occurrence', 'state-payload-fingerprint', 'source-content-and-age',
                         'evidence-requirement-mapping', 'provider-execution-and-calibration',
-                        'policy-disposition', 'other-result-primitives-and-extensions'],
+                        'policy-disposition', 'other-result-primitives-and-extensions'] +
+                       (['ordinal-value-distribution-relationship']
+                        if domain_checked and spec['decision_kind'] == 'ordinal' else []),
         'claims_authenticated': False, 'current_evidence_verified': False,
         'cache_reuse_authorized': False, 'decision_accepted': False,
         'consequence_authorized': False, 'provider_calls': 0, 'model_tokens': None,
