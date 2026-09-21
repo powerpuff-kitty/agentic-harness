@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/work-event.v1.schema.json",
+  "title": "Agent Work Event v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "id", "work_unit_id", "run_id", "sequence", "occurred_at", "type", "subject", "summary", "evidence_refs", "artifact_refs"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-event" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "run_id": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "run.created", "run.started", "run.completed", "run.failed", "run.cancelled",
+        "plan.created", "plan.revised",
+        "task.created", "task.started", "task.blocked", "task.waiting_for_user", "task.waiting_for_approval", "task.validating", "task.completed", "task.failed", "task.cancelled",
+        "attempt.started", "attempt.completed", "attempt.failed",
+        "tool.started", "tool.completed", "tool.failed",
+        "file.read", "file.modified",
+        "test.started", "test.passed", "test.failed",
+        "artifact.created", "evidence.recorded", "commit.created", "pull_request.created",
+        "approval.requested", "approval.granted", "approval.denied",
+        "finding.created", "evaluation.completed", "action.created"
+      ]
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["work-unit", "run", "plan", "task", "attempt", "tool", "file", "test", "artifact", "evidence", "commit", "pull-request", "approval", "finding", "evaluation", "action"] },
+        "id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "summary": { "type": ["string", "null"], "maxLength": 5000 },
+    "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "artifact_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" }
+  }
+}
