@@ -1,0 +1,35 @@
+{
+  "format_version": 1,
+  "kind": "work-reflection",
+  "id": "reflection:abstained:1",
+  "work_unit_id": "wu:reflection-demo",
+  "run_id": "run:reflection-demo",
+  "attempt_id": "attempt:security:1",
+  "trigger": {
+    "kind": "evaluator_finding",
+    "summary": "A security finding requested reflection, but the referenced evidence artifact is unavailable.",
+    "evidence_refs": [],
+    "finding_refs": ["finding:security-unavailable"]
+  },
+  "status": "insufficient_evidence",
+  "observation": {
+    "failure_or_risk": null,
+    "unsupported_assumptions": []
+  },
+  "causes": [],
+  "corrections": [],
+  "provider": {
+    "kind": "agent",
+    "connection_id": "agent:codex-local",
+    "name": "codex",
+    "model": null,
+    "version": null
+  },
+  "confidence": null,
+  "evidence_refs": [],
+  "resulting_action_ref": null,
+  "next_attempt_ref": null,
+  "memory_candidate_refs": [],
+  "prior_reflection_ref": null,
+  "created_at": "2026-09-21T20:04:00Z"
+}
