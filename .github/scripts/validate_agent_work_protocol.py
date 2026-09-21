@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import copy
 import json
 import sys
 from pathlib import Path
@@ -14,6 +15,9 @@ FIXTURES = WORK / "fixtures"
 SCHEMAS = {
     "work-unit": WORK / "work-unit.v1.schema.json",
     "work-event": WORK / "work-event.v1.schema.json",
+    "work-evidence": WORK / "evidence.v1.schema.json",
+    "work-artifact": WORK / "artifact.v1.schema.json",
+    "work-redaction": WORK / "redaction.v1.schema.json",
     "work-evaluation": WORK / "evaluation.v1.schema.json",
     "work-action": WORK / "work-action.v1.schema.json",
     "agent-connection": WORK / "agent-connection.v1.schema.json",
@@ -94,6 +98,12 @@ evaluation = load(FIXTURES / "evaluation.v1.json")
 action = load(FIXTURES / "action.v1.json")
 connection = load(FIXTURES / "agent-connection.v1.json")
 events = load(FIXTURES / "events.v1.json")
+evidence_records = load(FIXTURES / "evidence.v1.json")
+artifacts = load(FIXTURES / "artifacts.v1.json")
+redactions = load(FIXTURES / "redactions.v1.json")
+replay_seed = load(FIXTURES / "replay-seed-work-unit.v1.json")
+replay_expected = load(FIXTURES / "replay-expected-work-unit.v1.json")
+replay_events = load(FIXTURES / "replay-events.v1.json")
 
 reflection_files = [
     "reflection-failed-test.v1.json",
@@ -223,6 +233,321 @@ if isinstance(connection, dict):
 
 validate_event_list(events, "events")
 validate_event_list(reflection_events, "reflection-correction-events")
+validate_event_list(replay_events, "replay-events")
+
+# Evidence, Artifact and Redaction records are canonical references rather than
+# opaque strings. Keep their cross-record provenance deterministic.
+evidence_by_id: dict[str, dict] = {}
+artifact_by_id: dict[str, dict] = {}
+redaction_by_id: dict[str, dict] = {}
+
+if isinstance(replay_expected, dict):
+    validate("work-unit", replay_expected, "replay-expected-work-unit")
+if isinstance(replay_seed, dict):
+    validate("work-unit", replay_seed, "replay-seed-work-unit")
+
+expected_run_ids: set[str] = set()
+expected_task_ids: set[str] = set()
+expected_attempt_ids: set[str] = set()
+if isinstance(replay_expected, dict):
+    for run in replay_expected.get("runs", []):
+        if not isinstance(run, dict):
+            continue
+        run_id = run.get("id")
+        if isinstance(run_id, str):
+            expected_run_ids.add(run_id)
+        for task in run.get("tasks", []):
+            if isinstance(task, dict) and isinstance(task.get("id"), str):
+                expected_task_ids.add(task["id"])
+        for attempt in run.get("attempts", []):
+            if isinstance(attempt, dict) and isinstance(attempt.get("id"), str):
+                expected_attempt_ids.add(attempt["id"])
+
+if isinstance(evidence_records, list):
+    for index, evidence in enumerate(evidence_records):
+        validate("work-evidence", evidence, f"evidence[{index}]")
+        if not isinstance(evidence, dict):
+            continue
+
+        evidence_id = evidence.get("id")
+        if not isinstance(evidence_id, str):
+            continue
+        if evidence_id in evidence_by_id:
+            fail(f"evidence[{index}]: duplicate evidence id {evidence_id}")
+        evidence_by_id[evidence_id] = evidence
+
+        if evidence.get("work_unit_id") != "wu:replay-demo":
+            fail(f"{evidence_id}: evidence belongs to an unexpected work unit")
+
+        provenance = evidence.get("provenance", {})
+        if isinstance(provenance, dict):
+            run_id = provenance.get("run_id")
+            task_id = provenance.get("task_id")
+            attempt_id = provenance.get("attempt_id")
+            if isinstance(run_id, str) and run_id not in expected_run_ids:
+                fail(f"{evidence_id}: provenance references unknown run {run_id}")
+            if isinstance(task_id, str) and task_id not in expected_task_ids:
+                fail(f"{evidence_id}: provenance references unknown task {task_id}")
+            if isinstance(attempt_id, str) and attempt_id not in expected_attempt_ids:
+                fail(f"{evidence_id}: provenance references unknown attempt {attempt_id}")
+
+        evidence_kind = evidence.get("evidence_kind")
+        status = evidence.get("status")
+        derived_from = evidence.get("derived_from", [])
+        payload = evidence.get("payload", {})
+
+        if evidence_kind == "derived_result":
+            if not derived_from:
+                fail(f"{evidence_id}: derived evidence requires source evidence")
+            if evidence_id in derived_from:
+                fail(f"{evidence_id}: derived evidence cannot derive from itself")
+        if evidence_kind == "unavailable":
+            if status != "unavailable":
+                fail(f"{evidence_id}: unavailable evidence requires unavailable status")
+            if payload.get("mode") != "none":
+                fail(f"{evidence_id}: unavailable evidence cannot carry a payload")
+            if not evidence.get("unavailability_reason"):
+                fail(f"{evidence_id}: unavailable evidence requires a reason")
+        elif status == "unavailable":
+            fail(f"{evidence_id}: non-unavailable evidence cannot use unavailable status")
+
+if isinstance(artifacts, list):
+    for index, artifact in enumerate(artifacts):
+        validate("work-artifact", artifact, f"artifacts[{index}]")
+        if not isinstance(artifact, dict):
+            continue
+
+        artifact_id = artifact.get("id")
+        if not isinstance(artifact_id, str):
+            continue
+        if artifact_id in artifact_by_id:
+            fail(f"artifacts[{index}]: duplicate artifact id {artifact_id}")
+        artifact_by_id[artifact_id] = artifact
+
+        if artifact.get("work_unit_id") != "wu:replay-demo":
+            fail(f"{artifact_id}: artifact belongs to an unexpected work unit")
+
+        producer = artifact.get("produced_by", {})
+        if isinstance(producer, dict):
+            run_id = producer.get("run_id")
+            task_id = producer.get("task_id")
+            attempt_id = producer.get("attempt_id")
+            if isinstance(run_id, str) and run_id not in expected_run_ids:
+                fail(f"{artifact_id}: producer references unknown run {run_id}")
+            if isinstance(task_id, str) and task_id not in expected_task_ids:
+                fail(f"{artifact_id}: producer references unknown task {task_id}")
+            if isinstance(attempt_id, str) and attempt_id not in expected_attempt_ids:
+                fail(f"{artifact_id}: producer references unknown attempt {attempt_id}")
+
+        if artifact.get("artifact_kind") == "structured-snapshot":
+            payload = artifact.get("payload", {})
+            if payload.get("mode") != "inline_json" or not isinstance(payload.get("value"), dict):
+                fail(f"{artifact_id}: replay snapshot must be inline structured JSON")
+
+if isinstance(redactions, list):
+    for index, redaction in enumerate(redactions):
+        validate("work-redaction", redaction, f"redactions[{index}]")
+        if not isinstance(redaction, dict):
+            continue
+
+        redaction_id = redaction.get("id")
+        if not isinstance(redaction_id, str):
+            continue
+        if redaction_id in redaction_by_id:
+            fail(f"redactions[{index}]: duplicate redaction id {redaction_id}")
+        redaction_by_id[redaction_id] = redaction
+        if redaction.get("work_unit_id") != "wu:replay-demo":
+            fail(f"{redaction_id}: redaction belongs to an unexpected work unit")
+
+for evidence_id, evidence in evidence_by_id.items():
+    if evidence.get("evidence_kind") == "derived_result":
+        for source_id in evidence.get("derived_from", []):
+            if source_id not in evidence_by_id:
+                fail(f"{evidence_id}: derived_from references unknown evidence {source_id}")
+
+for record_id, record in {**evidence_by_id, **artifact_by_id}.items():
+    payload = record.get("payload", {})
+    if not isinstance(payload, dict) or payload.get("mode") != "redacted":
+        continue
+    redaction_ref = payload.get("redaction_ref")
+    redaction = redaction_by_id.get(redaction_ref)
+    if redaction is None:
+        fail(f"{record_id}: redacted payload references unknown redaction {redaction_ref}")
+    elif record_id not in redaction.get("target_refs", []):
+        fail(f"{record_id}: referenced redaction does not target this record")
+
+for redaction_id, redaction in redaction_by_id.items():
+    for target_ref in redaction.get("target_refs", []):
+        target = evidence_by_id.get(target_ref) or artifact_by_id.get(target_ref)
+        if target is None:
+            fail(f"{redaction_id}: redaction targets unknown record {target_ref}")
+            continue
+        payload = target.get("payload", {})
+        if payload.get("mode") != "redacted" or payload.get("redaction_ref") != redaction_id:
+            fail(f"{redaction_id}: target {target_ref} does not preserve the redaction reference")
+
+
+def _run_by_id(projection: dict, run_id: str):
+    for run in projection.get("runs", []):
+        if isinstance(run, dict) and run.get("id") == run_id:
+            return run
+    return None
+
+
+def _task_by_id(projection: dict, task_id: str):
+    for run in projection.get("runs", []):
+        if not isinstance(run, dict):
+            continue
+        for task in run.get("tasks", []):
+            if isinstance(task, dict) and task.get("id") == task_id:
+                return task
+    return None
+
+
+def _attempt_by_id(projection: dict, attempt_id: str):
+    for run in projection.get("runs", []):
+        if not isinstance(run, dict):
+            continue
+        for attempt in run.get("attempts", []):
+            if isinstance(attempt, dict) and attempt.get("id") == attempt_id:
+                return attempt
+    return None
+
+
+def _entity_for_delta(projection: dict, entity_kind: str, entity_id: str):
+    if entity_kind == "work-unit":
+        return projection if projection.get("id") == entity_id else None
+    if entity_kind == "run":
+        return _run_by_id(projection, entity_id)
+    if entity_kind == "task":
+        return _task_by_id(projection, entity_id)
+    if entity_kind == "attempt":
+        return _attempt_by_id(projection, entity_id)
+    return None
+
+
+def _snapshot_value(ref: str):
+    artifact = artifact_by_id.get(ref)
+    if artifact is None:
+        fail(f"replay-events: snapshot references unknown artifact {ref}")
+        return None
+    payload = artifact.get("payload", {})
+    if payload.get("mode") != "inline_json" or not isinstance(payload.get("value"), dict):
+        fail(f"replay-events: snapshot artifact {ref} is not inline structured JSON")
+        return None
+    return copy.deepcopy(payload["value"])
+
+
+if isinstance(replay_seed, dict) and isinstance(replay_expected, dict) and isinstance(replay_events, list):
+    projection = copy.deepcopy(replay_seed)
+    terminal_states = {"completed", "failed", "cancelled"}
+
+    for index, event in enumerate(replay_events):
+        if not isinstance(event, dict):
+            continue
+
+        for evidence_ref in event.get("evidence_refs", []):
+            if evidence_ref not in evidence_by_id:
+                fail(f"replay-events[{index}]: unknown evidence ref {evidence_ref}")
+        for artifact_ref in event.get("artifact_refs", []):
+            if artifact_ref not in artifact_by_id:
+                fail(f"replay-events[{index}]: unknown artifact ref {artifact_ref}")
+        for redaction_ref in event.get("redaction_refs", []):
+            if redaction_ref not in redaction_by_id:
+                fail(f"replay-events[{index}]: unknown redaction ref {redaction_ref}")
+
+        delta = event.get("projection_delta")
+        if delta is None:
+            continue
+        if not isinstance(delta, dict):
+            fail(f"replay-events[{index}]: projection_delta must be an object")
+            continue
+
+        operation = delta.get("operation")
+        entity = delta.get("entity", {})
+        entity_kind = entity.get("kind") if isinstance(entity, dict) else None
+        entity_id = entity.get("id") if isinstance(entity, dict) else None
+
+        if operation == "state_transition":
+            target = _entity_for_delta(projection, entity_kind, entity_id)
+            if target is None:
+                fail(f"replay-events[{index}]: transition target {entity_kind}:{entity_id} is missing")
+                continue
+            if target.get("state") != delta.get("previous_state"):
+                fail(
+                    f"replay-events[{index}]: expected {entity_kind}:{entity_id} "
+                    f"state {delta.get('previous_state')}, found {target.get('state')}"
+                )
+                continue
+            target["state"] = delta.get("next_state")
+            if entity_kind == "attempt" and delta.get("next_state") in terminal_states:
+                target["completed_at"] = event.get("occurred_at")
+
+        elif operation == "entity_created":
+            snapshot_ref = delta.get("snapshot_ref")
+            snapshot = _snapshot_value(snapshot_ref)
+            if snapshot is None:
+                continue
+            if snapshot.get("id") != entity_id:
+                fail(f"replay-events[{index}]: snapshot id does not match created entity")
+                continue
+            run = _run_by_id(projection, event.get("run_id"))
+            if run is None:
+                fail(f"replay-events[{index}]: creation event references missing run")
+                continue
+            if entity_kind == "task":
+                if _task_by_id(projection, entity_id) is not None:
+                    fail(f"replay-events[{index}]: task {entity_id} already exists")
+                    continue
+                run.setdefault("tasks", []).append(snapshot)
+            elif entity_kind == "attempt":
+                if _attempt_by_id(projection, entity_id) is not None:
+                    fail(f"replay-events[{index}]: attempt {entity_id} already exists")
+                    continue
+                if snapshot.get("task_id") not in {
+                    task.get("id") for task in run.get("tasks", []) if isinstance(task, dict)
+                }:
+                    fail(f"replay-events[{index}]: attempt snapshot references unknown task")
+                    continue
+                run.setdefault("attempts", []).append(snapshot)
+            else:
+                fail(f"replay-events[{index}]: unsupported entity_created kind {entity_kind}")
+
+        elif operation == "plan_revision":
+            snapshot = _snapshot_value(delta.get("snapshot_ref"))
+            run = _run_by_id(projection, event.get("run_id"))
+            if snapshot is None or run is None:
+                continue
+            if snapshot.get("revision") != delta.get("plan_revision"):
+                fail(f"replay-events[{index}]: plan revision number does not match snapshot")
+                continue
+            previous_revisions = [
+                item.get("revision")
+                for item in run.get("plan_revisions", [])
+                if isinstance(item, dict)
+            ]
+            if previous_revisions and snapshot.get("revision") <= max(previous_revisions):
+                fail(f"replay-events[{index}]: plan revision must append monotonically")
+                continue
+            run.setdefault("plan_revisions", []).append(snapshot)
+
+        elif operation in {"append_evidence_ref", "append_artifact_ref"}:
+            target = _entity_for_delta(projection, entity_kind, entity_id)
+            if target is None or entity_kind != "task":
+                fail(f"replay-events[{index}]: ref append requires an existing task")
+                continue
+            value_ref = delta.get("value_ref")
+            key = "evidence_refs" if operation == "append_evidence_ref" else "artifact_refs"
+            refs = target.setdefault(key, [])
+            if value_ref not in refs:
+                refs.append(value_ref)
+
+        else:
+            fail(f"replay-events[{index}]: unsupported projection operation {operation}")
+
+    if projection != replay_expected:
+        fail("replay-events: replayed projection does not match expected WorkUnit")
+
 
 reflection_by_id: dict[str, dict] = {}
 for filename, reflection in reflections:
