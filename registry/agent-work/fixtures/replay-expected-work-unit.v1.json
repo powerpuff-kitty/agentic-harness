@@ -100,6 +100,11 @@
         "revision": null,
         "branch": null,
         "pull_request": null
+      },
+      "session_ref": "session:fixture:replay",
+      "input_revision": {
+        "source_revision": "fixture-rev:replay",
+        "context_fingerprint": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
       }
     }
   ],
