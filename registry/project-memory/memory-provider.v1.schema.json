@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/project-memory/memory-provider.v1.schema.json",
+  "title": "Agentic Harness MemoryProvider v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "mode", "storage", "capabilities",
+    "sensitivity_policy", "configuration_ref"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "memory-provider" },
+    "id": { "$ref": "#/$defs/id" },
+    "mode": { "type": "string", "enum": ["local", "remote", "hybrid"] },
+    "storage": { "type": "string", "enum": ["filesystem", "sqlite", "postgres", "service", "custom"] },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lexical_search", "semantic_search", "upsert", "invalidate", "consolidate", "reverify"],
+      "properties": {
+        "lexical_search": { "type": "boolean" },
+        "semantic_search": { "type": "boolean" },
+        "upsert": { "type": "boolean" },
+        "invalidate": { "type": "boolean" },
+        "consolidate": { "type": "boolean" },
+        "reverify": { "type": "boolean" }
+      }
+    },
+    "sensitivity_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accepted_levels", "enforce_before_remote_handoff"],
+      "properties": {
+        "accepted_levels": {
+          "type": "array", "uniqueItems": true, "minItems": 1,
+          "items": { "type": "string", "enum": ["local_only", "project", "team", "org"] }
+        },
+        "enforce_before_remote_handoff": { "type": "boolean" }
+      }
+    },
+    "configuration_ref": { "type": ["string", "null"], "maxLength": 4096 }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$" }
+  }
+}
