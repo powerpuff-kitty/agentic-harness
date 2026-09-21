@@ -103,6 +103,12 @@ class EvaluationContracts(unittest.TestCase):
             result = economics.inspect_evaluation(value)
             self.assertIn("candidate-complete-usage-has-null-token-field", result["errors"])
 
+    def test_estimated_usage_requires_estimator_identity(self):
+        value = evaluation()
+        value["candidate"]["usage"]["estimated"]["estimator"] = None
+        self.assertIn("candidate-estimated-usage-without-estimator",
+                      economics.inspect_evaluation(value)["errors"])
+
     def test_observed_measurement_requires_evidence_reference(self):
         value = evaluation()
         value["candidate"]["usage"]["observed"]["evidence_ref"] = None
@@ -142,6 +148,12 @@ class RoutingContracts(unittest.TestCase):
         self.assertIn("deterministic-exact-answer-not-preferred", result["errors"])
         value["selected"] = {"kind": "deterministic-tool", "id": "parser", "version": "1"}
         self.assertTrue(economics.inspect_routing(value)["valid"])
+
+    def test_deterministic_stage_cannot_select_model(self):
+        value = routing()
+        value["stage_class"] = "deterministic-tool"
+        self.assertIn("deterministic-stage-routed-to-nondeterministic-mechanism",
+                      economics.inspect_routing(value)["errors"])
 
     def test_unmeasured_route_cannot_claim_quality_or_cost(self):
         for field, val in (("measured_quality", .9), ("measured_cost_microunits", 100)):
