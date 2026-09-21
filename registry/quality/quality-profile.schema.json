@@ -87,7 +87,14 @@
             "naming",
             "documentation",
             "error-handling",
-            "configuration"
+            "configuration",
+            "crawlability",
+            "indexability",
+            "url-architecture",
+            "rendering",
+            "metadata",
+            "structured-data",
+            "localization"
           ]
         },
         "severity": {
