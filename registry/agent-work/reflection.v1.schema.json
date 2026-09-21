@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/reflection.v1.schema.json",
+  "title": "Agent Work Reflection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "work_unit_id", "run_id", "attempt_id",
+    "trigger", "status", "observation", "causes", "corrections", "provider",
+    "confidence", "evidence_refs", "resulting_action_ref", "next_attempt_ref",
+    "memory_candidate_refs", "prior_reflection_ref", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-reflection" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "run_id": { "$ref": "#/$defs/id" },
+    "attempt_id": { "$ref": "#/$defs/id" },
+    "trigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "summary", "evidence_refs", "finding_refs"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "failed_check", "evaluator_finding", "architecture_violation",
+            "security_violation", "contradicted_assumption", "human_request",
+            "low_confidence", "other"
+          ]
+        },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 5000 },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "finding_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "abstained", "insufficient_evidence"]
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["failure_or_risk", "unsupported_assumptions"],
+      "properties": {
+        "failure_or_risk": { "type": ["string", "null"], "maxLength": 10000 },
+        "unsupported_assumptions": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "type": "string", "minLength": 1, "maxLength": 5000 }
+        }
+      }
+    },
+    "causes": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["summary", "confidence", "evidence_refs"],
+        "properties": {
+          "summary": { "type": "string", "minLength": 1, "maxLength": 5000 },
+          "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "evidence_refs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "$ref": "#/$defs/id" }
+          }
+        }
+      }
+    },
+    "corrections": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "summary", "scope", "action_ref", "next_attempt_ref"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "summary": { "type": "string", "minLength": 1, "maxLength": 5000 },
+          "scope": {
+            "type": "string",
+            "enum": ["task", "run", "plan", "project"]
+          },
+          "action_ref": {
+            "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+          },
+          "next_attempt_ref": {
+            "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+          }
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "connection_id", "name", "model", "version"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["deterministic", "agent", "human", "composite"]
+        },
+        "connection_id": {
+          "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+        },
+        "name": { "type": "string", "minLength": 1 },
+        "model": { "type": ["string", "null"] },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "resulting_action_ref": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "next_attempt_ref": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "memory_candidate_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "prior_reflection_ref": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    }
+  }
+}
