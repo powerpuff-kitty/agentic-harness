@@ -38,9 +38,12 @@ class SelfHostedSkills(unittest.TestCase):
 
     def test_installed_payload_matches_reviewed_source(self):
         report = check.verify(self.root)
-        self.assertEqual(report['files_verified'], 43)
-        self.assertEqual(len(report['skills']), 7)
-        self.assertEqual(len(report['declared_skills']), 8)
+        self.assertEqual(report['files_verified'], len(check.EXPECTED))
+        self.assertEqual(len(report['skills']), len(check.SKILLS))
+        self.assertEqual(
+            len(report['declared_skills']),
+            len(check.SKILLS) + len(check.INDEPENDENT),
+        )
         self.assertEqual(report['missing_declared_skills'], [])
         self.assertEqual(report['network_calls'], 0)
         self.assertFalse(report['host_loading_verified'])

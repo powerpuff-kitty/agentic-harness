@@ -6,7 +6,7 @@
   },
   "agents_source": {
     "repository": "powerpuff-kitty/agentic-harness-agents",
-    "revision": "cb1739c74c95c1d78ae110c01756a80b34c42c9d"
+    "revision": "7c8a4584a2ed6dd65754071f7296f522b2dd0a7b"
   },
   "variant": "base",
   "packs": {
@@ -27,7 +27,8 @@
     "decision-intelligence": "0.5.0-beta.1",
     "documentation": "0.5.0-beta.1",
     "release": "0.5.0-beta.1",
-    "security-review": "0.5.0-beta.1"
+    "security-review": "0.5.0-beta.1",
+    "seo-audit": "0.5.0-beta.1"
   },
   "checksums": {
     ".agents/skills/agentic-app/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
@@ -72,6 +73,8 @@
     ".agents/skills/security-review/references/review-guide.md": "7939d7648bc027f0ca51d615504b74275ae485ea9fb54b471dece493c4f03c2b",
     ".agents/skills/agentic-improvement/references/log-compaction.md": "5b9a9708ecd88f21b9ca41a5487ecdfcc5442ac0e1df167ca8f7a86e4fa0a257",
     ".agents/skills/agentic-improvement/references/rule-review.md": "cafed3ac609013523c1e4636ba672abeb1e55fa529394fcf07bf14e0adebcef4",
-    ".agents/skills/decision-intelligence/references/recorded-results.md": "9180c244853815d3eca4749ad8fb5d86fb7be0b571858e55a8fb27b53e379a72"
+    ".agents/skills/decision-intelligence/references/recorded-results.md": "9180c244853815d3eca4749ad8fb5d86fb7be0b571858e55a8fb27b53e379a72",
+    ".agents/skills/seo-audit/LICENSE": "da8e7b98c9f5547396031dd15ffe7a820eb8c2b9e4d1b32c9eb69bbc0d2c5af4",
+    ".agents/skills/seo-audit/SKILL.md": "ba36b03046af7fa98bc835c5291ed1eda17aa52cc7faff7b6aff5690bca6d515"
   }
 }

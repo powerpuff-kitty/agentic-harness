@@ -77,7 +77,7 @@ class GuideInventoryBounds(unittest.TestCase):
 class InstalledConditionalGuides(unittest.TestCase):
     def test_real_installed_inventory_and_verification_boundaries(self):
         result = imported.verify()
-        self.assertEqual(result['files_verified'], 43)
+        self.assertEqual(result['files_verified'], len(imported.EXPECTED))
         self.assertFalse(result['host_loading_verified'])
         self.assertFalse(result['token_savings_verified'])
         self.assertEqual(result['script_execution'], 'not-performed')

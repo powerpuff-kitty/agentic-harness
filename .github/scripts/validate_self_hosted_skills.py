@@ -9,7 +9,7 @@ import re
 import stat
 
 ROOT = Path(__file__).resolve().parents[2]
-REVISION = 'cb1739c74c95c1d78ae110c01756a80b34c42c9d'
+REVISION = '7c8a4584a2ed6dd65754071f7296f522b2dd0a7b'
 SOURCE = 'powerpuff-kitty/agentic-harness-agents'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
@@ -58,7 +58,9 @@ EXPECTED = {
     "security-review/SKILL.md": "fccc632eaff09f1f9eb0862b5d1cf313e2b89546",
     "security-review/bundle.json": "7cf79d68f9eebe54374a206369a5881fd4c9b8b9",
     "security-review/references/report-template.md": "38386da22d81666a094c7bf69a567c6feeeabc01",
-    "security-review/references/review-guide.md": "3c3e3d9e4365bbe918ba972cc1d0785913e2c57d"
+    "security-review/references/review-guide.md": "3c3e3d9e4365bbe918ba972cc1d0785913e2c57d",
+    "seo-audit/LICENSE": "20e4ac60ec40c75fd112148132f69f52a8cac5b0",
+    "seo-audit/SKILL.md": "e987a9fd2c684c611e2a745afe8b51701786a3f4"
 }
 SKILLS = tuple(sorted({p.split('/')[0] for p in EXPECTED}))
 INDEPENDENT = ('typesafe-ai',)
