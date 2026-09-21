@@ -135,6 +135,7 @@ class StatesAndBudgets(unittest.TestCase):
                        "provider-failure","timeout","budget-exceeded","cancelled","blocked"):
             current = value()
             current["nodes"][0] = node("a", source="none", status=status, start=0, end=1)
+            current["reducers"] = []  # Isolate node-state semantics; reducer binding has separate tests.
             self.assertTrue(run.inspect_run(current)["valid"], status)
 
     def test_status_reason_mismatch_is_rejected(self):
