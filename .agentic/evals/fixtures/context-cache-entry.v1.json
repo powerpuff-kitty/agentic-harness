@@ -1,0 +1,31 @@
+{
+  "format_version": 1,
+  "kind": "context-cache-entry",
+  "id": "fixture.analysis",
+  "authority": "generated-non-canonical",
+  "created_at": "2026-09-21T00:00:00Z",
+  "artifact_type": "architecture-analysis",
+  "repository": {
+    "id": "fixture",
+    "revision": "abc123"
+  },
+  "producer": {
+    "kind": "deterministic",
+    "id": "architecture-check",
+    "version": "1"
+  },
+  "inputs": [
+    {
+      "id": "service",
+      "kind": "source",
+      "reference": "src/service.ts",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "revision": "abc123"
+    }
+  ],
+  "result": {
+    "reference": "artifact:analysis/service",
+    "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+  },
+  "identity_sha256": "sha256:4b0c3aab626ce6d436078c7f3fc4a5f80614256e89a234d817586088ba4e5cd2"
+}

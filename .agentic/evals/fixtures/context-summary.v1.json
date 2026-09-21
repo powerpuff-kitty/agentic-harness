@@ -1,0 +1,43 @@
+{
+  "format_version": 1,
+  "kind": "context-summary",
+  "id": "fixture.service-summary",
+  "authority": "generated-non-canonical",
+  "created_at": "2026-09-21T00:00:00Z",
+  "producer": {
+    "kind": "deterministic",
+    "id": "fixture",
+    "version": "1"
+  },
+  "scope": {
+    "level": "file",
+    "identity": "src/service.ts",
+    "ancestry": [
+      {
+        "level": "repository",
+        "identity": "fixture"
+      },
+      {
+        "level": "module",
+        "identity": "src"
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "service",
+      "role": "source",
+      "reference": "src/service.ts",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "revision": "abc123",
+      "required": true
+    }
+  ],
+  "coverage": {
+    "status": "complete",
+    "missing": [],
+    "not_checked": []
+  },
+  "summary": "Service owns outbound HTTP; callers use the service boundary.",
+  "summary_sha256": "sha256:30d957b91dc48e8b646d7bab68aa57dfe8b6c7a86c283c5ad2f85c4998b3e7e8"
+}
