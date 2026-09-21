@@ -1,0 +1,142 @@
+{
+  "format_version": 1,
+  "kind": "context-selection-trace",
+  "id": "context-trace:stale-memory",
+  "request_ref": "context-request:remote-review",
+  "input_fingerprint": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+  "selector": {
+    "id": "context-gateway",
+    "version": "1.0.0",
+    "deterministic": true
+  },
+  "candidates": [
+    {
+      "id": "candidate:project-truth",
+      "source": {
+        "kind": "project-truth",
+        "reference": "AGENTS.md",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "revision": "main",
+        "retrieval": {
+          "kind": "direct",
+          "query_ref": null,
+          "provider_ref": null,
+          "result_digest": null
+        }
+      },
+      "authority": "project-truth",
+      "mandatory": true,
+      "sensitivity": "project",
+      "freshness": "current",
+      "estimated_tokens": 120,
+      "stages": [
+        {
+          "stage": "mandatory-policy",
+          "disposition": "included",
+          "reason": "Project-authored mandatory truth is always included.",
+          "score": null,
+          "decision": null
+        }
+      ],
+      "final_disposition": "included",
+      "reasons": [
+        "mandatory-project-truth"
+      ]
+    },
+    {
+      "id": "candidate:stale-memory",
+      "source": {
+        "kind": "project-memory",
+        "reference": "memory:stale:cli-install-path",
+        "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+        "revision": "2026-09-15T00:00:00Z",
+        "retrieval": {
+          "kind": "memory-query",
+          "query_ref": "memory-query:context-rules",
+          "provider_ref": "memory-provider:remote-service",
+          "result_digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+        }
+      },
+      "authority": "project-memory",
+      "mandatory": false,
+      "sensitivity": "project",
+      "freshness": "stale",
+      "estimated_tokens": 80,
+      "stages": [
+        {
+          "stage": "scope-filter",
+          "disposition": "candidate",
+          "reason": "Memory shares project scope but is stale.",
+          "score": null,
+          "decision": null
+        },
+        {
+          "stage": "semantic-search",
+          "disposition": "rejected",
+          "reason": "Stale memory is excluded because the request did not authorize stale retrieval.",
+          "score": {
+            "value": 0.71,
+            "method": "memory-semantic-v1",
+            "confidence": 0.9
+          },
+          "decision": null
+        }
+      ],
+      "final_disposition": "rejected",
+      "reasons": [
+        "stale-memory"
+      ]
+    }
+  ],
+  "budget": {
+    "input_limit": 500,
+    "allocations": [
+      {
+        "kind": "mandatory_project_truth",
+        "limit": null,
+        "estimated_selected": 120
+      },
+      {
+        "kind": "repository_evidence",
+        "limit": 200,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "project_memory",
+        "limit": 150,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "execution_evidence",
+        "limit": 75,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "generated_compression",
+        "limit": 75,
+        "estimated_selected": 0
+      }
+    ],
+    "estimated_selected": 120,
+    "over_budget": false
+  },
+  "token_usage": {
+    "estimated": {
+      "input": 120,
+      "tool_output": null,
+      "output": null
+    },
+    "observed": {
+      "input": null,
+      "tool_output": null,
+      "output": null
+    },
+    "observed_source_ref": null
+  },
+  "selection_fingerprint": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+  "compiled_plan_ref": "compiled-context:stale-memory",
+  "complete": true,
+  "not_checked": [
+    "provider tokenizer usage"
+  ]
+}
