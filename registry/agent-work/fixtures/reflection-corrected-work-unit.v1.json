@@ -2,12 +2,24 @@
   "format_version": 1,
   "kind": "work-unit",
   "id": "wu:reflection-correction",
-  "source": { "kind": "issue", "reference": "github:powerpuff-kitty/agentic-harness#170" },
+  "source": {
+    "kind": "issue",
+    "reference": "github:powerpuff-kitty/agentic-harness#170"
+  },
   "objective": "Correct an implementation after evidence-backed reflection.",
   "acceptance_criteria": [
-    { "id": "ac:verified", "text": "The focused test passes after the corrective attempt." }
+    {
+      "id": "ac:verified",
+      "text": "The focused test passes after the corrective attempt."
+    }
   ],
-  "permissions": { "read": true, "write": true, "execute": true, "commit": false, "create_pr": false },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "commit": false,
+    "create_pr": false
+  },
   "state": "completed",
   "created_at": "2026-09-21T20:01:00Z",
   "runs": [
@@ -20,7 +32,9 @@
         {
           "revision": 1,
           "created_at": "2026-09-21T20:01:01Z",
-          "task_ids": ["task:implement"],
+          "task_ids": [
+            "task:implement"
+          ],
           "change_summary": "Initial implementation plan."
         }
       ],
@@ -31,8 +45,12 @@
           "title": "Implement and verify query serialization",
           "depends_on": [],
           "state": "completed",
-          "evidence_refs": ["evidence:test-pass"],
-          "artifact_refs": ["artifact:orientation-fix"]
+          "evidence_refs": [
+            "evidence:test-pass"
+          ],
+          "artifact_refs": [
+            "artifact:orientation-fix"
+          ]
         }
       ],
       "attempts": [
@@ -54,7 +72,16 @@
           "triggered_by_reflection_ref": "reflection:test-failure:1"
         }
       ],
-      "result": { "revision": null, "branch": null, "pull_request": null }
+      "result": {
+        "revision": null,
+        "branch": null,
+        "pull_request": null
+      },
+      "session_ref": "session:fixture:reflection",
+      "input_revision": {
+        "source_revision": "fixture-rev:reflection",
+        "context_fingerprint": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      }
     }
   ],
   "current_run_id": "run:reflection-demo"
