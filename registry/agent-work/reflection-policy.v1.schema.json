@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/reflection-policy.v1.schema.json",
+  "title": "Agent Work Reflection Policy v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "id", "default_decision", "rules"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "reflection-policy" },
+    "id": { "$ref": "#/$defs/id" },
+    "default_decision": { "type": "string", "enum": ["reflect", "skip"] },
+    "rules": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "priority", "trigger_kind", "when", "decision", "reason"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "priority": { "type": "integer", "minimum": 0 },
+          "trigger_kind": {
+            "type": "string",
+            "enum": [
+              "failed_check", "evaluator_finding", "architecture_violation",
+              "security_violation", "contradicted_assumption", "human_request",
+              "low_confidence", "other"
+            ]
+          },
+          "when": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "deterministic_remediation_available",
+              "evidence_available",
+              "confidence_below"
+            ],
+            "properties": {
+              "deterministic_remediation_available": { "type": ["boolean", "null"] },
+              "evidence_available": { "type": ["boolean", "null"] },
+              "confidence_below": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+            }
+          },
+          "decision": { "type": "string", "enum": ["reflect", "skip"] },
+          "reason": { "type": "string", "minLength": 1, "maxLength": 5000 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    }
+  }
+}

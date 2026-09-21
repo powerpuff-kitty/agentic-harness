@@ -25,7 +25,8 @@
         "test.started", "test.passed", "test.failed",
         "artifact.created", "evidence.recorded", "commit.created", "pull_request.created",
         "approval.requested", "approval.granted", "approval.denied",
-        "finding.created", "evaluation.completed", "action.created"
+        "finding.created", "evaluation.completed", "action.created",
+        "reflection.requested", "reflection.created", "reflection.skipped"
       ]
     },
     "subject": {
@@ -33,7 +34,7 @@
       "additionalProperties": false,
       "required": ["kind", "id"],
       "properties": {
-        "kind": { "type": "string", "enum": ["work-unit", "run", "plan", "task", "attempt", "tool", "file", "test", "artifact", "evidence", "commit", "pull-request", "approval", "finding", "evaluation", "action"] },
+        "kind": { "type": "string", "enum": ["work-unit", "run", "plan", "task", "attempt", "tool", "file", "test", "artifact", "evidence", "commit", "pull-request", "approval", "finding", "evaluation", "action", "reflection"] },
         "id": { "$ref": "#/$defs/id" }
       }
     },

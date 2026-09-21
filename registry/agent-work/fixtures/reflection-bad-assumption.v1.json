@@ -1,0 +1,51 @@
+{
+  "format_version": 1,
+  "kind": "work-reflection",
+  "id": "reflection:assumption:1",
+  "work_unit_id": "wu:reflection-demo",
+  "run_id": "run:reflection-demo",
+  "attempt_id": "attempt:inspect:1",
+  "trigger": {
+    "kind": "contradicted_assumption",
+    "summary": "Repository evidence contradicted the assumed ownership of orientation filtering.",
+    "evidence_refs": ["evidence:service-boundary"],
+    "finding_refs": []
+  },
+  "status": "completed",
+  "observation": {
+    "failure_or_risk": "Continuing with the original plan would place query logic in the view instead of the repository/service boundary.",
+    "unsupported_assumptions": [
+      "The view layer owns search parameter serialization."
+    ]
+  },
+  "causes": [
+    {
+      "summary": "The initial plan was formed before repository architecture evidence was loaded.",
+      "confidence": 0.88,
+      "evidence_refs": ["evidence:service-boundary"]
+    }
+  ],
+  "corrections": [
+    {
+      "id": "correction:replan-boundary",
+      "summary": "Replan the change so the view emits domain state and the service/repository serializes the query.",
+      "scope": "plan",
+      "action_ref": "action:replan-boundary",
+      "next_attempt_ref": "attempt:query:1"
+    }
+  ],
+  "provider": {
+    "kind": "composite",
+    "connection_id": null,
+    "name": "agentic-harness/reflection",
+    "model": null,
+    "version": "1"
+  },
+  "confidence": 0.88,
+  "evidence_refs": ["evidence:service-boundary"],
+  "resulting_action_ref": "action:replan-boundary",
+  "next_attempt_ref": "attempt:query:1",
+  "memory_candidate_refs": [],
+  "prior_reflection_ref": null,
+  "created_at": "2026-09-21T20:03:00Z"
+}
