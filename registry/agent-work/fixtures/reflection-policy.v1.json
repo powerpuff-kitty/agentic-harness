@@ -1,0 +1,29 @@
+{
+  "format_version": 1,
+  "kind": "reflection-policy",
+  "id": "reflection-policy:default",
+  "default_decision": "reflect",
+  "rules": [
+    {
+      "id": "rule:human-request",
+      "priority": 100,
+      "trigger_kind": "human_request",
+      "decision": "reflect",
+      "reason": "An explicit human reflection request is always honored."
+    },
+    {
+      "id": "rule:contradicted-assumption",
+      "priority": 90,
+      "trigger_kind": "contradicted_assumption",
+      "decision": "reflect",
+      "reason": "Contradicted assumptions can invalidate the current plan and should be inspected."
+    },
+    {
+      "id": "rule:deterministic-fix",
+      "priority": 80,
+      "trigger_kind": "failed_check",
+      "decision": "skip",
+      "reason": "A known deterministic failure with a policy-approved direct remediation can skip model reflection."
+    }
+  ]
+}
