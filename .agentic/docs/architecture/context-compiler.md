@@ -35,3 +35,8 @@ Coverage records discovered, supported, unsupported and unreadable files plus un
 ## Determinism and provenance
 
 For a deterministic compiler, the same task, source bytes, rules, configuration, budget and compiler version should yield the same ordered plan. Cache keys and future hierarchical summaries must include the source/configuration identities necessary to detect staleness. Provider/model metadata may be attached by downstream execution evidence, but it does not redefine the canonical selection contract.
+
+
+## Context Gateway extension
+
+The provider-neutral [Context Gateway](context-gateway.md) extends this compiler with Project Memory retrieval, execution-evidence retrieval, staged semantic/typed-decision gating, sensitivity policy and selection traces. It does not fork this contract: `compiled-context-plan.v1.schema.json` remains the final model-input projection.
