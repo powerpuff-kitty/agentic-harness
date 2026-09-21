@@ -14,11 +14,11 @@
       "additionalProperties": false,
       "required": ["kind", "id"],
       "properties": {
-        "kind": { "type": "string", "enum": ["work-unit", "run", "evaluation", "finding", "task"] },
+        "kind": { "type": "string", "enum": ["work-unit", "run", "evaluation", "finding", "task", "reflection"] },
         "id": { "$ref": "#/$defs/id" }
       }
     },
-    "intent": { "type": "string", "enum": ["execute", "inspect", "audit", "evaluate", "remediate", "reassess", "validate", "replan", "compare_requirements", "review", "custom"] },
+    "intent": { "type": "string", "enum": ["execute", "inspect", "audit", "evaluate", "reflect", "remediate", "reassess", "validate", "replan", "compare_requirements", "review", "custom"] },
     "prompt": { "type": ["string", "null"], "maxLength": 50000 },
     "agent_connection_id": { "$ref": "#/$defs/id" },
     "permissions": {
