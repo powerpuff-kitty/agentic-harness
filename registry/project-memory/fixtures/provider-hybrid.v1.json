@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "kind": "memory-provider",
+  "id": "memory-provider:hybrid",
+  "mode": "hybrid",
+  "storage": "custom",
+  "capabilities": {
+    "lexical_search": true,
+    "semantic_search": true,
+    "upsert": true,
+    "invalidate": true,
+    "consolidate": true,
+    "reverify": true
+  },
+  "sensitivity_policy": {
+    "accepted_levels": ["local_only", "project", "team", "org"],
+    "enforce_before_remote_handoff": true
+  },
+  "configuration_ref": "config://memory/hybrid-routing"
+}
