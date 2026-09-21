@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/project-memory/memory.v1.schema.json",
+  "title": "Agentic Harness Project Memory v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "memory_class", "state", "statement",
+    "scope", "source", "validity", "confidence", "importance", "sensitivity",
+    "usage", "lineage", "created_at", "updated_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "project-memory" },
+    "id": { "$ref": "#/$defs/id" },
+    "memory_class": {
+      "type": "string",
+      "enum": [
+        "semantic_project_knowledge", "procedural_knowledge",
+        "architectural_decision", "constraint_gotcha",
+        "validated_observation", "reusable_lesson"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": ["candidate", "accepted", "stale", "superseded", "invalidated", "expired", "consolidated"]
+    },
+    "statement": { "$ref": "#/$defs/text" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "repositories", "paths", "tags"],
+      "properties": {
+        "project_id": { "$ref": "#/$defs/id" },
+        "repositories": {
+          "type": "array", "uniqueItems": true, "maxItems": 128,
+          "items": { "$ref": "#/$defs/text" }
+        },
+        "paths": {
+          "type": "array", "uniqueItems": true, "maxItems": 1024,
+          "items": { "$ref": "#/$defs/path" }
+        },
+        "tags": {
+          "type": "array", "uniqueItems": true, "maxItems": 128,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_refs", "evidence_refs", "created_by"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["reflection", "evidence", "decision", "human", "import", "other"]
+        },
+        "source_refs": {
+          "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 256,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "evidence_refs": {
+          "type": "array", "uniqueItems": true, "maxItems": 256,
+          "items": { "$ref": "#/$defs/id" }
+        },
+        "created_by": { "$ref": "#/$defs/text" }
+      }
+    },
+    "validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "valid_from", "valid_until", "last_verified_at"],
+      "properties": {
+        "status": { "type": "string", "enum": ["current", "stale", "unknown"] },
+        "valid_from": { "type": ["string", "null"], "format": "date-time" },
+        "valid_until": { "type": ["string", "null"], "format": "date-time" },
+        "last_verified_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "importance": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "sensitivity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "remote_persistence_allowed", "remote_retrieval_allowed"],
+      "properties": {
+        "level": { "type": "string", "enum": ["local_only", "project", "team", "org"] },
+        "remote_persistence_allowed": { "type": "boolean" },
+        "remote_retrieval_allowed": { "type": "boolean" }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["retrieval_count", "last_retrieved_at"],
+      "properties": {
+        "retrieval_count": { "type": "integer", "minimum": 0 },
+        "last_retrieved_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supersedes", "superseded_by", "invalidates", "invalidated_by",
+        "consolidated_from", "consolidated_into", "conflicts_with"
+      ],
+      "properties": {
+        "supersedes": { "$ref": "#/$defs/id_list" },
+        "superseded_by": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+        "invalidates": { "$ref": "#/$defs/id_list" },
+        "invalidated_by": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+        "consolidated_from": { "$ref": "#/$defs/id_list" },
+        "consolidated_into": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+        "conflicts_with": { "$ref": "#/$defs/id_list" }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "path": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "id_list": {
+      "type": "array", "uniqueItems": true, "maxItems": 256,
+      "items": { "$ref": "#/$defs/id" }
+    }
+  }
+}
