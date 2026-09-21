@@ -2,14 +2,14 @@
 
 The Quality Registry is the canonical, versioned source of code-quality rules and tool capabilities used by Agentic Harness analyzers, checks and agent guidance.
 
-It complements the Architecture Registry. Architecture defines dependency/ownership boundaries; Quality defines formatting, linting, type-safety, maintainability and implementation-coherence evidence. Consumers should reuse shared dependency-graph evidence instead of implementing competing graphs.
+It complements the Architecture Registry. Architecture defines dependency/ownership boundaries; Quality defines formatting, linting, type-safety, maintainability, implementation-coherence, and public-web search-visibility evidence. Consumers should reuse shared dependency-graph evidence instead of implementing competing graphs.
 
 ## Profile kinds
 
 - `language/` — language semantics and officially documented compiler/type-system quality controls.
 - `framework/` — framework-specific quality rules that are not already architecture rules.
 - `tooling/` — formatter/linter/analyzer capabilities. Tool presence does **not** make the tool a project authority.
-- `patterns/` — explicit Harness-owned maintainability/naming/documentation policies.
+- `patterns/` — explicit Harness-owned maintainability/naming/documentation policies, including public-web search-visibility rules that compose provider guidance with project policy.
 
 ## Core principles
 
@@ -44,9 +44,10 @@ tooling/
 
 patterns/
   maintainability/1.json
+  search-visibility/1.json
 ```
 
-Additional framework-specific and ecosystem-specific quality profiles remain tracked by the quality roadmap.
+Additional framework-specific and ecosystem-specific quality profiles remain tracked by the quality roadmap. Search-visibility profiles deliberately separate deterministic crawl/indexability facts from advisory framework choices: a JavaScript framework is not an SEO defect by itself, and SSR/prerender recommendations require concrete rendering or crawler-compatibility evidence.
 
 ## Machine contracts
 
