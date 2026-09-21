@@ -1,0 +1,144 @@
+{
+  "format_version": 1,
+  "kind": "context-selection-trace",
+  "id": "context-trace:memory-included",
+  "request_ref": "context-request:remote-review",
+  "input_fingerprint": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "selector": {
+    "id": "context-gateway",
+    "version": "1.0.0",
+    "deterministic": true
+  },
+  "candidates": [
+    {
+      "id": "candidate:project-truth",
+      "source": {
+        "kind": "project-truth",
+        "reference": "AGENTS.md",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "revision": "main",
+        "retrieval": {
+          "kind": "direct",
+          "query_ref": null,
+          "provider_ref": null,
+          "result_digest": null
+        }
+      },
+      "authority": "project-truth",
+      "mandatory": true,
+      "sensitivity": "project",
+      "freshness": "current",
+      "estimated_tokens": 120,
+      "stages": [
+        {
+          "stage": "mandatory-policy",
+          "disposition": "included",
+          "reason": "Mandatory project truth is included before relevance ranking.",
+          "score": null,
+          "decision": null
+        }
+      ],
+      "final_disposition": "included",
+      "reasons": [
+        "mandatory-project-truth"
+      ]
+    },
+    {
+      "id": "candidate:accepted-memory",
+      "source": {
+        "kind": "project-memory",
+        "reference": "memory:accepted:strict-query-boundary",
+        "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "revision": "2026-09-21T20:25:00Z",
+        "retrieval": {
+          "kind": "memory-query",
+          "query_ref": "memory-query:context-rules",
+          "provider_ref": "memory-provider:remote-service",
+          "result_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      },
+      "authority": "project-memory",
+      "mandatory": false,
+      "sensitivity": "project",
+      "freshness": "current",
+      "estimated_tokens": 90,
+      "stages": [
+        {
+          "stage": "scope-filter",
+          "disposition": "candidate",
+          "reason": "Memory scope matches the current repository and architecture paths.",
+          "score": null,
+          "decision": null
+        },
+        {
+          "stage": "semantic-search",
+          "disposition": "included",
+          "reason": "The accepted memory is relevant and within the project-memory allocation.",
+          "score": {
+            "value": 0.91,
+            "method": "memory-semantic-v1",
+            "confidence": 0.9
+          },
+          "decision": null
+        }
+      ],
+      "final_disposition": "included",
+      "reasons": [
+        "task-scope",
+        "current-memory",
+        "semantic-match"
+      ]
+    }
+  ],
+  "budget": {
+    "input_limit": 500,
+    "allocations": [
+      {
+        "kind": "mandatory_project_truth",
+        "limit": null,
+        "estimated_selected": 120
+      },
+      {
+        "kind": "repository_evidence",
+        "limit": 200,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "project_memory",
+        "limit": 150,
+        "estimated_selected": 90
+      },
+      {
+        "kind": "execution_evidence",
+        "limit": 75,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "generated_compression",
+        "limit": 75,
+        "estimated_selected": 0
+      }
+    ],
+    "estimated_selected": 210,
+    "over_budget": false
+  },
+  "token_usage": {
+    "estimated": {
+      "input": 210,
+      "tool_output": null,
+      "output": null
+    },
+    "observed": {
+      "input": null,
+      "tool_output": null,
+      "output": null
+    },
+    "observed_source_ref": null
+  },
+  "selection_fingerprint": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "compiled_plan_ref": "compiled-context:memory-included",
+  "complete": true,
+  "not_checked": [
+    "provider tokenizer usage"
+  ]
+}
