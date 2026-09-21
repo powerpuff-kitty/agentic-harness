@@ -16,6 +16,7 @@
     "type": {
       "type": "string",
       "enum": [
+        "work_unit.started", "work_unit.completed", "work_unit.failed", "work_unit.cancelled",
         "run.created", "run.started", "run.completed", "run.failed", "run.cancelled",
         "plan.created", "plan.revised",
         "task.created", "task.started", "task.blocked", "task.waiting_for_user", "task.waiting_for_approval", "task.validating", "task.completed", "task.failed", "task.cancelled",
@@ -26,7 +27,8 @@
         "artifact.created", "evidence.recorded", "commit.created", "pull_request.created",
         "approval.requested", "approval.granted", "approval.denied",
         "finding.created", "evaluation.completed", "action.created",
-        "reflection.requested", "reflection.created", "reflection.skipped"
+        "reflection.requested", "reflection.created", "reflection.skipped",
+        "redaction.applied"
       ]
     },
     "subject": {
@@ -34,15 +36,88 @@
       "additionalProperties": false,
       "required": ["kind", "id"],
       "properties": {
-        "kind": { "type": "string", "enum": ["work-unit", "run", "plan", "task", "attempt", "tool", "file", "test", "artifact", "evidence", "commit", "pull-request", "approval", "finding", "evaluation", "action", "reflection"] },
+        "kind": { "type": "string", "enum": ["work-unit", "run", "plan", "task", "attempt", "tool", "file", "test", "artifact", "evidence", "commit", "pull-request", "approval", "finding", "evaluation", "action", "reflection", "redaction"] },
         "id": { "$ref": "#/$defs/id" }
       }
     },
     "summary": { "type": ["string", "null"], "maxLength": 5000 },
     "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
-    "artifact_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+    "artifact_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "redaction_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "projection_delta": {
+      "anyOf": [
+        { "$ref": "#/$defs/projection_delta" },
+        { "type": "null" }
+      ]
+    }
   },
   "$defs": {
-    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" }
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "state": {
+      "type": "string",
+      "enum": ["proposed", "queued", "running", "validating", "completed", "blocked", "waiting_for_user", "waiting_for_approval", "failed", "cancelled"]
+    },
+    "nullable_id": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "nullable_state": {
+      "anyOf": [{ "$ref": "#/$defs/state" }, { "type": "null" }]
+    },
+    "projection_delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "entity", "previous_state", "next_state", "snapshot_ref", "value_ref", "plan_revision"],
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": ["state_transition", "entity_created", "plan_revision", "append_evidence_ref", "append_artifact_ref"]
+        },
+        "entity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "id"],
+          "properties": {
+            "kind": { "type": "string", "enum": ["work-unit", "run", "plan", "task", "attempt"] },
+            "id": { "$ref": "#/$defs/id" }
+          }
+        },
+        "previous_state": { "$ref": "#/$defs/nullable_state" },
+        "next_state": { "$ref": "#/$defs/nullable_state" },
+        "snapshot_ref": { "$ref": "#/$defs/nullable_id" },
+        "value_ref": { "$ref": "#/$defs/nullable_id" },
+        "plan_revision": { "type": ["integer", "null"], "minimum": 1 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "operation": { "const": "state_transition" } }, "required": ["operation"] },
+          "then": {
+            "properties": {
+              "previous_state": { "$ref": "#/$defs/state" },
+              "next_state": { "$ref": "#/$defs/state" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "operation": { "const": "entity_created" } }, "required": ["operation"] },
+          "then": { "properties": { "snapshot_ref": { "$ref": "#/$defs/id" } } }
+        },
+        {
+          "if": { "properties": { "operation": { "const": "plan_revision" } }, "required": ["operation"] },
+          "then": {
+            "properties": {
+              "snapshot_ref": { "$ref": "#/$defs/id" },
+              "plan_revision": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "operation": { "enum": ["append_evidence_ref", "append_artifact_ref"] } },
+            "required": ["operation"]
+          },
+          "then": { "properties": { "value_ref": { "$ref": "#/$defs/id" } } }
+        }
+      ]
+    }
   }
 }
