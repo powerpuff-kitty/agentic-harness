@@ -63,6 +63,7 @@ DecisionEvaluation / calibration / replay
 - `decision-eval-dataset.v1.schema.json`: versioned labeled cases pairing immutable receipts with independently verified truth.
 - `decision-calibration.v1.schema.json`: empirical quality/calibration/reliability metrics and threshold-selection evidence over one exact dataset/provider/spec identity.
 - `decision-regression.v1.schema.json`: deterministic baseline/candidate comparison against explicit quality/coverage/calibration/latency/cost budgets.
+- `decision-run.v1.schema.json`: bounded fan-out, cache/replay provenance and pure reducer-input evidence over one immutable state/question/provider identity.
 
 These contracts allow additive compatible fields within v1. Semantic validators must additionally enforce graph referential integrity, acyclicity and arithmetic invariants that JSON Schema cannot prove conveniently.
 

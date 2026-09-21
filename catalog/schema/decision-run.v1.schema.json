@@ -1,0 +1,452 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/decision-run.v1.schema.json",
+  "title": "Agentic Harness DecisionRun v1",
+  "description": "Recorded bounded fan-out/cache/replay/reducer run over one immutable decision state. Validation never authorizes provider calls, cache reuse, side effects, or consequences.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "mode",
+    "identity",
+    "identity_sha256",
+    "limits",
+    "fallback",
+    "provider_calls",
+    "nodes",
+    "reducers",
+    "side_effects",
+    "consequence_authorized"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "decision-run"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "mode": {
+      "enum": [
+        "live",
+        "replay"
+      ]
+    },
+    "identity": {
+      "$ref": "#/$defs/identity"
+    },
+    "identity_sha256": {
+      "$ref": "#/$defs/digest"
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_parallel",
+        "timeout_ms",
+        "max_cost_microunits"
+      ],
+      "properties": {
+        "max_parallel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 64
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 86400000
+        },
+        "max_cost_microunits": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "fallback": {
+      "enum": [
+        "fail-closed",
+        "review",
+        "abstain"
+      ]
+    },
+    "provider_calls": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1000000
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 256,
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "reducers": {
+      "type": "array",
+      "maxItems": 64,
+      "items": {
+        "$ref": "#/$defs/reducer"
+      }
+    },
+    "side_effects": {
+      "const": false
+    },
+    "consequence_authorized": {
+      "const": false
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[A-Za-z0-9_.:/+@-]+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "nullable_text": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/text"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "nullable_digest": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/digest"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "schema_version": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        {
+          "type": "integer",
+          "minimum": 1
+        }
+      ]
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "id",
+        "model",
+        "version"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "deterministic",
+            "jev",
+            "llm",
+            "ml",
+            "human",
+            "custom"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "model": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "question_set",
+        "provider"
+      ],
+      "properties": {
+        "state": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_id",
+            "schema_version",
+            "fingerprint"
+          ],
+          "properties": {
+            "schema_id": {
+              "$ref": "#/$defs/id"
+            },
+            "schema_version": {
+              "$ref": "#/$defs/schema_version"
+            },
+            "fingerprint": {
+              "$ref": "#/$defs/text"
+            }
+          }
+        },
+        "question_set": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "revision",
+            "digest"
+          ],
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "revision": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "digest": {
+              "$ref": "#/$defs/digest"
+            }
+          }
+        },
+        "provider": {
+          "$ref": "#/$defs/provider"
+        }
+      }
+    },
+    "status": {
+      "enum": [
+        "produced",
+        "unknown",
+        "insufficient-evidence",
+        "conflicting-evidence",
+        "out-of-distribution",
+        "abstained",
+        "provider-failure",
+        "timeout",
+        "budget-exceeded",
+        "cancelled",
+        "blocked"
+      ]
+    },
+    "reason": {
+      "enum": [
+        "none",
+        "insufficient-evidence",
+        "conflicting-evidence",
+        "out-of-distribution",
+        "provider-failure",
+        "timeout",
+        "budget-exceeded",
+        "cancelled",
+        "dependency-unavailable",
+        "policy-fallback",
+        "unknown"
+      ]
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "spec_id",
+        "spec_revision",
+        "depends_on",
+        "status",
+        "source",
+        "receipt_ref",
+        "receipt_digest",
+        "source_run_ref",
+        "source_identity_sha256",
+        "started_at_ms",
+        "ended_at_ms",
+        "reason_code"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "spec_id": {
+          "$ref": "#/$defs/id"
+        },
+        "spec_revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "depends_on": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "source": {
+          "enum": [
+            "provider",
+            "cache",
+            "replay",
+            "none"
+          ]
+        },
+        "receipt_ref": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "receipt_digest": {
+          "$ref": "#/$defs/nullable_digest"
+        },
+        "source_run_ref": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "source_identity_sha256": {
+          "$ref": "#/$defs/nullable_digest"
+        },
+        "started_at_ms": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ended_at_ms": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason_code": {
+          "$ref": "#/$defs/reason"
+        }
+      }
+    },
+    "reducer_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "status",
+        "receipt_ref",
+        "receipt_digest"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "$ref": "#/$defs/status"
+        },
+        "receipt_ref": {
+          "$ref": "#/$defs/nullable_text"
+        },
+        "receipt_digest": {
+          "$ref": "#/$defs/nullable_digest"
+        }
+      }
+    },
+    "reducer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "version",
+        "inputs",
+        "input_digest",
+        "output_digest",
+        "pure",
+        "side_effects",
+        "consequence_authorized",
+        "fallback_used"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        },
+        "inputs": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/reducer_input"
+          }
+        },
+        "input_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "output_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "pure": {
+          "const": true
+        },
+        "side_effects": {
+          "const": false
+        },
+        "consequence_authorized": {
+          "const": false
+        },
+        "fallback_used": {
+          "oneOf": [
+            {
+              "enum": [
+                "fail-closed",
+                "review",
+                "abstain"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
