@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/context-gateway-benchmark.v1.schema.json",
+  "title": "Agentic Harness ContextGatewayBenchmark v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "task_ref", "input_fingerprint",
+    "baseline", "gateway", "comparison", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "context-gateway-benchmark" },
+    "id": { "$ref": "#/$defs/id" },
+    "task_ref": { "$ref": "#/$defs/id" },
+    "input_fingerprint": { "$ref": "#/$defs/digest" },
+    "baseline": { "$ref": "#/$defs/variant" },
+    "gateway": { "$ref": "#/$defs/variant" },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "outcome_equivalent", "estimated_input_delta",
+        "observed_input_delta", "quality_regression", "notes"
+      ],
+      "properties": {
+        "outcome_equivalent": { "type": ["boolean", "null"] },
+        "estimated_input_delta": { "type": "integer" },
+        "observed_input_delta": { "type": ["integer", "null"] },
+        "quality_regression": { "type": ["boolean", "null"] },
+        "notes": {
+          "type": "array", "uniqueItems": true, "maxItems": 64,
+          "items": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string", "minLength": 1, "maxLength": 256,
+      "pattern": "^[A-Za-z0-9_.:/+@-]+$"
+    },
+    "text": { "type": "string", "minLength": 1, "maxLength": 10000 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "tool_output", "output"],
+      "properties": {
+        "input": { "type": "integer", "minimum": 0 },
+        "tool_output": { "type": "integer", "minimum": 0 },
+        "output": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimated", "observed", "observed_source_ref"],
+      "properties": {
+        "estimated": { "$ref": "#/$defs/counts" },
+        "observed": { "$ref": "#/$defs/counts" },
+        "observed_source_ref": { "$ref": "#/$defs/id" }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "verifier", "evidence_refs"],
+      "properties": {
+        "status": { "type": "string", "enum": ["verified", "failed", "unverified"] },
+        "verifier": { "$ref": "#/$defs/text" },
+        "evidence_refs": {
+          "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 128,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy", "context_ref", "mandatory_context_complete",
+        "selected_item_count", "usage", "outcome"
+      ],
+      "properties": {
+        "strategy": { "type": "string", "enum": ["full-context", "gateway-selected"] },
+        "context_ref": { "$ref": "#/$defs/id" },
+        "mandatory_context_complete": { "type": "boolean" },
+        "selected_item_count": { "type": "integer", "minimum": 0 },
+        "usage": { "$ref": "#/$defs/usage" },
+        "outcome": { "$ref": "#/$defs/outcome" }
+      }
+    }
+  }
+}
