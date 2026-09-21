@@ -32,6 +32,9 @@ language/
   python/current.json
   go/current.json
 
+framework/
+  nuxt/current.json
+
 tooling/
   eslint/current.json
   biome/current.json
@@ -47,7 +50,7 @@ patterns/
   search-visibility/1.json
 ```
 
-Additional framework-specific and ecosystem-specific quality profiles remain tracked by the quality roadmap. Search-visibility profiles deliberately separate deterministic crawl/indexability facts from advisory framework choices: a JavaScript framework is not an SEO defect by itself, and SSR/prerender recommendations require concrete rendering or crawler-compatibility evidence.
+The Nuxt profile is a capability profile, not a migration recommendation: audits must compare its rendering/caching/meta capabilities against the current project's measured gaps. Additional framework-specific and ecosystem-specific quality profiles remain tracked by the quality roadmap. Search-visibility profiles deliberately separate deterministic crawl/indexability facts from advisory framework choices: a JavaScript framework is not an SEO defect by itself, and SSR/prerender recommendations require concrete rendering or crawler-compatibility evidence.
 
 ## Machine contracts
 
