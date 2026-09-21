@@ -6,7 +6,8 @@ It models execution as structured work rather than a chat transcript. Consumers 
 
 ## V1 contracts
 
-- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt lifecycle.
+- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt structure with immutable run input identity.
+- lifecycle.v1.schema.json + lifecycle.v1.json — canonical state transitions, terminal states and derived-progress policy.
 - work-event.v1.schema.json — append-only execution event envelope with optional replay deltas.
 - evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
 - artifact.v1.schema.json — content-addressed produced artifacts linked to their producing run/task/attempt.
@@ -31,6 +32,16 @@ It models execution as structured work rather than a chat transcript. Consumers 
 | Context | Task-specific compiled view shown to a model | Ephemeral projection | It is the model input |
 
 Reflection is not memory. A reflection may emit only memory candidate references; promotion, consolidation, supersession and remote-storage policy belong to the Project Memory subsystem. Reflection is also not hidden reasoning capture: it stores concise inspectable conclusions, uncertainty, evidence and proposed corrective actions.
+
+## Lifecycle and progress
+
+Runs carry both an `agent_connection_id` and an optional `session_ref`, plus an immutable input identity composed of `source_revision` and `context_fingerprint`. The existing Run result keeps the output revision separate from the input identity, so a consumer can distinguish what was executed from what was produced.
+
+`lifecycle.v1.json` is the canonical transition policy for WorkUnit, Run, Task and Attempt projections. WorkUnit/Run/Task failure is recoverable only through an explicit transition; completed/cancelled projections do not restart in place. An Attempt is stricter: completed, failed and cancelled Attempts are terminal, and retry/recovery creates a new Attempt with the next contiguous ordinal.
+
+Plan revisions are append-only snapshots. A newer plan may add or remove active task IDs without deleting historical Task/Attempt records. Parent relationships and `depends_on` edges are validated as separate acyclic graphs.
+
+Progress is derived from state counts for the **latest plan revision only**. The canonical protocol does not persist a model-estimated percentage. Consumers can render total active tasks and counts by state (completed, running, blocked, failed, and so on) from the WorkUnit projection.
 
 ## Evidence, artifacts and replay
 
