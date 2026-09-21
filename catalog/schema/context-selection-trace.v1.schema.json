@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/context-selection-trace.v1.schema.json",
+  "title": "Agentic Harness ContextSelectionTrace v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "request_ref", "input_fingerprint",
+    "selector", "candidates", "budget", "token_usage", "selection_fingerprint",
+    "compiled_plan_ref", "complete", "not_checked"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "context-selection-trace" },
+    "id": { "$ref": "#/$defs/id" },
+    "request_ref": { "$ref": "#/$defs/id" },
+    "input_fingerprint": { "$ref": "#/$defs/digest" },
+    "selector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "deterministic"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "version": { "$ref": "#/$defs/text" },
+        "deterministic": { "type": "boolean" }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "maxItems": 200000,
+      "items": { "$ref": "#/$defs/candidate" }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_limit", "allocations", "estimated_selected", "over_budget"],
+      "properties": {
+        "input_limit": { "type": "integer", "minimum": 1 },
+        "allocations": {
+          "type": "array",
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "limit", "estimated_selected"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "mandatory_project_truth", "repository_evidence",
+                  "project_memory", "execution_evidence", "generated_compression"
+                ]
+              },
+              "limit": { "type": ["integer", "null"], "minimum": 0 },
+              "estimated_selected": { "type": "integer", "minimum": 0 }
+            }
+          }
+        },
+        "estimated_selected": { "type": "integer", "minimum": 0 },
+        "over_budget": { "type": "boolean" }
+      }
+    },
+    "token_usage": { "$ref": "#/$defs/token_usage" },
+    "selection_fingerprint": { "$ref": "#/$defs/digest" },
+    "compiled_plan_ref": { "$ref": "#/$defs/id" },
+    "complete": { "type": "boolean" },
+    "not_checked": {
+      "type": "array", "uniqueItems": true, "maxItems": 128,
+      "items": { "$ref": "#/$defs/text" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string", "minLength": 1, "maxLength": 256,
+      "pattern": "^[A-Za-z0-9_.:/+@-]+$"
+    },
+    "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "nullable_digest": {
+      "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }]
+    },
+    "nullable_id": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference", "digest", "revision", "retrieval"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "project-truth", "repository-evidence", "project-memory",
+            "execution-evidence", "diagnostic", "generated-analysis"
+          ]
+        },
+        "reference": { "$ref": "#/$defs/text" },
+        "digest": { "$ref": "#/$defs/digest" },
+        "revision": { "type": ["string", "null"], "maxLength": 1000 },
+        "retrieval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "query_ref", "provider_ref", "result_digest"],
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": ["direct", "repository-search", "memory-query", "execution-query", "generated"]
+            },
+            "query_ref": { "$ref": "#/$defs/nullable_id" },
+            "provider_ref": { "$ref": "#/$defs/nullable_id" },
+            "result_digest": { "$ref": "#/$defs/nullable_digest" }
+          }
+        }
+      }
+    },
+    "score": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "method", "confidence"],
+      "properties": {
+        "value": { "type": "number", "minimum": 0 },
+        "method": { "$ref": "#/$defs/id" },
+        "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+      }
+    },
+    "semantic_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_ref", "status", "provider", "provider_confidence",
+        "distribution", "policy_disposition", "advisory"
+      ],
+      "properties": {
+        "receipt_ref": { "$ref": "#/$defs/id" },
+        "status": {
+          "type": "string",
+          "enum": [
+            "produced", "unknown", "insufficient-evidence",
+            "conflicting-evidence", "out-of-distribution",
+            "abstained", "provider-failure"
+          ]
+        },
+        "provider": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "id", "model", "version"],
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["deterministic", "jev", "llm", "ml", "human", "custom"]
+            },
+            "id": { "$ref": "#/$defs/id" },
+            "model": { "type": ["string", "null"], "maxLength": 1000 },
+            "version": { "type": ["string", "null"], "maxLength": 1000 }
+          }
+        },
+        "provider_confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "distribution": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number", "minimum": 0, "maximum": 1
+              }
+            },
+            { "type": "null" }
+          ]
+        },
+        "policy_disposition": {
+          "type": "string",
+          "enum": ["accepted", "review", "abstained", "rejected"]
+        },
+        "advisory": { "type": "boolean", "const": true }
+      }
+    },
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "disposition", "reason", "score", "decision"],
+      "properties": {
+        "stage": {
+          "type": "string",
+          "enum": [
+            "mandatory-policy", "scope-filter", "lexical", "semantic-search",
+            "typed-decision", "compression", "budget", "sensitivity-policy"
+          ]
+        },
+        "disposition": {
+          "type": "string",
+          "enum": ["candidate", "included", "deferred", "rejected", "unchanged"]
+        },
+        "reason": { "$ref": "#/$defs/text" },
+        "score": {
+          "anyOf": [{ "$ref": "#/$defs/score" }, { "type": "null" }]
+        },
+        "decision": {
+          "anyOf": [{ "$ref": "#/$defs/semantic_decision" }, { "type": "null" }]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "stage": { "const": "typed-decision" } },
+            "required": ["stage"]
+          },
+          "then": {
+            "properties": {
+              "decision": { "$ref": "#/$defs/semantic_decision" }
+            }
+          }
+        }
+      ]
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "source", "authority", "mandatory", "sensitivity", "freshness",
+        "estimated_tokens", "stages", "final_disposition", "reasons"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "source": { "$ref": "#/$defs/source" },
+        "authority": {
+          "type": "string",
+          "enum": [
+            "mandatory-policy", "project-truth", "repository-evidence",
+            "project-memory", "execution-evidence", "generated-analysis"
+          ]
+        },
+        "mandatory": { "type": "boolean" },
+        "sensitivity": {
+          "type": "string",
+          "enum": ["local_only", "project", "team", "org"]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": ["current", "stale", "unknown"]
+        },
+        "estimated_tokens": { "type": "integer", "minimum": 1 },
+        "stages": {
+          "type": "array", "minItems": 1, "maxItems": 32,
+          "items": { "$ref": "#/$defs/stage" }
+        },
+        "final_disposition": {
+          "type": "string",
+          "enum": ["included", "deferred", "rejected"]
+        },
+        "reasons": {
+          "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 32,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "mandatory": { "const": true } },
+            "required": ["mandatory"]
+          },
+          "then": {
+            "properties": { "final_disposition": { "const": "included" } }
+          }
+        }
+      ]
+    },
+    "usage_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input", "tool_output", "output"],
+      "properties": {
+        "input": { "type": ["integer", "null"], "minimum": 0 },
+        "tool_output": { "type": ["integer", "null"], "minimum": 0 },
+        "output": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "token_usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimated", "observed", "observed_source_ref"],
+      "properties": {
+        "estimated": { "$ref": "#/$defs/usage_counts" },
+        "observed": { "$ref": "#/$defs/usage_counts" },
+        "observed_source_ref": { "$ref": "#/$defs/nullable_id" }
+      }
+    }
+  }
+}
