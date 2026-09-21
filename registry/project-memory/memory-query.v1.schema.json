@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/project-memory/memory-query.v1.schema.json",
+  "title": "Agentic Harness MemoryQuery v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "task", "scope", "classes", "states",
+    "include_stale", "max_results", "execution_environment", "allowed_sensitivity"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "memory-query" },
+    "id": { "$ref": "#/$defs/id" },
+    "task": { "$ref": "#/$defs/text" },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "repository", "path", "tags"],
+      "properties": {
+        "project_id": { "$ref": "#/$defs/id" },
+        "repository": { "type": ["string", "null"], "maxLength": 1000 },
+        "path": { "type": ["string", "null"], "maxLength": 4096 },
+        "tags": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "classes": {
+      "type": "array", "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "semantic_project_knowledge", "procedural_knowledge",
+          "architectural_decision", "constraint_gotcha",
+          "validated_observation", "reusable_lesson"
+        ]
+      }
+    },
+    "states": {
+      "type": "array", "uniqueItems": true,
+      "items": { "type": "string", "enum": ["candidate", "accepted", "stale"] }
+    },
+    "include_stale": { "type": "boolean" },
+    "max_results": { "type": "integer", "minimum": 1, "maximum": 1000 },
+    "execution_environment": { "type": "string", "enum": ["local", "remote"] },
+    "allowed_sensitivity": {
+      "type": "array", "uniqueItems": true, "minItems": 1,
+      "items": { "type": "string", "enum": ["local_only", "project", "team", "org"] }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 20000 }
+  }
+}
