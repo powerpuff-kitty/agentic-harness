@@ -4,11 +4,19 @@
     "kind": "memory-operation",
     "id": "memory-operation:promote:strict-query-boundary",
     "operation": "promote",
-    "target_memory_refs": ["memory:candidate:strict-query-boundary"],
-    "source_refs": ["reflection:test-failure:1", "evidence:test-pass"],
-    "actor": { "kind": "human", "id": "project-maintainer" },
+    "target_memory_refs": [
+      "memory:candidate:strict-query-boundary"
+    ],
+    "source_refs": [
+      "reflection:test-failure:1",
+      "evidence:test-pass"
+    ],
+    "actor": {
+      "kind": "human",
+      "id": "project-maintainer"
+    },
     "reason": "The lesson was verified by the corrective attempt and is reusable beyond the original task.",
-    "result_memory_ref": "memory:candidate:strict-query-boundary",
+    "result_memory_ref": "memory:accepted:strict-query-boundary",
     "created_at": "2026-09-21T20:25:00Z"
   },
   {
@@ -16,9 +24,16 @@
     "kind": "memory-operation",
     "id": "memory-operation:supersede:context-workflow",
     "operation": "supersede",
-    "target_memory_refs": ["memory:superseded:old"],
-    "source_refs": ["decision:context-workflow:new"],
-    "actor": { "kind": "human", "id": "architecture-review" },
+    "target_memory_refs": [
+      "memory:superseded:old"
+    ],
+    "source_refs": [
+      "decision:context-workflow:new"
+    ],
+    "actor": {
+      "kind": "human",
+      "id": "architecture-review"
+    },
     "reason": "The Context Compiler replaced full-context export as the default workflow.",
     "result_memory_ref": "memory:superseded:new",
     "created_at": "2026-09-20T00:00:00Z"
@@ -28,9 +43,16 @@
     "kind": "memory-operation",
     "id": "memory-operation:invalidate:unsafe-default",
     "operation": "invalidate",
-    "target_memory_refs": ["memory:invalidated:unsafe-default"],
-    "source_refs": ["decision:memory-sensitivity-policy"],
-    "actor": { "kind": "policy", "id": "memory-privacy-policy-v1" },
+    "target_memory_refs": [
+      "memory:invalidated:unsafe-default"
+    ],
+    "source_refs": [
+      "decision:memory-sensitivity-policy"
+    ],
+    "actor": {
+      "kind": "policy",
+      "id": "memory-privacy-policy-v1"
+    },
     "reason": "Confidence must never override sensitivity policy for remote memory handoff.",
     "result_memory_ref": null,
     "created_at": "2026-09-21T20:30:00Z"
@@ -40,9 +62,18 @@
     "kind": "memory-operation",
     "id": "memory-operation:consolidate:mandatory-context",
     "operation": "consolidate",
-    "target_memory_refs": ["memory:consolidated:a", "memory:consolidated:b"],
-    "source_refs": ["evidence:context-doc:a", "evidence:context-doc:b"],
-    "actor": { "kind": "system", "id": "memory-consolidator-v1" },
+    "target_memory_refs": [
+      "memory:consolidated:a",
+      "memory:consolidated:b"
+    ],
+    "source_refs": [
+      "evidence:context-doc:a",
+      "evidence:context-doc:b"
+    ],
+    "actor": {
+      "kind": "system",
+      "id": "memory-consolidator-v1"
+    },
     "reason": "The two memories describe one invariant and can be represented compactly without losing provenance.",
     "result_memory_ref": "memory:consolidated:final",
     "created_at": "2026-09-21T20:35:00Z"
