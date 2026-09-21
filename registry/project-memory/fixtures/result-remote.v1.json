@@ -1,0 +1,47 @@
+{
+  "format_version": 1,
+  "kind": "memory-result",
+  "query_id": "memory-query:context-rules",
+  "provider_id": "memory-provider:remote-service",
+  "matches": [
+    {
+      "memory_id": "memory:superseded:new",
+      "relevance": {
+        "score": 0.93,
+        "method": "fixture-semantic-v1",
+        "confidence": 0.9
+      },
+      "match_reason": "Current procedural memory matches context selection scope and tag.",
+      "matched_scope": "semantic"
+    },
+    {
+      "memory_id": "memory:consolidated:final",
+      "relevance": {
+        "score": 0.89,
+        "method": "fixture-semantic-v1",
+        "confidence": 0.95
+      },
+      "match_reason": "Accepted consolidated memory captures mandatory context and budget semantics.",
+      "matched_scope": "path"
+    }
+  ],
+  "excluded": [
+    {
+      "memory_id": "memory:local-only:auth-note",
+      "reason": "sensitivity"
+    },
+    {
+      "memory_id": "memory:stale:cli-install-path",
+      "reason": "stale"
+    },
+    {
+      "memory_id": "memory:superseded:old",
+      "reason": "state"
+    },
+    {
+      "memory_id": "memory:invalidated:unsafe-default",
+      "reason": "state"
+    }
+  ],
+  "complete": true
+}
