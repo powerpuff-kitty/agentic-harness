@@ -100,6 +100,7 @@ reflection_files = [
     "reflection-bad-assumption.v1.json",
     "reflection-insufficient-evidence.v1.json",
     "reflection-abstained.v1.json",
+    "reflection-rereflection.v1.json",
 ]
 reflections = [(name, load(FIXTURES / name)) for name in reflection_files]
 reflection_policy = load(FIXTURES / "reflection-policy.v1.json")
@@ -243,6 +244,9 @@ for filename, reflection in reflections:
 
     if reflection.get("prior_reflection_ref") == reflection_id:
         fail(f"{filename}: reflection cannot reference itself as prior_reflection_ref")
+    prior_reflection_ref = reflection.get("prior_reflection_ref")
+    if prior_reflection_ref is not None and prior_reflection_ref not in reflection_by_id:
+        fail(f"{filename}: prior_reflection_ref must reference an earlier fixture reflection")
 
     if status == "completed":
         if not evidence_refs:
