@@ -8,6 +8,11 @@
       "id": "rule:human-request",
       "priority": 100,
       "trigger_kind": "human_request",
+      "when": {
+        "deterministic_remediation_available": null,
+        "evidence_available": null,
+        "confidence_below": null
+      },
       "decision": "reflect",
       "reason": "An explicit human reflection request is always honored."
     },
@@ -15,6 +20,11 @@
       "id": "rule:contradicted-assumption",
       "priority": 90,
       "trigger_kind": "contradicted_assumption",
+      "when": {
+        "deterministic_remediation_available": null,
+        "evidence_available": null,
+        "confidence_below": null
+      },
       "decision": "reflect",
       "reason": "Contradicted assumptions can invalidate the current plan and should be inspected."
     },
@@ -22,8 +32,25 @@
       "id": "rule:deterministic-fix",
       "priority": 80,
       "trigger_kind": "failed_check",
+      "when": {
+        "deterministic_remediation_available": true,
+        "evidence_available": true,
+        "confidence_below": null
+      },
       "decision": "skip",
       "reason": "A known deterministic failure with a policy-approved direct remediation can skip model reflection."
+    },
+    {
+      "id": "rule:low-confidence",
+      "priority": 70,
+      "trigger_kind": "low_confidence",
+      "when": {
+        "deterministic_remediation_available": null,
+        "evidence_available": true,
+        "confidence_below": 0.65
+      },
+      "decision": "reflect",
+      "reason": "Low-confidence work should be reflected only when supporting evidence is available."
     }
   ]
 }
