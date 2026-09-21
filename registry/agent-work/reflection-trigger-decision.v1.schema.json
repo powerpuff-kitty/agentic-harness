@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/reflection-trigger-decision.v1.schema.json",
+  "title": "Agent Work Reflection Trigger Decision v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "policy_id", "work_unit_id", "run_id",
+    "attempt_id", "trigger_kind", "decision", "reason", "evidence_refs", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "reflection-trigger-decision" },
+    "id": { "$ref": "#/$defs/id" },
+    "policy_id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "run_id": { "$ref": "#/$defs/id" },
+    "attempt_id": { "$ref": "#/$defs/id" },
+    "trigger_kind": {
+      "type": "string",
+      "enum": [
+        "failed_check", "evaluator_finding", "architecture_violation",
+        "security_violation", "contradicted_assumption", "human_request",
+        "low_confidence", "other"
+      ]
+    },
+    "decision": { "type": "string", "enum": ["reflect", "skip"] },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 5000 },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    }
+  }
+}
