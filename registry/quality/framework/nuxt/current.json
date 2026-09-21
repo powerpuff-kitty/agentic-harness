@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "id": "framework/nuxt/current",
+  "kind": "framework",
+  "name": "Nuxt 4 public-web rendering capabilities",
+  "version_selector": "4.x",
+  "authority": "official",
+  "reviewed_at": "2026-09-21",
+  "description": "Official Nuxt 4 rendering, prerendering and SEO metadata capabilities used to evaluate public-web architecture without treating framework adoption as an automatic SEO requirement.",
+  "capabilities": ["detect", "analyze", "check"],
+  "rules": [
+    {
+      "id": "nuxt.rendering.universal.available",
+      "title": "Recognize Nuxt universal rendering as an available capability",
+      "category": "rendering",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "official",
+      "summary": "Nuxt 4 supports universal rendering that returns fully rendered HTML before hydration; this is a framework capability, not evidence that an existing application must migrate.",
+      "source_refs": ["nuxt.rendering"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "default_universal_rendering": true,
+        "framework_capability_not_project_requirement": true
+      }
+    },
+    {
+      "id": "nuxt.rendering.hybrid.route-rules",
+      "title": "Model route-specific rendering and cache strategies",
+      "category": "rendering",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "official",
+      "summary": "Nuxt routeRules can select prerendering, SSR/client-only behavior, redirects and SWR/ISR-style caching per route class; audits should compare those capabilities to the target project's actual route/freshness needs.",
+      "source_refs": ["nuxt.rendering", "nuxt.server"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "route_specific_policy": true,
+        "compare_to_existing_capability": true
+      }
+    },
+    {
+      "id": "nuxt.prerender.discovery.explicit-dynamic-routes",
+      "title": "Do not assume crawl-based prerender discovers every dynamic route",
+      "category": "indexability",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "official",
+      "summary": "Nuxt crawl-based prerender follows anchor links from discovered pages; unlinked or dynamic routes may require explicit prerender routes or another rendering strategy.",
+      "source_refs": ["nuxt.prerendering"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "crawl_links_requires_discoverable_anchors": true,
+        "dynamic_routes_may_require_explicit_routes": true
+      }
+    },
+    {
+      "id": "nuxt.meta.unhead.typed-seo",
+      "title": "Recognize Nuxt's server-compatible head and SEO metadata primitives",
+      "category": "metadata",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "official",
+      "summary": "Nuxt uses Unhead and provides useHead/useSeoMeta for reactive page metadata; their availability reduces custom head plumbing but does not by itself improve search outcomes.",
+      "source_refs": ["nuxt.seo-meta", "nuxt.use-seo-meta"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "typed_seo_meta_available": true,
+        "availability_not_ranking_evidence": true
+      }
+    },
+    {
+      "id": "nuxt.deployment.cloudflare.edge-supported",
+      "title": "Account for Cloudflare-compatible Nuxt edge deployment",
+      "category": "rendering",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "official",
+      "summary": "Nuxt/Nitro supports edge-side rendering on Cloudflare Pages; migration analysis must still measure deployment complexity, runtime constraints and hydration behavior in the target environment.",
+      "source_refs": ["nuxt.rendering", "nuxt.deployment"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "cloudflare_pages_supported": true,
+        "deployment_fit_requires_project_measurement": true
+      }
+    },
+    {
+      "id": "nuxt.migration.require-measured-gap",
+      "title": "Require a measured capability or maintenance gap before recommending Nuxt migration",
+      "category": "rendering",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "harness",
+      "summary": "Do not recommend Nuxt solely because it offers SSR or SEO helpers. Compare response HTML completeness, dynamic freshness, cache/revalidation needs, route scale, build/runtime cost, operational complexity and migration blast radius against the existing architecture first.",
+      "source_refs": ["harness.rendering-issue", "nuxt.rendering", "nuxt.prerendering"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "migration_requires_concrete_gap": true,
+        "seo_claim_alone_insufficient": true,
+        "benchmark_current_architecture_first": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "nuxt.rendering",
+      "title": "Nuxt 4 Rendering Modes",
+      "url": "https://nuxt.com/docs/4.x/guide/concepts/rendering",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "nuxt.prerendering",
+      "title": "Nuxt 4 Prerendering",
+      "url": "https://nuxt.com/docs/4.x/getting-started/prerendering",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "nuxt.server",
+      "title": "Nuxt 4 Server and Hybrid Rendering",
+      "url": "https://nuxt.com/docs/4.x/getting-started/server",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "nuxt.seo-meta",
+      "title": "Nuxt 4 SEO and Meta",
+      "url": "https://nuxt.com/docs/4.x/getting-started/seo-meta",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "nuxt.use-seo-meta",
+      "title": "Nuxt 4 useSeoMeta",
+      "url": "https://nuxt.com/docs/4.x/api/composables/use-seo-meta",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "nuxt.deployment",
+      "title": "Nuxt 4 Deployment",
+      "url": "https://nuxt.com/docs/4.x/getting-started/deployment",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "harness.rendering-issue",
+      "title": "Agentic Harness SSR/SSG/prerender/hybrid decision analysis",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/issues/155",
+      "authority": "harness",
+      "reviewed_at": "2026-09-21"
+    }
+  ]
+}
