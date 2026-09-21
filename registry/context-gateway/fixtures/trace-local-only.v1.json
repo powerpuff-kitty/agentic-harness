@@ -1,0 +1,139 @@
+{
+  "format_version": 1,
+  "kind": "context-selection-trace",
+  "id": "context-trace:local-only",
+  "request_ref": "context-request:remote-review",
+  "input_fingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "selector": {
+    "id": "context-gateway",
+    "version": "1.0.0",
+    "deterministic": true
+  },
+  "candidates": [
+    {
+      "id": "candidate:project-truth",
+      "source": {
+        "kind": "project-truth",
+        "reference": "AGENTS.md",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "revision": "main",
+        "retrieval": {
+          "kind": "direct",
+          "query_ref": null,
+          "provider_ref": null,
+          "result_digest": null
+        }
+      },
+      "authority": "project-truth",
+      "mandatory": true,
+      "sensitivity": "project",
+      "freshness": "current",
+      "estimated_tokens": 120,
+      "stages": [
+        {
+          "stage": "mandatory-policy",
+          "disposition": "included",
+          "reason": "Project-authored mandatory truth is always included.",
+          "score": null,
+          "decision": null
+        }
+      ],
+      "final_disposition": "included",
+      "reasons": [
+        "mandatory-project-truth"
+      ]
+    },
+    {
+      "id": "candidate:local-only-memory",
+      "source": {
+        "kind": "project-memory",
+        "reference": "memory:local-only:auth-note",
+        "digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "revision": "2026-09-21T20:20:00Z",
+        "retrieval": {
+          "kind": "memory-query",
+          "query_ref": "memory-query:context-rules",
+          "provider_ref": "memory-provider:local-sqlite",
+          "result_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        }
+      },
+      "authority": "project-memory",
+      "mandatory": false,
+      "sensitivity": "local_only",
+      "freshness": "current",
+      "estimated_tokens": 90,
+      "stages": [
+        {
+          "stage": "scope-filter",
+          "disposition": "candidate",
+          "reason": "Memory is relevant to the project scope.",
+          "score": null,
+          "decision": null
+        },
+        {
+          "stage": "sensitivity-policy",
+          "disposition": "rejected",
+          "reason": "The target model is remote and local-only memory is not authorized for remote handoff.",
+          "score": null,
+          "decision": null
+        }
+      ],
+      "final_disposition": "rejected",
+      "reasons": [
+        "local-only",
+        "remote-handoff-blocked"
+      ]
+    }
+  ],
+  "budget": {
+    "input_limit": 500,
+    "allocations": [
+      {
+        "kind": "mandatory_project_truth",
+        "limit": null,
+        "estimated_selected": 120
+      },
+      {
+        "kind": "repository_evidence",
+        "limit": 200,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "project_memory",
+        "limit": 150,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "execution_evidence",
+        "limit": 75,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "generated_compression",
+        "limit": 75,
+        "estimated_selected": 0
+      }
+    ],
+    "estimated_selected": 120,
+    "over_budget": false
+  },
+  "token_usage": {
+    "estimated": {
+      "input": 120,
+      "tool_output": null,
+      "output": null
+    },
+    "observed": {
+      "input": null,
+      "tool_output": null,
+      "output": null
+    },
+    "observed_source_ref": null
+  },
+  "selection_fingerprint": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "compiled_plan_ref": "compiled-context:local-only",
+  "complete": true,
+  "not_checked": [
+    "provider tokenizer usage"
+  ]
+}
