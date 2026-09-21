@@ -18,27 +18,47 @@
     "not_checked"
   ],
   "properties": {
-    "format_version": { "const": 1 },
-    "kind": { "const": "compiled-context-plan" },
-    "target": { "$ref": "#/$defs/text" },
-    "task": { "$ref": "#/$defs/task" },
-    "compiler": { "$ref": "#/$defs/compiler" },
-    "budget": { "$ref": "#/$defs/budget" },
+    "format_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "compiled-context-plan"
+    },
+    "target": {
+      "$ref": "#/$defs/text"
+    },
+    "task": {
+      "$ref": "#/$defs/task"
+    },
+    "compiler": {
+      "$ref": "#/$defs/compiler"
+    },
+    "budget": {
+      "$ref": "#/$defs/budget"
+    },
     "active_context_packs": {
       "type": "array",
-      "items": { "$ref": "#/$defs/id" },
+      "items": {
+        "$ref": "#/$defs/id"
+      },
       "maxItems": 128,
       "uniqueItems": true
     },
     "items": {
       "type": "array",
-      "items": { "$ref": "#/$defs/item" },
+      "items": {
+        "$ref": "#/$defs/item"
+      },
       "maxItems": 200000
     },
-    "coverage": { "$ref": "#/$defs/coverage" },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    },
     "not_checked": {
       "type": "array",
-      "items": { "$ref": "#/$defs/text" },
+      "items": {
+        "$ref": "#/$defs/text"
+      },
       "maxItems": 128,
       "uniqueItems": true
     }
@@ -69,13 +89,22 @@
     "task": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["text", "intent"],
+      "required": [
+        "text",
+        "intent"
+      ],
       "properties": {
-        "text": { "$ref": "#/$defs/text" },
+        "text": {
+          "$ref": "#/$defs/text"
+        },
         "intent": {
           "oneOf": [
-            { "$ref": "#/$defs/id" },
-            { "type": "null" }
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       }
@@ -83,28 +112,53 @@
     "compiler": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "version", "deterministic"],
+      "required": [
+        "id",
+        "version",
+        "deterministic"
+      ],
       "properties": {
-        "id": { "$ref": "#/$defs/id" },
-        "version": { "$ref": "#/$defs/text" },
-        "deterministic": { "type": "boolean" }
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "version": {
+          "$ref": "#/$defs/text"
+        },
+        "deterministic": {
+          "type": "boolean"
+        }
       }
     },
     "budget_slice": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["limit", "estimated"],
+      "required": [
+        "limit",
+        "estimated"
+      ],
       "properties": {
         "limit": {
           "oneOf": [
-            { "type": "integer", "minimum": 1, "maximum": 1000000000 },
-            { "type": "null" }
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "estimated": {
           "oneOf": [
-            { "type": "integer", "minimum": 0, "maximum": 1000000000 },
-            { "type": "null" }
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       }
@@ -112,29 +166,61 @@
     "budget": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["estimator", "input", "tool_output", "output", "over_budget"],
+      "required": [
+        "estimator",
+        "input",
+        "tool_output",
+        "output",
+        "over_budget"
+      ],
       "properties": {
         "estimator": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["id", "version", "unit", "disclaimer"],
+          "required": [
+            "id",
+            "version",
+            "unit",
+            "disclaimer"
+          ],
           "properties": {
-            "id": { "$ref": "#/$defs/id" },
-            "version": { "$ref": "#/$defs/text" },
-            "unit": { "const": "estimated-tokens" },
-            "disclaimer": { "$ref": "#/$defs/text" }
+            "id": {
+              "$ref": "#/$defs/id"
+            },
+            "version": {
+              "$ref": "#/$defs/text"
+            },
+            "unit": {
+              "const": "estimated-tokens"
+            },
+            "disclaimer": {
+              "$ref": "#/$defs/text"
+            }
           }
         },
-        "input": { "$ref": "#/$defs/budget_slice" },
-        "tool_output": { "$ref": "#/$defs/budget_slice" },
-        "output": { "$ref": "#/$defs/budget_slice" },
-        "over_budget": { "type": "boolean" }
+        "input": {
+          "$ref": "#/$defs/budget_slice"
+        },
+        "tool_output": {
+          "$ref": "#/$defs/budget_slice"
+        },
+        "output": {
+          "$ref": "#/$defs/budget_slice"
+        },
+        "over_budget": {
+          "type": "boolean"
+        }
       }
     },
     "source": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "path", "digest", "revision"],
+      "required": [
+        "kind",
+        "path",
+        "digest",
+        "revision"
+      ],
       "properties": {
         "kind": {
           "enum": [
@@ -148,18 +234,104 @@
             "symbol",
             "diagnostic",
             "event",
-            "rule"
+            "rule",
+            "memory",
+            "execution-evidence"
           ]
         },
-        "path": { "$ref": "#/$defs/path" },
-        "digest": { "$ref": "#/$defs/digest" },
+        "path": {
+          "$ref": "#/$defs/path"
+        },
+        "digest": {
+          "$ref": "#/$defs/digest"
+        },
         "revision": {
           "oneOf": [
-            { "$ref": "#/$defs/text" },
-            { "type": "null" }
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "memory_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "provider_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "query_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_digest": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/digest"
+            },
+            {
+              "type": "null"
+            }
           ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "memory"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "memory_id",
+              "provider_id",
+              "query_id",
+              "result_digest"
+            ],
+            "properties": {
+              "memory_id": {
+                "$ref": "#/$defs/id"
+              },
+              "provider_id": {
+                "$ref": "#/$defs/id"
+              },
+              "query_id": {
+                "$ref": "#/$defs/id"
+              },
+              "result_digest": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        }
+      ]
     },
     "signals": {
       "type": "object",
@@ -174,25 +346,49 @@
         "relevance": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["score", "method"],
+          "required": [
+            "score",
+            "method"
+          ],
           "properties": {
-            "score": { "type": "number", "minimum": 0 },
-            "method": { "$ref": "#/$defs/id" }
+            "score": {
+              "type": "number",
+              "minimum": 0
+            },
+            "method": {
+              "$ref": "#/$defs/id"
+            }
           }
         },
         "confidence": {
           "oneOf": [
-            { "type": "number", "minimum": 0, "maximum": 1 },
-            { "type": "null" }
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "freshness": {
-          "enum": ["current", "stale", "unknown"]
+          "enum": [
+            "current",
+            "stale",
+            "unknown"
+          ]
         },
         "dependency_distance": {
           "oneOf": [
-            { "type": "integer", "minimum": 0, "maximum": 1000000 },
-            { "type": "null" }
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            {
+              "type": "null"
+            }
           ]
         }
       }
@@ -214,52 +410,131 @@
         "reasons"
       ],
       "properties": {
-        "id": { "$ref": "#/$defs/text" },
-        "source": { "$ref": "#/$defs/source" },
+        "id": {
+          "$ref": "#/$defs/text"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
         "authority": {
           "enum": [
             "mandatory-policy",
             "project-truth",
             "repository-evidence",
-            "generated-analysis"
+            "generated-analysis",
+            "project-memory",
+            "execution-evidence"
           ]
         },
-        "mandatory": { "type": "boolean" },
-        "stability": { "enum": ["stable", "volatile", "unknown"] },
+        "mandatory": {
+          "type": "boolean"
+        },
+        "stability": {
+          "enum": [
+            "stable",
+            "volatile",
+            "unknown"
+          ]
+        },
         "disclosure": {
-          "enum": ["router", "summary", "symbol", "file", "artifact-reference"]
+          "enum": [
+            "router",
+            "summary",
+            "symbol",
+            "file",
+            "artifact-reference"
+          ]
         },
         "disposition": {
-          "enum": ["included", "deferred", "omitted"]
+          "enum": [
+            "included",
+            "deferred",
+            "omitted"
+          ]
         },
         "estimated_tokens": {
           "type": "integer",
           "minimum": 1,
           "maximum": 1000000000
         },
-        "signals": { "$ref": "#/$defs/signals" },
+        "signals": {
+          "$ref": "#/$defs/signals"
+        },
         "context_packs": {
           "type": "array",
-          "items": { "$ref": "#/$defs/id" },
+          "items": {
+            "$ref": "#/$defs/id"
+          },
           "maxItems": 128,
           "uniqueItems": true
         },
         "reasons": {
           "type": "array",
-          "items": { "$ref": "#/$defs/id" },
+          "items": {
+            "$ref": "#/$defs/id"
+          },
           "minItems": 1,
           "maxItems": 32,
           "uniqueItems": true
+        },
+        "selection_trace_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "allOf": [
         {
           "if": {
-            "properties": { "mandatory": { "const": true } },
-            "required": ["mandatory"]
+            "properties": {
+              "mandatory": {
+                "const": true
+              }
+            },
+            "required": [
+              "mandatory"
+            ]
           },
           "then": {
-            "properties": { "disposition": { "const": "included" } }
+            "properties": {
+              "disposition": {
+                "const": "included"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "properties": {
+                  "kind": {
+                    "const": "memory"
+                  }
+                },
+                "required": [
+                  "kind"
+                ]
+              }
+            },
+            "required": [
+              "source"
+            ]
+          },
+          "then": {
+            "required": [
+              "selection_trace_ref"
+            ],
+            "properties": {
+              "selection_trace_ref": {
+                "$ref": "#/$defs/id"
+              }
+            }
           }
         }
       ]
@@ -277,7 +552,9 @@
         "errors"
       ],
       "properties": {
-        "complete": { "type": "boolean" },
+        "complete": {
+          "type": "boolean"
+        },
         "files_discovered": {
           "type": "integer",
           "minimum": 0,
@@ -305,7 +582,9 @@
         },
         "errors": {
           "type": "array",
-          "items": { "$ref": "#/$defs/text" },
+          "items": {
+            "$ref": "#/$defs/text"
+          },
           "maxItems": 1024
         }
       }
