@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "kind": "context-gateway-benchmark",
+  "id": "context-benchmark:review-01",
+  "task_ref": "task:context-review",
+  "input_fingerprint": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "baseline": {
+    "strategy": "full-context",
+    "context_ref": "context:full-review",
+    "mandatory_context_complete": true,
+    "selected_item_count": 24,
+    "usage": {
+      "estimated": {
+        "input": 1600,
+        "tool_output": 200,
+        "output": 300
+      },
+      "observed": {
+        "input": 1700,
+        "tool_output": 180,
+        "output": 320
+      },
+      "observed_source_ref": "provider-usage:baseline-01"
+    },
+    "outcome": {
+      "status": "verified",
+      "verifier": "Deterministic acceptance checks plus reviewer confirmation.",
+      "evidence_refs": [
+        "evidence:baseline-review-passed"
+      ]
+    }
+  },
+  "gateway": {
+    "strategy": "gateway-selected",
+    "context_ref": "compiled-context:no-memory",
+    "mandatory_context_complete": true,
+    "selected_item_count": 2,
+    "usage": {
+      "estimated": {
+        "input": 280,
+        "tool_output": 200,
+        "output": 300
+      },
+      "observed": {
+        "input": 300,
+        "tool_output": 170,
+        "output": 310
+      },
+      "observed_source_ref": "provider-usage:gateway-01"
+    },
+    "outcome": {
+      "status": "verified",
+      "verifier": "Same deterministic acceptance checks plus reviewer confirmation.",
+      "evidence_refs": [
+        "evidence:gateway-review-passed"
+      ]
+    }
+  },
+  "comparison": {
+    "outcome_equivalent": true,
+    "estimated_input_delta": -1320,
+    "observed_input_delta": -1400,
+    "quality_regression": false,
+    "notes": [
+      "Fixture demonstrates metric shape only; it is not a production performance claim."
+    ]
+  },
+  "created_at": "2026-09-21T20:30:00Z"
+}

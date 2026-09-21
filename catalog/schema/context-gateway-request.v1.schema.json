@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/context-gateway-request.v1.schema.json",
+  "title": "Agentic Harness ContextGatewayRequest v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "task", "scope", "input_identity",
+    "execution", "stages", "policy", "budget", "memory_query_refs", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "context-gateway-request" },
+    "id": { "$ref": "#/$defs/id" },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "intent"],
+      "properties": {
+        "text": { "$ref": "#/$defs/text" },
+        "intent": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["project_id", "repositories", "paths", "work_unit_ref"],
+      "properties": {
+        "project_id": { "$ref": "#/$defs/id" },
+        "repositories": {
+          "type": "array", "uniqueItems": true, "maxItems": 128,
+          "items": { "$ref": "#/$defs/text" }
+        },
+        "paths": {
+          "type": "array", "uniqueItems": true, "maxItems": 4096,
+          "items": { "$ref": "#/$defs/text" }
+        },
+        "work_unit_ref": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] }
+      }
+    },
+    "input_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_digest", "project_truth_digest", "repository_digest",
+        "memory_digest", "execution_evidence_digest"
+      ],
+      "properties": {
+        "request_digest": { "$ref": "#/$defs/digest" },
+        "project_truth_digest": { "$ref": "#/$defs/digest" },
+        "repository_digest": { "$ref": "#/$defs/digest" },
+        "memory_digest": { "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] },
+        "execution_evidence_digest": { "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "target_provider", "target_model"],
+      "properties": {
+        "environment": { "type": "string", "enum": ["local", "remote"] },
+        "target_provider": { "type": ["string", "null"], "maxLength": 1000 },
+        "target_model": { "type": ["string", "null"], "maxLength": 1000 }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lexical", "semantic_search", "typed_decision", "generative_compression"],
+      "properties": {
+        "lexical": { "type": "boolean" },
+        "semantic_search": { "type": "boolean" },
+        "typed_decision": { "type": "boolean" },
+        "generative_compression": { "type": "boolean" }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed_sensitivity", "semantic_gating_allowed",
+        "generative_compression_allowed"
+      ],
+      "properties": {
+        "allowed_sensitivity": {
+          "type": "array", "uniqueItems": true, "minItems": 1,
+          "items": { "type": "string", "enum": ["local_only", "project", "team", "org"] }
+        },
+        "semantic_gating_allowed": { "type": "boolean" },
+        "generative_compression_allowed": { "type": "boolean" }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_limit", "tool_output_limit", "output_limit", "allocations"],
+      "properties": {
+        "input_limit": { "type": "integer", "minimum": 1 },
+        "tool_output_limit": { "type": ["integer", "null"], "minimum": 1 },
+        "output_limit": { "type": ["integer", "null"], "minimum": 1 },
+        "allocations": {
+          "type": "array", "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "limit"],
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "mandatory_project_truth", "repository_evidence",
+                  "project_memory", "execution_evidence", "generated_compression"
+                ]
+              },
+              "limit": { "type": ["integer", "null"], "minimum": 0 }
+            }
+          }
+        }
+      }
+    },
+    "memory_query_refs": {
+      "type": "array", "uniqueItems": true, "maxItems": 128,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string", "minLength": 1, "maxLength": 256,
+      "pattern": "^[A-Za-z0-9_.:/+@-]+$"
+    },
+    "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

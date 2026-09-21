@@ -1,0 +1,113 @@
+{
+  "format_version": 1,
+  "kind": "compiled-context-plan",
+  "target": ".",
+  "task": {
+    "text": "Review context and memory integration.",
+    "intent": "code-review"
+  },
+  "compiler": {
+    "id": "agentic-harness/context-gateway",
+    "version": "1.0.0",
+    "deterministic": true
+  },
+  "budget": {
+    "estimator": {
+      "id": "characters-div-4",
+      "version": "1",
+      "unit": "estimated-tokens",
+      "disclaimer": "Portable estimate; not provider billing."
+    },
+    "input": {
+      "limit": 500,
+      "estimated": 210
+    },
+    "tool_output": {
+      "limit": 800,
+      "estimated": null
+    },
+    "output": {
+      "limit": 500,
+      "estimated": null
+    },
+    "over_budget": false
+  },
+  "active_context_packs": [],
+  "items": [
+    {
+      "id": "AGENTS.md",
+      "source": {
+        "kind": "router",
+        "path": "AGENTS.md",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "revision": "main"
+      },
+      "authority": "project-truth",
+      "mandatory": true,
+      "stability": "stable",
+      "disclosure": "router",
+      "disposition": "included",
+      "estimated_tokens": 120,
+      "signals": {
+        "relevance": {
+          "score": 0,
+          "method": "mandatory-policy"
+        },
+        "confidence": null,
+        "freshness": "current",
+        "dependency_distance": null
+      },
+      "context_packs": [],
+      "reasons": [
+        "mandatory-project-truth"
+      ],
+      "selection_trace_ref": null
+    },
+    {
+      "id": "memory:accepted:strict-query-boundary",
+      "source": {
+        "kind": "memory",
+        "path": "memory://memory-provider:remote-service/memory:accepted:strict-query-boundary",
+        "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "revision": "2026-09-21T20:25:00Z",
+        "memory_id": "memory:accepted:strict-query-boundary",
+        "provider_id": "memory-provider:remote-service",
+        "query_id": "memory-query:context-rules",
+        "result_digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      },
+      "authority": "project-memory",
+      "mandatory": false,
+      "stability": "stable",
+      "disclosure": "summary",
+      "disposition": "included",
+      "estimated_tokens": 90,
+      "signals": {
+        "relevance": {
+          "score": 0.91,
+          "method": "memory-semantic-v1"
+        },
+        "confidence": 0.9,
+        "freshness": "current",
+        "dependency_distance": null
+      },
+      "context_packs": [],
+      "reasons": [
+        "current-memory",
+        "semantic-match"
+      ],
+      "selection_trace_ref": "context-trace:memory-included"
+    }
+  ],
+  "coverage": {
+    "complete": true,
+    "files_discovered": 1,
+    "supported_text_files": 1,
+    "unsupported_files": 0,
+    "unreadable_files": 0,
+    "required_unavailable": 0,
+    "errors": []
+  },
+  "not_checked": [
+    "provider tokenizer billing"
+  ]
+}

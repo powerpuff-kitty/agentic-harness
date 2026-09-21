@@ -25,6 +25,7 @@ jobs:
           python3 .github/scripts/validate_cli_contracts.py
           python3 .github/scripts/validate_agent_work_protocol.py
           python3 .github/scripts/validate_project_memory.py
+          python3 .github/scripts/validate_context_gateway.py
 
   reading-list:
     runs-on: ubuntu-latest

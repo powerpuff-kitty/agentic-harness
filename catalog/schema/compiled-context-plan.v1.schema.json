@@ -144,6 +144,8 @@
             "project-context",
             "project-truth",
             "repository-file",
+            "memory",
+            "execution-evidence",
             "summary",
             "symbol",
             "diagnostic",
@@ -158,8 +160,49 @@
             { "$ref": "#/$defs/text" },
             { "type": "null" }
           ]
+        },
+        "memory_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "provider_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "query_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "result_digest": {
+          "oneOf": [
+            { "$ref": "#/$defs/digest" },
+            { "type": "null" }
+          ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "kind": { "const": "memory" } },
+            "required": ["kind"]
+          },
+          "then": {
+            "required": ["memory_id", "provider_id", "query_id", "result_digest"],
+            "properties": {
+              "memory_id": { "$ref": "#/$defs/id" },
+              "provider_id": { "$ref": "#/$defs/id" },
+              "query_id": { "$ref": "#/$defs/id" },
+              "result_digest": { "$ref": "#/$defs/digest" }
+            }
+          }
+        }
+      ]
     },
     "signals": {
       "type": "object",
@@ -221,6 +264,8 @@
             "mandatory-policy",
             "project-truth",
             "repository-evidence",
+            "project-memory",
+            "execution-evidence",
             "generated-analysis"
           ]
         },
@@ -244,6 +289,12 @@
           "maxItems": 128,
           "uniqueItems": true
         },
+        "selection_trace_ref": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
         "reasons": {
           "type": "array",
           "items": { "$ref": "#/$defs/id" },
@@ -260,6 +311,23 @@
           },
           "then": {
             "properties": { "disposition": { "const": "included" } }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "source": {
+                "properties": { "kind": { "const": "memory" } },
+                "required": ["kind"]
+              }
+            },
+            "required": ["source"]
+          },
+          "then": {
+            "required": ["selection_trace_ref"],
+            "properties": {
+              "selection_trace_ref": { "$ref": "#/$defs/id" }
+            }
           }
         }
       ]

@@ -1,0 +1,147 @@
+{
+  "format_version": 1,
+  "kind": "context-selection-trace",
+  "id": "context-trace:budget-overflow",
+  "request_ref": "context-request:remote-review",
+  "input_fingerprint": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+  "selector": {
+    "id": "context-gateway",
+    "version": "1.0.0",
+    "deterministic": true
+  },
+  "candidates": [
+    {
+      "id": "candidate:project-truth",
+      "source": {
+        "kind": "project-truth",
+        "reference": "AGENTS.md",
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "revision": "main",
+        "retrieval": {
+          "kind": "direct",
+          "query_ref": null,
+          "provider_ref": null,
+          "result_digest": null
+        }
+      },
+      "authority": "project-truth",
+      "mandatory": true,
+      "sensitivity": "project",
+      "freshness": "current",
+      "estimated_tokens": 650,
+      "stages": [
+        {
+          "stage": "mandatory-policy",
+          "disposition": "included",
+          "reason": "Mandatory project truth remains included even though it exceeds the input budget.",
+          "score": null,
+          "decision": null
+        },
+        {
+          "stage": "budget",
+          "disposition": "included",
+          "reason": "Budget overflow is reported instead of dropping mandatory context.",
+          "score": null,
+          "decision": null
+        }
+      ],
+      "final_disposition": "included",
+      "reasons": [
+        "mandatory-project-truth",
+        "budget-overflow"
+      ]
+    },
+    {
+      "id": "candidate:optional-repository",
+      "source": {
+        "kind": "repository-evidence",
+        "reference": "registry/project-memory/README.md",
+        "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+        "revision": "main",
+        "retrieval": {
+          "kind": "repository-search",
+          "query_ref": "repo-query:memory",
+          "provider_ref": "repository-index:v1",
+          "result_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+        }
+      },
+      "authority": "repository-evidence",
+      "mandatory": false,
+      "sensitivity": "project",
+      "freshness": "current",
+      "estimated_tokens": 100,
+      "stages": [
+        {
+          "stage": "scope-filter",
+          "disposition": "candidate",
+          "reason": "Repository evidence is in task scope.",
+          "score": null,
+          "decision": null
+        },
+        {
+          "stage": "budget",
+          "disposition": "deferred",
+          "reason": "Optional evidence is deferred because mandatory context already exceeds the budget.",
+          "score": null,
+          "decision": null
+        }
+      ],
+      "final_disposition": "deferred",
+      "reasons": [
+        "budget",
+        "mandatory-context-first"
+      ]
+    }
+  ],
+  "budget": {
+    "input_limit": 500,
+    "allocations": [
+      {
+        "kind": "mandatory_project_truth",
+        "limit": null,
+        "estimated_selected": 650
+      },
+      {
+        "kind": "repository_evidence",
+        "limit": 200,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "project_memory",
+        "limit": 150,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "execution_evidence",
+        "limit": 75,
+        "estimated_selected": 0
+      },
+      {
+        "kind": "generated_compression",
+        "limit": 75,
+        "estimated_selected": 0
+      }
+    ],
+    "estimated_selected": 650,
+    "over_budget": true
+  },
+  "token_usage": {
+    "estimated": {
+      "input": 650,
+      "tool_output": null,
+      "output": null
+    },
+    "observed": {
+      "input": null,
+      "tool_output": null,
+      "output": null
+    },
+    "observed_source_ref": null
+  },
+  "selection_fingerprint": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+  "compiled_plan_ref": "compiled-context:budget-overflow",
+  "complete": true,
+  "not_checked": [
+    "provider tokenizer usage"
+  ]
+}
