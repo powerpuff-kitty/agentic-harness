@@ -58,7 +58,8 @@ def validate(kind: str, value, label: str) -> None:
 memories_value = load(FIXTURES / "memories.v1.json")
 operations_value = load(FIXTURES / "operations.v1.json")
 local_provider = load(FIXTURES / "provider-local.v1.json")
-remote_provider = load(FIXTURES / "provider-remote.v1.json")\nhybrid_provider = load(FIXTURES / "provider-hybrid.v1.json")
+remote_provider = load(FIXTURES / "provider-remote.v1.json")
+hybrid_provider = load(FIXTURES / "provider-hybrid.v1.json")
 query = load(FIXTURES / "query-remote.v1.json")
 result = load(FIXTURES / "result-remote.v1.json")
 
