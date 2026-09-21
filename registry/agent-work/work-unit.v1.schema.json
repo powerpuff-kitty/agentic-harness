@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/work-unit.v1.schema.json",
+  "title": "Agent Work WorkUnit v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "id", "source", "objective", "acceptance_criteria", "permissions", "state", "created_at", "runs", "current_run_id"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-unit" },
+    "id": { "$ref": "#/$defs/id" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["ticket", "issue", "project-item", "finding", "trail", "prompt", "other"] },
+        "reference": { "type": "string", "minLength": 1 }
+      }
+    },
+    "objective": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "acceptance_criteria": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "text": { "type": "string", "minLength": 1, "maxLength": 5000 }
+        }
+      }
+    },
+    "permissions": { "$ref": "#/$defs/permissions" },
+    "state": { "$ref": "#/$defs/state" },
+    "created_at": { "$ref": "#/$defs/timestamp" },
+    "runs": { "type": "array", "maxItems": 1000, "items": { "$ref": "#/$defs/run" } },
+    "current_run_id": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "state": {
+      "type": "string",
+      "enum": ["proposed", "queued", "running", "validating", "completed", "blocked", "waiting_for_user", "waiting_for_approval", "failed", "cancelled"]
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read", "write", "execute", "commit", "create_pr"],
+      "properties": {
+        "read": { "type": "boolean" },
+        "write": { "type": "boolean" },
+        "execute": { "type": "boolean" },
+        "commit": { "type": "boolean" },
+        "create_pr": { "type": "boolean" }
+      }
+    },
+    "plan_revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revision", "created_at", "task_ids", "change_summary"],
+      "properties": {
+        "revision": { "type": "integer", "minimum": 1 },
+        "created_at": { "$ref": "#/$defs/timestamp" },
+        "task_ids": { "type": "array", "uniqueItems": true, "maxItems": 5000, "items": { "$ref": "#/$defs/id" } },
+        "change_summary": { "type": ["string", "null"], "maxLength": 5000 }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "parent_id", "title", "depends_on", "state", "evidence_refs", "artifact_refs"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "parent_id": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+        "title": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "depends_on": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "state": { "$ref": "#/$defs/state" },
+        "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "artifact_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "task_id", "ordinal", "state", "started_at", "completed_at"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "task_id": { "$ref": "#/$defs/id" },
+        "ordinal": { "type": "integer", "minimum": 1 },
+        "state": { "$ref": "#/$defs/state" },
+        "started_at": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
+        "completed_at": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] }
+      }
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "revision": { "type": ["string", "null"] },
+        "branch": { "type": ["string", "null"] },
+        "pull_request": { "type": ["string", "null"], "format": "uri" }
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "agent_connection_id", "state", "plan_revisions", "tasks", "attempts", "result"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "role": { "type": "string", "enum": ["implementer", "collaborator", "reviewer", "validator", "evaluator", "specialist"] },
+        "agent_connection_id": { "$ref": "#/$defs/id" },
+        "state": { "$ref": "#/$defs/state" },
+        "plan_revisions": { "type": "array", "maxItems": 1000, "items": { "$ref": "#/$defs/plan_revision" } },
+        "tasks": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/task" } },
+        "attempts": { "type": "array", "maxItems": 10000, "items": { "$ref": "#/$defs/attempt" } },
+        "result": { "$ref": "#/$defs/result" }
+      }
+    }
+  }
+}
