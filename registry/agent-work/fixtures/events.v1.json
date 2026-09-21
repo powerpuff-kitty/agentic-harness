@@ -1,0 +1,44 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:1",
+    "work_unit_id": "wu:342",
+    "run_id": "run:1",
+    "sequence": 1,
+    "occurred_at": "2026-09-21T17:00:02Z",
+    "type": "plan.created",
+    "subject": { "kind": "plan", "id": "run:1:plan:1" },
+    "summary": "Initial plan recorded.",
+    "evidence_refs": [],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:2",
+    "work_unit_id": "wu:342",
+    "run_id": "run:1",
+    "sequence": 2,
+    "occurred_at": "2026-09-21T17:00:03Z",
+    "type": "task.started",
+    "subject": { "kind": "task", "id": "task:inspect" },
+    "summary": "Inspecting search architecture.",
+    "evidence_refs": [],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:3",
+    "work_unit_id": "wu:342",
+    "run_id": "run:1",
+    "sequence": 3,
+    "occurred_at": "2026-09-21T17:05:00Z",
+    "type": "plan.revised",
+    "subject": { "kind": "plan", "id": "run:1:plan:2" },
+    "summary": "Compatibility validation task added.",
+    "evidence_refs": ["evidence:architecture"],
+    "artifact_refs": []
+  }
+]
