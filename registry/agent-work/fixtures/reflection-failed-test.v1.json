@@ -1,0 +1,51 @@
+{
+  "format_version": 1,
+  "kind": "work-reflection",
+  "id": "reflection:test-failure:1",
+  "work_unit_id": "wu:reflection-demo",
+  "run_id": "run:reflection-demo",
+  "attempt_id": "attempt:implement:1",
+  "trigger": {
+    "kind": "failed_check",
+    "summary": "The repository query test failed after the implementation attempt.",
+    "evidence_refs": ["evidence:test-failure"],
+    "finding_refs": ["finding:test-failure"]
+  },
+  "status": "completed",
+  "observation": {
+    "failure_or_risk": "The implementation used a normalized orientation value while the repository query expects the canonical enum token.",
+    "unsupported_assumptions": [
+      "The repository adapter would normalize display labels before query serialization."
+    ]
+  },
+  "causes": [
+    {
+      "summary": "The implementation assumed normalization at the adapter boundary, but the failing test shows the boundary is strict.",
+      "confidence": 0.92,
+      "evidence_refs": ["evidence:test-failure", "evidence:repository-query-contract"]
+    }
+  ],
+  "corrections": [
+    {
+      "id": "correction:canonical-orientation",
+      "summary": "Serialize the canonical orientation enum at the query boundary and rerun the focused test.",
+      "scope": "task",
+      "action_ref": "action:fix-orientation",
+      "next_attempt_ref": "attempt:implement:2"
+    }
+  ],
+  "provider": {
+    "kind": "agent",
+    "connection_id": "agent:codex-local",
+    "name": "codex",
+    "model": null,
+    "version": null
+  },
+  "confidence": 0.92,
+  "evidence_refs": ["evidence:test-failure", "evidence:repository-query-contract"],
+  "resulting_action_ref": "action:fix-orientation",
+  "next_attempt_ref": "attempt:implement:2",
+  "memory_candidate_refs": ["memory-candidate:strict-query-boundary"],
+  "prior_reflection_ref": null,
+  "created_at": "2026-09-21T20:02:00Z"
+}
