@@ -53,6 +53,10 @@ def inspect_evaluation(value):
     baseline_checks_missing = _missing_checks(value, value["baseline"])
     candidate_checks_missing = _missing_checks(value, value["candidate"])
     for label, treatment in (("baseline", value["baseline"]), ("candidate", value["candidate"])):
+        estimated = treatment["usage"]["estimated"]
+        estimate_fields = ("input_tokens", "tool_output_tokens", "output_tokens")
+        if estimated["estimator"] is None and any(estimated[field] is not None for field in estimate_fields):
+            errors.append(label + "-estimated-usage-without-estimator")
         observed = treatment["usage"]["observed"]
         token_fields = ("input_tokens", "tool_output_tokens", "output_tokens", "retries")
         if observed["token_usage_complete"] and any(observed[field] is None for field in token_fields):
@@ -114,6 +118,8 @@ def inspect_routing(value):
     errors = []
     if value["deterministic_exact_answer_available"] and value["selected"]["kind"] != "deterministic-tool":
         errors.append("deterministic-exact-answer-not-preferred")
+    if value["stage_class"] == "deterministic-tool" and value["selected"]["kind"] != "deterministic-tool":
+        errors.append("deterministic-stage-routed-to-nondeterministic-mechanism")
     if value["evidence_status"] == "unmeasured":
         if value["evaluation_refs"] or value["measured_quality"] is not None or value["measured_cost_microunits"] is not None:
             errors.append("unmeasured-route-has-measured-claims")
