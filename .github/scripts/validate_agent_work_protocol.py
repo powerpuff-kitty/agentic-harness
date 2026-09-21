@@ -18,6 +18,7 @@ SCHEMAS = {
     "work-evidence": WORK / "evidence.v1.schema.json",
     "work-artifact": WORK / "artifact.v1.schema.json",
     "work-redaction": WORK / "redaction.v1.schema.json",
+    "work-lifecycle": WORK / "lifecycle.v1.schema.json",
     "work-evaluation": WORK / "evaluation.v1.schema.json",
     "work-action": WORK / "work-action.v1.schema.json",
     "agent-connection": WORK / "agent-connection.v1.schema.json",
@@ -104,6 +105,8 @@ redactions = load(FIXTURES / "redactions.v1.json")
 replay_seed = load(FIXTURES / "replay-seed-work-unit.v1.json")
 replay_expected = load(FIXTURES / "replay-expected-work-unit.v1.json")
 replay_events = load(FIXTURES / "replay-events.v1.json")
+lifecycle_policy = load(WORK / "lifecycle.v1.json")
+lifecycle_work_units = load(FIXTURES / "lifecycle-work-units.v1.json")
 
 reflection_files = [
     "reflection-failed-test.v1.json",
@@ -117,6 +120,304 @@ reflection_policy = load(FIXTURES / "reflection-policy.v1.json")
 reflection_decision = load(FIXTURES / "reflection-trigger-skip.v1.json")
 reflection_events = load(FIXTURES / "reflection-correction-events.v1.json")
 corrected_work_unit = load(FIXTURES / "reflection-corrected-work-unit.v1.json")
+
+WORK_STATES = {
+    "proposed", "queued", "running", "validating", "completed",
+    "blocked", "waiting_for_user", "waiting_for_approval", "failed", "cancelled",
+}
+TRANSITIONS: dict[str, dict[str, set[str]]] = {}
+
+if isinstance(lifecycle_policy, dict):
+    validate("work-lifecycle", lifecycle_policy, "lifecycle-policy")
+    if set(lifecycle_policy.get("states", [])) != WORK_STATES:
+        fail("lifecycle-policy: states must enumerate the canonical Work state set exactly")
+
+    progress = lifecycle_policy.get("progress", {})
+    if isinstance(progress, dict):
+        if progress.get("basis") != "latest-plan-task-state-counts":
+            fail("lifecycle-policy: progress must derive from latest plan task states")
+        if progress.get("persist_percentage") is not False:
+            fail("lifecycle-policy: canonical state must not persist an invented progress percentage")
+
+    entities = lifecycle_policy.get("entities", {})
+    if isinstance(entities, dict):
+        for entity_kind in ("work-unit", "run", "task", "attempt"):
+            policy = entities.get(entity_kind)
+            if not isinstance(policy, dict):
+                fail(f"lifecycle-policy: missing policy for {entity_kind}")
+                continue
+
+            transition_rows = policy.get("transitions", [])
+            by_from: dict[str, set[str]] = {}
+            for row in transition_rows:
+                if not isinstance(row, dict):
+                    continue
+                source = row.get("from")
+                if source in by_from:
+                    fail(f"lifecycle-policy:{entity_kind}: duplicate transition row for {source}")
+                    continue
+                targets = set(row.get("to", []))
+                if source in targets:
+                    fail(f"lifecycle-policy:{entity_kind}: self-transition is not allowed for {source}")
+                by_from[source] = targets
+
+            required_states = (
+                {"queued", "running", "completed", "failed", "cancelled"}
+                if entity_kind == "attempt"
+                else WORK_STATES
+            )
+            if set(by_from) != required_states:
+                missing = sorted(required_states - set(by_from))
+                extra = sorted(set(by_from) - required_states)
+                fail(
+                    f"lifecycle-policy:{entity_kind}: transition rows mismatch "
+                    f"(missing={missing}, extra={extra})"
+                )
+
+            terminal_states = set(policy.get("terminal_states", []))
+            for terminal_state in terminal_states:
+                if by_from.get(terminal_state):
+                    fail(
+                        f"lifecycle-policy:{entity_kind}: terminal state "
+                        f"{terminal_state} must not have outgoing transitions"
+                    )
+
+            TRANSITIONS[entity_kind] = by_from
+
+
+def transition_allowed(entity_kind: str, previous: str, next_state: str) -> bool:
+    return next_state in TRANSITIONS.get(entity_kind, {}).get(previous, set())
+
+
+def derived_progress(run: dict) -> dict:
+    revisions = [
+        revision
+        for revision in run.get("plan_revisions", [])
+        if isinstance(revision, dict)
+    ]
+    if not revisions:
+        return {"total": 0, "by_state": {}}
+
+    latest = max(revisions, key=lambda revision: revision.get("revision", 0))
+    active_ids = set(latest.get("task_ids", []))
+    by_state: dict[str, int] = {}
+    total = 0
+    for task in run.get("tasks", []):
+        if not isinstance(task, dict) or task.get("id") not in active_ids:
+            continue
+        state = task.get("state")
+        by_state[state] = by_state.get(state, 0) + 1
+        total += 1
+    return {"total": total, "by_state": by_state}
+
+
+def validate_work_unit_lifecycle(value: dict, label: str) -> None:
+    validate("work-unit", value, label)
+
+    if "progress" in value or "progress_percentage" in value:
+        fail(f"{label}: progress must be derived, not persisted")
+
+    runs = [run for run in value.get("runs", []) if isinstance(run, dict)]
+    run_ids = [run.get("id") for run in runs]
+    if len(run_ids) != len(set(run_ids)):
+        fail(f"{label}: run ids must be unique")
+
+    current_run_id = value.get("current_run_id")
+    current_run = next((run for run in runs if run.get("id") == current_run_id), None)
+    if current_run_id is not None and current_run is None:
+        fail(f"{label}: current_run_id must reference an existing run")
+
+    for run in runs:
+        run_id = run.get("id")
+        if "progress" in run or "progress_percentage" in run:
+            fail(f"{label}:{run_id}: progress must be derived from task state")
+
+        tasks = [task for task in run.get("tasks", []) if isinstance(task, dict)]
+        task_by_id = {
+            task.get("id"): task
+            for task in tasks
+            if isinstance(task.get("id"), str)
+        }
+        if len(task_by_id) != len(tasks):
+            fail(f"{label}:{run_id}: task ids must be unique")
+
+        # Parent hierarchy and dependency edges are separate DAGs. Both must be acyclic.
+        parent_edges: dict[str, list[str]] = {}
+        dependency_edges: dict[str, list[str]] = {}
+        for task_id, task in task_by_id.items():
+            parent = task.get("parent_id")
+            if parent is not None:
+                if parent not in task_by_id:
+                    fail(f"{label}:{run_id}:{task_id}: unknown parent {parent}")
+                if parent == task_id:
+                    fail(f"{label}:{run_id}:{task_id}: task cannot parent itself")
+                parent_edges[task_id] = [parent]
+            else:
+                parent_edges[task_id] = []
+
+            dependencies = list(task.get("depends_on", []))
+            dependency_edges[task_id] = dependencies
+            for dependency in dependencies:
+                if dependency not in task_by_id:
+                    fail(f"{label}:{run_id}:{task_id}: unknown dependency {dependency}")
+                if dependency == task_id:
+                    fail(f"{label}:{run_id}:{task_id}: task cannot depend on itself")
+
+        def ensure_acyclic(edges: dict[str, list[str]], edge_kind: str) -> None:
+            visiting: set[str] = set()
+            visited: set[str] = set()
+
+            def visit(node: str) -> None:
+                if node in visited:
+                    return
+                if node in visiting:
+                    fail(f"{label}:{run_id}: {edge_kind} graph contains a cycle at {node}")
+                    return
+                visiting.add(node)
+                for dependency in edges.get(node, []):
+                    if dependency in edges:
+                        visit(dependency)
+                visiting.remove(node)
+                visited.add(node)
+
+            for node in edges:
+                visit(node)
+
+        ensure_acyclic(parent_edges, "parent")
+        ensure_acyclic(dependency_edges, "dependency")
+
+        revisions = [
+            revision
+            for revision in run.get("plan_revisions", [])
+            if isinstance(revision, dict)
+        ]
+        revision_numbers = [revision.get("revision") for revision in revisions]
+        if revision_numbers != sorted(revision_numbers) or len(revision_numbers) != len(set(revision_numbers)):
+            fail(f"{label}:{run_id}: plan revisions must append monotonically")
+        for revision in revisions:
+            for task_id in revision.get("task_ids", []):
+                if task_id not in task_by_id:
+                    fail(f"{label}:{run_id}: plan revision references unknown task {task_id}")
+
+        latest_ids: set[str] = set()
+        if revisions:
+            latest_ids = set(max(revisions, key=lambda revision: revision.get("revision", 0)).get("task_ids", []))
+
+        for task_id, task in task_by_id.items():
+            if task.get("state") == "completed":
+                for dependency in task.get("depends_on", []):
+                    dependency_task = task_by_id.get(dependency)
+                    if dependency_task is not None and dependency_task.get("state") != "completed":
+                        fail(
+                            f"{label}:{run_id}:{task_id}: completed task has "
+                            f"non-completed dependency {dependency}"
+                        )
+
+        attempts_by_task: dict[str, list[dict]] = {}
+        for attempt in run.get("attempts", []):
+            if not isinstance(attempt, dict):
+                continue
+            task_id = attempt.get("task_id")
+            attempt_id = attempt.get("id")
+            if task_id not in task_by_id:
+                fail(f"{label}:{run_id}:{attempt_id}: attempt references unknown task {task_id}")
+                continue
+            attempts_by_task.setdefault(task_id, []).append(attempt)
+
+            state = attempt.get("state")
+            started_at = attempt.get("started_at")
+            completed_at = attempt.get("completed_at")
+            if state == "queued" and (started_at is not None or completed_at is not None):
+                fail(f"{label}:{run_id}:{attempt_id}: queued attempt cannot have timestamps")
+            if state == "running" and (started_at is None or completed_at is not None):
+                fail(f"{label}:{run_id}:{attempt_id}: running attempt requires start and no completion")
+            if state in {"completed", "failed", "cancelled"} and (
+                started_at is None or completed_at is None
+            ):
+                fail(f"{label}:{run_id}:{attempt_id}: terminal attempt requires start and completion")
+
+        for task_id, attempts in attempts_by_task.items():
+            attempts.sort(key=lambda attempt: attempt.get("ordinal", 0))
+            ordinals = [attempt.get("ordinal") for attempt in attempts]
+            expected_ordinals = list(range(1, len(attempts) + 1))
+            if ordinals != expected_ordinals:
+                fail(
+                    f"{label}:{run_id}:{task_id}: retry ordinals must be contiguous "
+                    f"from 1, found {ordinals}"
+                )
+            for prior in attempts[:-1]:
+                if prior.get("state") not in {"failed", "cancelled"}:
+                    fail(
+                        f"{label}:{run_id}:{task_id}: a later retry cannot follow "
+                        f"attempt {prior.get('id')} in state {prior.get('state')}"
+                    )
+
+        # The current projection can fail/block while historical tasks remain preserved.
+        active_tasks = [task_by_id[task_id] for task_id in latest_ids if task_id in task_by_id]
+        active_states = {task.get("state") for task in active_tasks}
+        run_state = run.get("state")
+        if run_state == "completed" and any(
+            task.get("state") not in {"completed", "cancelled"} for task in active_tasks
+        ):
+            fail(f"{label}:{run_id}: completed run has unfinished active tasks")
+        if run_state == "blocked" and not (
+            active_states & {"blocked", "waiting_for_user", "waiting_for_approval"}
+        ):
+            fail(f"{label}:{run_id}: blocked run lacks an active blocking task")
+        if run_state == "failed" and "failed" not in active_states:
+            fail(f"{label}:{run_id}: failed run lacks an active failed task")
+
+        progress = derived_progress(run)
+        if progress["total"] != len(latest_ids):
+            fail(f"{label}:{run_id}: derived progress does not cover latest plan tasks")
+
+    if isinstance(current_run, dict):
+        work_state = value.get("state")
+        run_state = current_run.get("state")
+        if work_state in {"completed", "blocked", "failed"} and run_state != work_state:
+            fail(
+                f"{label}: current run state {run_state} does not match "
+                f"terminal/blocking work-unit state {work_state}"
+            )
+
+
+if isinstance(lifecycle_work_units, list):
+    seen_lifecycle_ids: set[str] = set()
+    for index, lifecycle_work_unit in enumerate(lifecycle_work_units):
+        if not isinstance(lifecycle_work_unit, dict):
+            fail(f"lifecycle-work-units[{index}]: expected an object")
+            continue
+        work_unit_id = lifecycle_work_unit.get("id")
+        if work_unit_id in seen_lifecycle_ids:
+            fail(f"lifecycle-work-units[{index}]: duplicate work-unit id {work_unit_id}")
+        if isinstance(work_unit_id, str):
+            seen_lifecycle_ids.add(work_unit_id)
+        validate_work_unit_lifecycle(
+            lifecycle_work_unit,
+            f"lifecycle-work-units[{index}]",
+        )
+
+    required_cases = {
+        "wu:lifecycle:successful",
+        "wu:lifecycle:blocked",
+        "wu:lifecycle:failed",
+        "wu:lifecycle:retried",
+    }
+    if not required_cases.issubset(seen_lifecycle_ids):
+        fail(
+            "lifecycle-work-units: missing required lifecycle cases "
+            f"{sorted(required_cases - seen_lifecycle_ids)}"
+        )
+
+for fixture_label, fixture_value in (
+    ("replanned-work-unit", work_unit),
+    ("reflection-corrected-work-unit", corrected_work_unit),
+    ("replay-seed-work-unit", replay_seed),
+    ("replay-expected-work-unit", replay_expected),
+):
+    if isinstance(fixture_value, dict):
+        validate_work_unit_lifecycle(fixture_value, fixture_label)
+
 
 if isinstance(work_unit, dict):
     validate("work-unit", work_unit, "replanned-work-unit")
@@ -469,6 +770,12 @@ if isinstance(replay_seed, dict) and isinstance(replay_expected, dict) and isins
         entity_id = entity.get("id") if isinstance(entity, dict) else None
 
         if operation == "state_transition":
+            if not transition_allowed(entity_kind, delta.get("previous_state"), delta.get("next_state")):
+                fail(
+                    f"replay-events[{index}]: lifecycle forbids "
+                    f"{entity_kind} {delta.get('previous_state')} -> {delta.get('next_state')}"
+                )
+                continue
             target = _entity_for_delta(projection, entity_kind, entity_id)
             if target is None:
                 fail(f"replay-events[{index}]: transition target {entity_kind}:{entity_id} is missing")
@@ -657,6 +964,15 @@ if isinstance(failed_reflection, dict) and isinstance(reflection_events, list):
         fail("reflection-correction-events: missing corrective attempt completion")
     if not any(event.get("type") == "test.passed" for event in reflection_events if isinstance(event, dict)):
         fail("reflection-correction-events: successful correction requires verification evidence")
+
+# Negative lifecycle checks make recovery/terminal semantics executable.
+if TRANSITIONS:
+    if transition_allowed("attempt", "failed", "running"):
+        fail("lifecycle-policy: failed Attempt must be terminal; retry requires a new Attempt")
+    if transition_allowed("task", "completed", "running"):
+        fail("lifecycle-policy: completed Task must not restart in place")
+    if not transition_allowed("task", "failed", "queued"):
+        fail("lifecycle-policy: failed Task should support explicit recovery through queued state")
 
 if errors:
     print("Agent Work Protocol validation failed:", file=sys.stderr)
