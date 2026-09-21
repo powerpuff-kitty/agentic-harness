@@ -1,0 +1,338 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:successful",
+    "source": {
+      "kind": "issue",
+      "reference": "fixture:wu:lifecycle:successful"
+    },
+    "objective": "Lifecycle conformance case wu:lifecycle:successful.",
+    "acceptance_criteria": [
+      {
+        "id": "ac:successful",
+        "text": "Fixture satisfies its declared lifecycle outcome."
+      }
+    ],
+    "permissions": {
+      "read": true,
+      "write": true,
+      "execute": true,
+      "commit": false,
+      "create_pr": false
+    },
+    "state": "completed",
+    "created_at": "2026-09-21T20:50:00Z",
+    "runs": [
+      {
+        "id": "run:lifecycle:successful",
+        "role": "implementer",
+        "agent_connection_id": "agent:fixture",
+        "session_ref": "session:fixture:successful",
+        "input_revision": {
+          "source_revision": "fixture-rev:successful",
+          "context_fingerprint": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "state": "completed",
+        "plan_revisions": [
+          {
+            "revision": 1,
+            "created_at": "2026-09-21T20:50:01Z",
+            "task_ids": [
+              "task:success:root",
+              "task:success:verify"
+            ],
+            "change_summary": "Successful nested-task plan."
+          }
+        ],
+        "tasks": [
+          {
+            "id": "task:success:root",
+            "parent_id": null,
+            "title": "Implement change",
+            "depends_on": [],
+            "state": "completed",
+            "evidence_refs": [],
+            "artifact_refs": [
+              "artifact:success"
+            ]
+          },
+          {
+            "id": "task:success:verify",
+            "parent_id": "task:success:root",
+            "title": "Verify change",
+            "depends_on": [
+              "task:success:root"
+            ],
+            "state": "completed",
+            "evidence_refs": [
+              "evidence:success"
+            ],
+            "artifact_refs": []
+          }
+        ],
+        "attempts": [
+          {
+            "id": "attempt:success:root:1",
+            "task_id": "task:success:root",
+            "ordinal": 1,
+            "state": "completed",
+            "started_at": "2026-09-21T20:50:02Z",
+            "completed_at": "2026-09-21T20:50:20Z",
+            "triggered_by_reflection_ref": null
+          },
+          {
+            "id": "attempt:success:verify:1",
+            "task_id": "task:success:verify",
+            "ordinal": 1,
+            "state": "completed",
+            "started_at": "2026-09-21T20:50:21Z",
+            "completed_at": "2026-09-21T20:50:30Z",
+            "triggered_by_reflection_ref": null
+          }
+        ],
+        "result": {
+          "revision": "fixture-output:successful",
+          "branch": null,
+          "pull_request": null
+        }
+      }
+    ],
+    "current_run_id": "run:lifecycle:successful"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:blocked",
+    "source": {
+      "kind": "issue",
+      "reference": "fixture:wu:lifecycle:blocked"
+    },
+    "objective": "Lifecycle conformance case wu:lifecycle:blocked.",
+    "acceptance_criteria": [
+      {
+        "id": "ac:blocked",
+        "text": "Fixture satisfies its declared lifecycle outcome."
+      }
+    ],
+    "permissions": {
+      "read": true,
+      "write": true,
+      "execute": true,
+      "commit": false,
+      "create_pr": false
+    },
+    "state": "blocked",
+    "created_at": "2026-09-21T20:50:00Z",
+    "runs": [
+      {
+        "id": "run:lifecycle:blocked",
+        "role": "implementer",
+        "agent_connection_id": "agent:fixture",
+        "session_ref": null,
+        "input_revision": {
+          "source_revision": "fixture-rev:blocked",
+          "context_fingerprint": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+        },
+        "state": "blocked",
+        "plan_revisions": [
+          {
+            "revision": 1,
+            "created_at": "2026-09-21T20:51:01Z",
+            "task_ids": [
+              "task:blocked"
+            ],
+            "change_summary": "Blocked-case plan."
+          }
+        ],
+        "tasks": [
+          {
+            "id": "task:blocked",
+            "parent_id": null,
+            "title": "Wait for required external input",
+            "depends_on": [],
+            "state": "blocked",
+            "evidence_refs": [
+              "evidence:blocker"
+            ],
+            "artifact_refs": []
+          }
+        ],
+        "attempts": [],
+        "result": {
+          "revision": null,
+          "branch": null,
+          "pull_request": null
+        }
+      }
+    ],
+    "current_run_id": "run:lifecycle:blocked"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:failed",
+    "source": {
+      "kind": "issue",
+      "reference": "fixture:wu:lifecycle:failed"
+    },
+    "objective": "Lifecycle conformance case wu:lifecycle:failed.",
+    "acceptance_criteria": [
+      {
+        "id": "ac:failed",
+        "text": "Fixture satisfies its declared lifecycle outcome."
+      }
+    ],
+    "permissions": {
+      "read": true,
+      "write": true,
+      "execute": true,
+      "commit": false,
+      "create_pr": false
+    },
+    "state": "failed",
+    "created_at": "2026-09-21T20:50:00Z",
+    "runs": [
+      {
+        "id": "run:lifecycle:failed",
+        "role": "implementer",
+        "agent_connection_id": "agent:fixture",
+        "session_ref": "session:fixture:failed",
+        "input_revision": {
+          "source_revision": "fixture-rev:failed",
+          "context_fingerprint": "sha256:3333333333333333333333333333333333333333333333333333333333333333"
+        },
+        "state": "failed",
+        "plan_revisions": [
+          {
+            "revision": 1,
+            "created_at": "2026-09-21T20:52:01Z",
+            "task_ids": [
+              "task:failed"
+            ],
+            "change_summary": "Failed-case plan."
+          }
+        ],
+        "tasks": [
+          {
+            "id": "task:failed",
+            "parent_id": null,
+            "title": "Execute failing implementation",
+            "depends_on": [],
+            "state": "failed",
+            "evidence_refs": [
+              "evidence:failure"
+            ],
+            "artifact_refs": []
+          }
+        ],
+        "attempts": [
+          {
+            "id": "attempt:failed:1",
+            "task_id": "task:failed",
+            "ordinal": 1,
+            "state": "failed",
+            "started_at": "2026-09-21T20:52:02Z",
+            "completed_at": "2026-09-21T20:52:20Z",
+            "triggered_by_reflection_ref": null
+          }
+        ],
+        "result": {
+          "revision": null,
+          "branch": null,
+          "pull_request": null
+        }
+      }
+    ],
+    "current_run_id": "run:lifecycle:failed"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:retried",
+    "source": {
+      "kind": "issue",
+      "reference": "fixture:wu:lifecycle:retried"
+    },
+    "objective": "Lifecycle conformance case wu:lifecycle:retried.",
+    "acceptance_criteria": [
+      {
+        "id": "ac:retried",
+        "text": "Fixture satisfies its declared lifecycle outcome."
+      }
+    ],
+    "permissions": {
+      "read": true,
+      "write": true,
+      "execute": true,
+      "commit": false,
+      "create_pr": false
+    },
+    "state": "completed",
+    "created_at": "2026-09-21T20:50:00Z",
+    "runs": [
+      {
+        "id": "run:lifecycle:retried",
+        "role": "implementer",
+        "agent_connection_id": "agent:fixture",
+        "session_ref": "session:fixture:retried",
+        "input_revision": {
+          "source_revision": "fixture-rev:retried",
+          "context_fingerprint": "sha256:4444444444444444444444444444444444444444444444444444444444444444"
+        },
+        "state": "completed",
+        "plan_revisions": [
+          {
+            "revision": 1,
+            "created_at": "2026-09-21T20:53:01Z",
+            "task_ids": [
+              "task:retried"
+            ],
+            "change_summary": "Retry-case plan."
+          }
+        ],
+        "tasks": [
+          {
+            "id": "task:retried",
+            "parent_id": null,
+            "title": "Complete work after retry",
+            "depends_on": [],
+            "state": "completed",
+            "evidence_refs": [
+              "evidence:retry-pass"
+            ],
+            "artifact_refs": [
+              "artifact:retry-output"
+            ]
+          }
+        ],
+        "attempts": [
+          {
+            "id": "attempt:retried:1",
+            "task_id": "task:retried",
+            "ordinal": 1,
+            "state": "failed",
+            "started_at": "2026-09-21T20:53:02Z",
+            "completed_at": "2026-09-21T20:53:15Z",
+            "triggered_by_reflection_ref": null
+          },
+          {
+            "id": "attempt:retried:2",
+            "task_id": "task:retried",
+            "ordinal": 2,
+            "state": "completed",
+            "started_at": "2026-09-21T20:53:16Z",
+            "completed_at": "2026-09-21T20:53:30Z",
+            "triggered_by_reflection_ref": null
+          }
+        ],
+        "result": {
+          "revision": "fixture-output:retried",
+          "branch": null,
+          "pull_request": null
+        }
+      }
+    ],
+    "current_run_id": "run:lifecycle:retried"
+  }
+]
