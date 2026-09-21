@@ -1,0 +1,79 @@
+{
+  "format_version": 1,
+  "kind": "context-gateway-request",
+  "id": "context-request:remote-review",
+  "task": {
+    "text": "Review the context compiler and memory integration without loading unrelated project history.",
+    "intent": "code-review"
+  },
+  "scope": {
+    "project_id": "project:agentic-harness",
+    "repositories": [
+      "powerpuff-kitty/agentic-harness"
+    ],
+    "paths": [
+      ".agentic/docs/architecture/",
+      "catalog/schema/",
+      "registry/project-memory/"
+    ],
+    "work_unit_ref": "wu:context-gateway"
+  },
+  "input_identity": {
+    "request_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+    "project_truth_digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+    "repository_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "memory_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+    "execution_evidence_digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "execution": {
+    "environment": "remote",
+    "target_provider": "openai",
+    "target_model": "coding-agent"
+  },
+  "stages": {
+    "lexical": true,
+    "semantic_search": true,
+    "typed_decision": true,
+    "generative_compression": true
+  },
+  "policy": {
+    "allowed_sensitivity": [
+      "project",
+      "team",
+      "org"
+    ],
+    "semantic_gating_allowed": true,
+    "generative_compression_allowed": true
+  },
+  "budget": {
+    "input_limit": 500,
+    "tool_output_limit": 800,
+    "output_limit": 500,
+    "allocations": [
+      {
+        "kind": "mandatory_project_truth",
+        "limit": null
+      },
+      {
+        "kind": "repository_evidence",
+        "limit": 200
+      },
+      {
+        "kind": "project_memory",
+        "limit": 150
+      },
+      {
+        "kind": "execution_evidence",
+        "limit": 75
+      },
+      {
+        "kind": "generated_compression",
+        "limit": 75
+      }
+    ]
+  },
+  "memory_query_refs": [
+    "memory-query:context-rules"
+  ],
+  "created_at": "2026-09-21T20:20:00Z"
+}
