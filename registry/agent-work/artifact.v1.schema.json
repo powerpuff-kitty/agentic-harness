@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/artifact.v1.schema.json",
+  "title": "Agent Work Artifact v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "work_unit_id", "produced_by",
+    "artifact_kind", "identity", "payload", "sensitivity", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-artifact" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "produced_by": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "task_id", "attempt_id", "action_id"],
+      "properties": {
+        "run_id": { "$ref": "#/$defs/id" },
+        "task_id": { "$ref": "#/$defs/nullable_id" },
+        "attempt_id": { "$ref": "#/$defs/nullable_id" },
+        "action_id": { "$ref": "#/$defs/nullable_id" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "attempt_id": { "type": "string" } },
+            "required": ["attempt_id"]
+          },
+          "then": {
+            "properties": { "task_id": { "$ref": "#/$defs/id" } }
+          }
+        }
+      ]
+    },
+    "artifact_kind": {
+      "type": "string",
+      "enum": [
+        "file", "patch", "report", "log", "test-result", "build",
+        "screenshot", "recording", "commit", "pull-request",
+        "structured-snapshot", "other"
+      ]
+    },
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uri", "digest", "revision", "mime_type", "size_bytes"],
+      "properties": {
+        "uri": { "type": "string", "minLength": 1, "maxLength": 4096 },
+        "digest": { "$ref": "#/$defs/digest" },
+        "revision": { "type": ["string", "null"], "maxLength": 1000 },
+        "mime_type": { "type": ["string", "null"], "maxLength": 500 },
+        "size_bytes": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "payload": { "$ref": "#/$defs/payload" },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["local_only", "project", "team", "org"]
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "nullable_id": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "content_ref", "text", "value", "redaction_ref"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["external", "inline_text", "inline_json", "redacted"] },
+        "content_ref": { "type": ["string", "null"], "maxLength": 4096 },
+        "text": { "type": ["string", "null"], "maxLength": 50000 },
+        "value": {},
+        "redaction_ref": { "$ref": "#/$defs/nullable_id" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "external" } }, "required": ["mode"] },
+          "then": { "properties": { "content_ref": { "type": "string", "minLength": 1 } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "inline_text" } }, "required": ["mode"] },
+          "then": { "properties": { "text": { "type": "string", "minLength": 1 } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "redacted" } }, "required": ["mode"] },
+          "then": {
+            "properties": {
+              "content_ref": { "type": "null" },
+              "text": { "type": "null" },
+              "redaction_ref": { "$ref": "#/$defs/id" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

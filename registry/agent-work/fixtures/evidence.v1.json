@@ -1,0 +1,174 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-evidence",
+    "id": "evidence:test-failure",
+    "work_unit_id": "wu:replay-demo",
+    "provenance": {
+      "run_id": "run:replay",
+      "task_id": "task:primary",
+      "attempt_id": "attempt:primary:1"
+    },
+    "evidence_kind": "captured_fact",
+    "status": "verified",
+    "subject": "Focused validation failed with one deterministic assertion.",
+    "source": {
+      "kind": "test",
+      "reference": "test:focused",
+      "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "revision": "rev:test-1"
+    },
+    "derived_from": [],
+    "payload": {
+      "mode": "external",
+      "content_ref": "artifact://test-output/failure",
+      "text": null,
+      "value": null,
+      "digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "mime_type": "text/plain",
+      "size_bytes": 420,
+      "redaction_ref": null
+    },
+    "unavailability_reason": null,
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:40:30Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-evidence",
+    "id": "evidence:test-pass",
+    "work_unit_id": "wu:replay-demo",
+    "provenance": {
+      "run_id": "run:replay",
+      "task_id": "task:retry",
+      "attempt_id": "attempt:retry:1"
+    },
+    "evidence_kind": "captured_fact",
+    "status": "verified",
+    "subject": "Focused validation passed after the corrective retry.",
+    "source": {
+      "kind": "test",
+      "reference": "test:focused",
+      "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "revision": "rev:test-2"
+    },
+    "derived_from": [],
+    "payload": {
+      "mode": "external",
+      "content_ref": "artifact://test-output/pass",
+      "text": null,
+      "value": null,
+      "digest": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+      "mime_type": "text/plain",
+      "size_bytes": 310,
+      "redaction_ref": null
+    },
+    "unavailability_reason": null,
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:42:30Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-evidence",
+    "id": "evidence:failure-summary",
+    "work_unit_id": "wu:replay-demo",
+    "provenance": {
+      "run_id": "run:replay",
+      "task_id": "task:primary",
+      "attempt_id": "attempt:primary:1"
+    },
+    "evidence_kind": "derived_result",
+    "status": "verified",
+    "subject": "Derived failure summary used for replanning.",
+    "source": {
+      "kind": "system",
+      "reference": "agent-work/replay-fixture",
+      "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "revision": "1"
+    },
+    "derived_from": [
+      "evidence:test-failure"
+    ],
+    "payload": {
+      "mode": "inline_text",
+      "content_ref": null,
+      "text": "The first attempt failed the focused validation and requires a retry task.",
+      "value": null,
+      "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "mime_type": "text/plain",
+      "size_bytes": 78,
+      "redaction_ref": null
+    },
+    "unavailability_reason": null,
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:40:40Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-evidence",
+    "id": "evidence:browser-unavailable",
+    "work_unit_id": "wu:replay-demo",
+    "provenance": {
+      "run_id": "run:replay",
+      "task_id": "task:retry",
+      "attempt_id": "attempt:retry:1"
+    },
+    "evidence_kind": "unavailable",
+    "status": "unavailable",
+    "subject": "Browser runtime evidence was requested but no browser was available.",
+    "source": {
+      "kind": "unavailable",
+      "reference": null,
+      "digest": null,
+      "revision": null
+    },
+    "derived_from": [],
+    "payload": {
+      "mode": "none",
+      "content_ref": null,
+      "text": null,
+      "value": null,
+      "digest": null,
+      "mime_type": null,
+      "size_bytes": null,
+      "redaction_ref": null
+    },
+    "unavailability_reason": "The execution environment did not provide a browser runtime.",
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:42:35Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-evidence",
+    "id": "evidence:redacted-log",
+    "work_unit_id": "wu:replay-demo",
+    "provenance": {
+      "run_id": "run:replay",
+      "task_id": "task:primary",
+      "attempt_id": "attempt:primary:1"
+    },
+    "evidence_kind": "captured_fact",
+    "status": "captured",
+    "subject": "A runner log existed but its sensitive payload was redacted.",
+    "source": {
+      "kind": "log",
+      "reference": "runner://logs/sensitive",
+      "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "revision": "log:1"
+    },
+    "derived_from": [],
+    "payload": {
+      "mode": "redacted",
+      "content_ref": null,
+      "text": null,
+      "value": null,
+      "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "mime_type": "text/plain",
+      "size_bytes": 128,
+      "redaction_ref": "redaction:sensitive-log"
+    },
+    "unavailability_reason": null,
+    "sensitivity": "local_only",
+    "created_at": "2026-09-21T20:40:35Z"
+  }
+]

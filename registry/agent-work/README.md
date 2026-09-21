@@ -7,7 +7,10 @@ It models execution as structured work rather than a chat transcript. Consumers 
 ## V1 contracts
 
 - work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt lifecycle.
-- work-event.v1.schema.json — append-only execution event envelope.
+- work-event.v1.schema.json — append-only execution event envelope with optional replay deltas.
+- evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
+- artifact.v1.schema.json — content-addressed produced artifacts linked to their producing run/task/attempt.
+- redaction.v1.schema.json — explicit redaction records so sensitive payload removal remains auditable.
 - evaluation.v1.schema.json — evidence-backed metrics, confidence signals and findings.
 - work-action.v1.schema.json — execute/audit/reflect/fix/validate/reassess/custom actions and permissions.
 - agent-connection.v1.schema.json — executable provider/model/auth/environment capabilities.
@@ -28,6 +31,16 @@ It models execution as structured work rather than a chat transcript. Consumers 
 | Context | Task-specific compiled view shown to a model | Ephemeral projection | It is the model input |
 
 Reflection is not memory. A reflection may emit only memory candidate references; promotion, consolidation, supersession and remote-storage policy belong to the Project Memory subsystem. Reflection is also not hidden reasoning capture: it stores concise inspectable conclusions, uncertainty, evidence and proposed corrective actions.
+
+## Evidence, artifacts and replay
+
+Evidence is not a generic success flag. v1 distinguishes captured facts, derived results and unavailable evidence; verification status remains explicit. Derived evidence references its inputs rather than replacing them.
+
+Artifacts are content-addressed outputs with producer lineage. Small structured snapshots may be stored inline for deterministic replay; larger files/logs/reports normally use external content references. Artifact metadata is canonical, while storage location may be provider-specific.
+
+Sensitive content is never silently deleted. A redacted payload carries a `redaction_ref` to a WorkRedaction record identifying the affected evidence/artifact, fields, reason, policy/actor and optional redacted digest. A redaction record must not contain the removed secret itself.
+
+WorkEvent remains append-only. Optional `projection_delta` records deterministic state transitions, entity creation snapshots, plan revisions and evidence/artifact links. Replaying a seed WorkUnit plus ordered events and referenced structured snapshots must rebuild the same current WorkUnit projection. Replay data captures observable state changes, not private chain-of-thought.
 
 ## Reflection lifecycle
 
@@ -61,4 +74,4 @@ Run:
 
     python3 .github/scripts/validate_agent_work_protocol.py
 
-The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including DAG cycles, references, monotonic event sequence, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
+The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including DAG cycles, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.

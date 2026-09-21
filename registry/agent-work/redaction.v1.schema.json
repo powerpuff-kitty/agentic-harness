@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/redaction.v1.schema.json",
+  "title": "Agent Work Redaction v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "work_unit_id", "target_refs",
+    "fields", "reason", "policy_ref", "replacement_ref", "actor",
+    "redacted_digest", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-redaction" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "target_refs": {
+      "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 256,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "fields": {
+      "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 256,
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 }
+    },
+    "reason": { "type": "string", "minLength": 1, "maxLength": 10000 },
+    "policy_ref": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "replacement_ref": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["system", "policy", "human", "agent"] },
+        "id": { "type": "string", "minLength": 1, "maxLength": 1000 }
+      }
+    },
+    "redacted_digest": {
+      "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }]
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+  }
+}

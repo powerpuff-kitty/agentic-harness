@@ -1,0 +1,24 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-redaction",
+    "id": "redaction:sensitive-log",
+    "work_unit_id": "wu:replay-demo",
+    "target_refs": [
+      "evidence:redacted-log",
+      "artifact:sensitive-log"
+    ],
+    "fields": [
+      "payload"
+    ],
+    "reason": "Credential-like runner output must not be copied into canonical Agent Work state.",
+    "policy_ref": "policy:redact-secrets",
+    "replacement_ref": null,
+    "actor": {
+      "kind": "policy",
+      "id": "agent-work-redaction-v1"
+    },
+    "redacted_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+    "created_at": "2026-09-21T20:40:36Z"
+  }
+]

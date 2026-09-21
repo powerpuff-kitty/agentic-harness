@@ -1,0 +1,596 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:1",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": null,
+    "sequence": 1,
+    "occurred_at": "2026-09-21T20:40:05Z",
+    "type": "work_unit.started",
+    "subject": {
+      "kind": "work-unit",
+      "id": "wu:replay-demo"
+    },
+    "summary": "Work unit entered execution.",
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "work-unit",
+        "id": "wu:replay-demo"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:2",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 2,
+    "occurred_at": "2026-09-21T20:40:10Z",
+    "type": "run.started",
+    "subject": {
+      "kind": "run",
+      "id": "run:replay"
+    },
+    "summary": "Implementation run started.",
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "run",
+        "id": "run:replay"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:3",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 3,
+    "occurred_at": "2026-09-21T20:40:15Z",
+    "type": "task.started",
+    "subject": {
+      "kind": "task",
+      "id": "task:primary"
+    },
+    "summary": "Primary task started.",
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:primary"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:4",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 4,
+    "occurred_at": "2026-09-21T20:40:20Z",
+    "type": "attempt.started",
+    "subject": {
+      "kind": "attempt",
+      "id": "attempt:primary:1"
+    },
+    "summary": "First task attempt started.",
+    "evidence_refs": [],
+    "artifact_refs": [
+      "artifact:attempt-primary-snapshot"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "entity_created",
+      "entity": {
+        "kind": "attempt",
+        "id": "attempt:primary:1"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": "artifact:attempt-primary-snapshot",
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:5",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 5,
+    "occurred_at": "2026-09-21T20:40:30Z",
+    "type": "evidence.recorded",
+    "subject": {
+      "kind": "evidence",
+      "id": "evidence:test-failure"
+    },
+    "summary": "Focused test failure recorded.",
+    "evidence_refs": [
+      "evidence:test-failure"
+    ],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "append_evidence_ref",
+      "entity": {
+        "kind": "task",
+        "id": "task:primary"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": null,
+      "value_ref": "evidence:test-failure",
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:6",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 6,
+    "occurred_at": "2026-09-21T20:40:35Z",
+    "type": "evidence.recorded",
+    "subject": {
+      "kind": "evidence",
+      "id": "evidence:redacted-log"
+    },
+    "summary": "Sensitive runner log recorded by reference only.",
+    "evidence_refs": [
+      "evidence:redacted-log"
+    ],
+    "artifact_refs": [
+      "artifact:sensitive-log"
+    ],
+    "redaction_refs": [
+      "redaction:sensitive-log"
+    ],
+    "projection_delta": null
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:7",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 7,
+    "occurred_at": "2026-09-21T20:40:36Z",
+    "type": "redaction.applied",
+    "subject": {
+      "kind": "redaction",
+      "id": "redaction:sensitive-log"
+    },
+    "summary": "Sensitive runner payload redaction applied.",
+    "evidence_refs": [
+      "evidence:redacted-log"
+    ],
+    "artifact_refs": [
+      "artifact:sensitive-log"
+    ],
+    "redaction_refs": [
+      "redaction:sensitive-log"
+    ],
+    "projection_delta": null
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:8",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 8,
+    "occurred_at": "2026-09-21T20:40:50Z",
+    "type": "attempt.failed",
+    "subject": {
+      "kind": "attempt",
+      "id": "attempt:primary:1"
+    },
+    "summary": "First attempt failed.",
+    "evidence_refs": [
+      "evidence:test-failure"
+    ],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "attempt",
+        "id": "attempt:primary:1"
+      },
+      "previous_state": "running",
+      "next_state": "failed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:9",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 9,
+    "occurred_at": "2026-09-21T20:40:51Z",
+    "type": "task.failed",
+    "subject": {
+      "kind": "task",
+      "id": "task:primary"
+    },
+    "summary": "Primary task failed.",
+    "evidence_refs": [
+      "evidence:test-failure"
+    ],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:primary"
+      },
+      "previous_state": "running",
+      "next_state": "failed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:10",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 10,
+    "occurred_at": "2026-09-21T20:41:00Z",
+    "type": "task.created",
+    "subject": {
+      "kind": "task",
+      "id": "task:retry"
+    },
+    "summary": "Retry task created without rewriting the failed task.",
+    "evidence_refs": [],
+    "artifact_refs": [
+      "artifact:task-retry-snapshot"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "entity_created",
+      "entity": {
+        "kind": "task",
+        "id": "task:retry"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": "artifact:task-retry-snapshot",
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:11",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 11,
+    "occurred_at": "2026-09-21T20:41:10Z",
+    "type": "plan.revised",
+    "subject": {
+      "kind": "plan",
+      "id": "plan:run:replay"
+    },
+    "summary": "Plan revision 2 activates the retry task.",
+    "evidence_refs": [],
+    "artifact_refs": [
+      "artifact:plan-revision-2"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "plan_revision",
+      "entity": {
+        "kind": "plan",
+        "id": "plan:run:replay"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": "artifact:plan-revision-2",
+      "value_ref": null,
+      "plan_revision": 2
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:12",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 12,
+    "occurred_at": "2026-09-21T20:41:20Z",
+    "type": "task.started",
+    "subject": {
+      "kind": "task",
+      "id": "task:retry"
+    },
+    "summary": "Retry task started.",
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:retry"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:13",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 13,
+    "occurred_at": "2026-09-21T20:41:30Z",
+    "type": "attempt.started",
+    "subject": {
+      "kind": "attempt",
+      "id": "attempt:retry:1"
+    },
+    "summary": "Retry attempt started.",
+    "evidence_refs": [],
+    "artifact_refs": [
+      "artifact:attempt-retry-snapshot"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "entity_created",
+      "entity": {
+        "kind": "attempt",
+        "id": "attempt:retry:1"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": "artifact:attempt-retry-snapshot",
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:14",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 14,
+    "occurred_at": "2026-09-21T20:42:00Z",
+    "type": "artifact.created",
+    "subject": {
+      "kind": "artifact",
+      "id": "artifact:patch"
+    },
+    "summary": "Corrective patch artifact created.",
+    "evidence_refs": [],
+    "artifact_refs": [
+      "artifact:patch"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "append_artifact_ref",
+      "entity": {
+        "kind": "task",
+        "id": "task:retry"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": null,
+      "value_ref": "artifact:patch",
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:15",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 15,
+    "occurred_at": "2026-09-21T20:42:30Z",
+    "type": "evidence.recorded",
+    "subject": {
+      "kind": "evidence",
+      "id": "evidence:test-pass"
+    },
+    "summary": "Passing focused test recorded.",
+    "evidence_refs": [
+      "evidence:test-pass"
+    ],
+    "artifact_refs": [],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "append_evidence_ref",
+      "entity": {
+        "kind": "task",
+        "id": "task:retry"
+      },
+      "previous_state": null,
+      "next_state": null,
+      "snapshot_ref": null,
+      "value_ref": "evidence:test-pass",
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:16",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 16,
+    "occurred_at": "2026-09-21T20:42:40Z",
+    "type": "attempt.completed",
+    "subject": {
+      "kind": "attempt",
+      "id": "attempt:retry:1"
+    },
+    "summary": "Retry attempt completed.",
+    "evidence_refs": [
+      "evidence:test-pass"
+    ],
+    "artifact_refs": [
+      "artifact:patch"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "attempt",
+        "id": "attempt:retry:1"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:17",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 17,
+    "occurred_at": "2026-09-21T20:42:41Z",
+    "type": "task.completed",
+    "subject": {
+      "kind": "task",
+      "id": "task:retry"
+    },
+    "summary": "Retry task completed.",
+    "evidence_refs": [
+      "evidence:test-pass"
+    ],
+    "artifact_refs": [
+      "artifact:patch"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:retry"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:18",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": "run:replay",
+    "sequence": 18,
+    "occurred_at": "2026-09-21T20:42:42Z",
+    "type": "run.completed",
+    "subject": {
+      "kind": "run",
+      "id": "run:replay"
+    },
+    "summary": "Run completed.",
+    "evidence_refs": [
+      "evidence:test-pass"
+    ],
+    "artifact_refs": [
+      "artifact:patch"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "run",
+        "id": "run:replay"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:replay:19",
+    "work_unit_id": "wu:replay-demo",
+    "run_id": null,
+    "sequence": 19,
+    "occurred_at": "2026-09-21T20:42:43Z",
+    "type": "work_unit.completed",
+    "subject": {
+      "kind": "work-unit",
+      "id": "wu:replay-demo"
+    },
+    "summary": "Work unit completed.",
+    "evidence_refs": [
+      "evidence:test-pass"
+    ],
+    "artifact_refs": [
+      "artifact:patch"
+    ],
+    "redaction_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "work-unit",
+        "id": "wu:replay-demo"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  }
+]

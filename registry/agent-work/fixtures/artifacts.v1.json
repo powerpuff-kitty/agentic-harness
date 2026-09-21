@@ -1,0 +1,207 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:attempt-primary-snapshot",
+    "work_unit_id": "wu:replay-demo",
+    "produced_by": {
+      "run_id": "run:replay",
+      "task_id": null,
+      "attempt_id": null,
+      "action_id": null
+    },
+    "artifact_kind": "structured-snapshot",
+    "identity": {
+      "uri": "artifact://artifact:attempt-primary-snapshot",
+      "digest": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+      "revision": null,
+      "mime_type": "application/json",
+      "size_bytes": 256
+    },
+    "payload": {
+      "mode": "inline_json",
+      "content_ref": null,
+      "text": null,
+      "value": {
+        "id": "attempt:primary:1",
+        "task_id": "task:primary",
+        "ordinal": 1,
+        "state": "running",
+        "started_at": "2026-09-21T20:40:20Z",
+        "completed_at": null,
+        "triggered_by_reflection_ref": null
+      },
+      "redaction_ref": null
+    },
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:41:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:task-retry-snapshot",
+    "work_unit_id": "wu:replay-demo",
+    "produced_by": {
+      "run_id": "run:replay",
+      "task_id": null,
+      "attempt_id": null,
+      "action_id": null
+    },
+    "artifact_kind": "structured-snapshot",
+    "identity": {
+      "uri": "artifact://artifact:task-retry-snapshot",
+      "digest": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+      "revision": null,
+      "mime_type": "application/json",
+      "size_bytes": 256
+    },
+    "payload": {
+      "mode": "inline_json",
+      "content_ref": null,
+      "text": null,
+      "value": {
+        "id": "task:retry",
+        "parent_id": null,
+        "title": "Retry after focused validation failure",
+        "depends_on": [],
+        "state": "queued",
+        "evidence_refs": [],
+        "artifact_refs": []
+      },
+      "redaction_ref": null
+    },
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:41:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:plan-revision-2",
+    "work_unit_id": "wu:replay-demo",
+    "produced_by": {
+      "run_id": "run:replay",
+      "task_id": null,
+      "attempt_id": null,
+      "action_id": null
+    },
+    "artifact_kind": "structured-snapshot",
+    "identity": {
+      "uri": "artifact://artifact:plan-revision-2",
+      "digest": "sha256:7777777777777777777777777777777777777777777777777777777777777777",
+      "revision": null,
+      "mime_type": "application/json",
+      "size_bytes": 256
+    },
+    "payload": {
+      "mode": "inline_json",
+      "content_ref": null,
+      "text": null,
+      "value": {
+        "revision": 2,
+        "created_at": "2026-09-21T20:41:10Z",
+        "task_ids": [
+          "task:retry"
+        ],
+        "change_summary": "Replace the failed task with an explicit retry task."
+      },
+      "redaction_ref": null
+    },
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:41:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:attempt-retry-snapshot",
+    "work_unit_id": "wu:replay-demo",
+    "produced_by": {
+      "run_id": "run:replay",
+      "task_id": null,
+      "attempt_id": null,
+      "action_id": null
+    },
+    "artifact_kind": "structured-snapshot",
+    "identity": {
+      "uri": "artifact://artifact:attempt-retry-snapshot",
+      "digest": "sha256:8888888888888888888888888888888888888888888888888888888888888888",
+      "revision": null,
+      "mime_type": "application/json",
+      "size_bytes": 256
+    },
+    "payload": {
+      "mode": "inline_json",
+      "content_ref": null,
+      "text": null,
+      "value": {
+        "id": "attempt:retry:1",
+        "task_id": "task:retry",
+        "ordinal": 1,
+        "state": "running",
+        "started_at": "2026-09-21T20:41:30Z",
+        "completed_at": null,
+        "triggered_by_reflection_ref": null
+      },
+      "redaction_ref": null
+    },
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:41:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:patch",
+    "work_unit_id": "wu:replay-demo",
+    "produced_by": {
+      "run_id": "run:replay",
+      "task_id": "task:retry",
+      "attempt_id": "attempt:retry:1",
+      "action_id": null
+    },
+    "artifact_kind": "patch",
+    "identity": {
+      "uri": "artifact://artifact:patch",
+      "digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
+      "revision": "rev:patch-1",
+      "mime_type": "text/x-diff",
+      "size_bytes": 640
+    },
+    "payload": {
+      "mode": "external",
+      "content_ref": "git://agentic-harness/replay-demo.patch",
+      "text": null,
+      "value": null,
+      "redaction_ref": null
+    },
+    "sensitivity": "project",
+    "created_at": "2026-09-21T20:41:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:sensitive-log",
+    "work_unit_id": "wu:replay-demo",
+    "produced_by": {
+      "run_id": "run:replay",
+      "task_id": "task:primary",
+      "attempt_id": "attempt:primary:1",
+      "action_id": null
+    },
+    "artifact_kind": "log",
+    "identity": {
+      "uri": "artifact://artifact:sensitive-log",
+      "digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "revision": "log:1",
+      "mime_type": "text/plain",
+      "size_bytes": 128
+    },
+    "payload": {
+      "mode": "redacted",
+      "content_ref": null,
+      "text": null,
+      "value": null,
+      "redaction_ref": "redaction:sensitive-log"
+    },
+    "sensitivity": "local_only",
+    "created_at": "2026-09-21T20:41:00Z"
+  }
+]
