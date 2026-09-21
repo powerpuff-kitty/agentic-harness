@@ -105,6 +105,7 @@ reflections = [(name, load(FIXTURES / name)) for name in reflection_files]
 reflection_policy = load(FIXTURES / "reflection-policy.v1.json")
 reflection_decision = load(FIXTURES / "reflection-trigger-skip.v1.json")
 reflection_events = load(FIXTURES / "reflection-correction-events.v1.json")
+corrected_work_unit = load(FIXTURES / "reflection-corrected-work-unit.v1.json")
 
 if isinstance(work_unit, dict):
     validate("work-unit", work_unit, "replanned-work-unit")
@@ -266,6 +267,27 @@ for filename, reflection in reflections:
 
     if memory_candidates and status != "completed":
         fail(f"{filename}: only completed reflection can emit memory candidates")
+
+if isinstance(corrected_work_unit, dict):
+    validate("work-unit", corrected_work_unit, "reflection-corrected-work-unit")
+    corrective_attempts = [
+        attempt
+        for run in corrected_work_unit.get("runs", [])
+        if isinstance(run, dict)
+        for attempt in run.get("attempts", [])
+        if isinstance(attempt, dict) and attempt.get("triggered_by_reflection_ref")
+    ]
+    if not corrective_attempts:
+        fail("reflection-corrected-work-unit: expected a corrective attempt linked to reflection")
+    for attempt in corrective_attempts:
+        reflection_ref = attempt.get("triggered_by_reflection_ref")
+        if reflection_ref not in reflection_by_id:
+            fail(
+                "reflection-corrected-work-unit: corrective attempt references "
+                f"unknown reflection {reflection_ref}"
+            )
+        if attempt.get("ordinal", 0) <= 1:
+            fail("reflection-corrected-work-unit: corrective attempt must follow an earlier attempt")
 
 if isinstance(reflection_policy, dict):
     validate("reflection-policy", reflection_policy, "reflection-policy")
