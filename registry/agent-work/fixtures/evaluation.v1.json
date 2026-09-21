@@ -1,0 +1,28 @@
+{
+  "format_version": 1,
+  "kind": "work-evaluation",
+  "id": "eval:342:1",
+  "work_unit_id": "wu:342",
+  "run_id": "run:1",
+  "evaluator": { "kind": "composite", "connection_id": null, "name": "agentic-harness/code-quality", "version": "1" },
+  "status": "partial",
+  "created_at": "2026-09-21T17:20:00Z",
+  "dimensions": [
+    { "id": "requirements", "label": "Requirement coverage", "status": "measured", "score": 0.5, "method": "1 of 2 acceptance criteria verified", "evidence_refs": ["evidence:ac-query"], "confidence": 1.0 },
+    { "id": "security", "label": "Security", "status": "not_checked", "score": null, "method": null, "evidence_refs": [], "confidence": null }
+  ],
+  "confidence": [
+    { "kind": "completion", "status": "measured", "value": 0.5, "method": "Verified acceptance criteria ratio", "evidence_refs": ["evidence:ac-query"] },
+    { "kind": "evidence_completeness", "status": "judged", "value": 0.7, "method": "Evaluator coverage of required checks", "evidence_refs": ["evidence:coverage"] }
+  ],
+  "findings": [
+    {
+      "id": "finding:missing-security",
+      "severity": "info",
+      "message": "Security review was not executed.",
+      "target": { "kind": "run", "reference": "run:1" },
+      "evidence_refs": [],
+      "remediation": "Run the configured security checks before release."
+    }
+  ]
+}
