@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/project-memory/memory-result.v1.schema.json",
+  "title": "Agentic Harness MemoryResult v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "query_id", "provider_id", "matches", "excluded", "complete"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "memory-result" },
+    "query_id": { "$ref": "#/$defs/id" },
+    "provider_id": { "$ref": "#/$defs/id" },
+    "matches": {
+      "type": "array", "maxItems": 1000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["memory_id", "relevance", "match_reason", "matched_scope"],
+        "properties": {
+          "memory_id": { "$ref": "#/$defs/id" },
+          "relevance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["score", "method", "confidence"],
+            "properties": {
+              "score": { "type": "number", "minimum": 0 },
+              "method": { "$ref": "#/$defs/id" },
+              "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+            }
+          },
+          "match_reason": { "$ref": "#/$defs/text" },
+          "matched_scope": { "type": "string", "enum": ["project", "repository", "path", "tag", "semantic", "lexical"] }
+        }
+      }
+    },
+    "excluded": {
+      "type": "array", "maxItems": 10000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["memory_id", "reason"],
+        "properties": {
+          "memory_id": { "$ref": "#/$defs/id" },
+          "reason": { "type": "string", "enum": ["state", "stale", "scope", "sensitivity", "provider_policy", "limit"] }
+        }
+      }
+    },
+    "complete": { "type": "boolean" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 5000 }
+  }
+}
