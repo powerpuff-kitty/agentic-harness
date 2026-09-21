@@ -1,0 +1,72 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:reflection:1",
+    "work_unit_id": "wu:reflection-demo",
+    "run_id": "run:reflection-demo",
+    "sequence": 10,
+    "occurred_at": "2026-09-21T20:02:00Z",
+    "type": "reflection.created",
+    "subject": { "kind": "reflection", "id": "reflection:test-failure:1" },
+    "summary": "Structured reflection linked the failed test to a strict query-boundary assumption.",
+    "evidence_refs": ["evidence:test-failure", "evidence:repository-query-contract"],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:reflection:2",
+    "work_unit_id": "wu:reflection-demo",
+    "run_id": "run:reflection-demo",
+    "sequence": 11,
+    "occurred_at": "2026-09-21T20:02:05Z",
+    "type": "action.created",
+    "subject": { "kind": "action", "id": "action:fix-orientation" },
+    "summary": "Corrective action created from the reflection.",
+    "evidence_refs": ["evidence:test-failure"],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:reflection:3",
+    "work_unit_id": "wu:reflection-demo",
+    "run_id": "run:reflection-demo",
+    "sequence": 12,
+    "occurred_at": "2026-09-21T20:03:00Z",
+    "type": "attempt.started",
+    "subject": { "kind": "attempt", "id": "attempt:implement:2" },
+    "summary": "Corrective attempt started.",
+    "evidence_refs": [],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:reflection:4",
+    "work_unit_id": "wu:reflection-demo",
+    "run_id": "run:reflection-demo",
+    "sequence": 13,
+    "occurred_at": "2026-09-21T20:04:00Z",
+    "type": "test.passed",
+    "subject": { "kind": "test", "id": "test:orientation-query" },
+    "summary": "The focused repository query test passed after the correction.",
+    "evidence_refs": ["evidence:test-pass"],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:reflection:5",
+    "work_unit_id": "wu:reflection-demo",
+    "run_id": "run:reflection-demo",
+    "sequence": 14,
+    "occurred_at": "2026-09-21T20:04:05Z",
+    "type": "attempt.completed",
+    "subject": { "kind": "attempt", "id": "attempt:implement:2" },
+    "summary": "Corrective attempt completed with verification evidence.",
+    "evidence_refs": ["evidence:test-pass"],
+    "artifact_refs": ["artifact:orientation-fix"]
+  }
+]
