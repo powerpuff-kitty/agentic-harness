@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/evidence.v1.schema.json",
+  "title": "Agent Work Evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "work_unit_id", "provenance",
+    "evidence_kind", "status", "subject", "source", "derived_from",
+    "payload", "unavailability_reason", "sensitivity", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-evidence" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "task_id", "attempt_id"],
+      "properties": {
+        "run_id": { "$ref": "#/$defs/nullable_id" },
+        "task_id": { "$ref": "#/$defs/nullable_id" },
+        "attempt_id": { "$ref": "#/$defs/nullable_id" }
+      }
+    },
+    "evidence_kind": {
+      "type": "string",
+      "enum": ["captured_fact", "derived_result", "unavailable"]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["captured", "verified", "unverified", "unavailable"]
+    },
+    "subject": { "$ref": "#/$defs/text" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reference", "digest", "revision"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["file", "test", "tool", "log", "human", "system", "model", "external", "unavailable"]
+        },
+        "reference": { "type": ["string", "null"], "maxLength": 4096 },
+        "digest": { "$ref": "#/$defs/nullable_digest" },
+        "revision": { "type": ["string", "null"], "maxLength": 1000 }
+      }
+    },
+    "derived_from": {
+      "type": "array", "uniqueItems": true, "maxItems": 256,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "payload": { "$ref": "#/$defs/payload" },
+    "unavailability_reason": { "type": ["string", "null"], "maxLength": 10000 },
+    "sensitivity": {
+      "type": "string",
+      "enum": ["local_only", "project", "team", "org"]
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "evidence_kind": { "const": "unavailable" } },
+        "required": ["evidence_kind"]
+      },
+      "then": {
+        "properties": {
+          "status": { "const": "unavailable" },
+          "payload": {
+            "properties": { "mode": { "const": "none" } },
+            "required": ["mode"]
+          },
+          "unavailability_reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "evidence_kind": { "const": "derived_result" } },
+        "required": ["evidence_kind"]
+      },
+      "then": {
+        "properties": { "derived_from": { "minItems": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 20000 },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "nullable_id": {
+      "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }]
+    },
+    "nullable_digest": {
+      "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }]
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "content_ref", "text", "value", "digest", "mime_type", "size_bytes", "redaction_ref"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["external", "inline_text", "inline_json", "redacted", "none"] },
+        "content_ref": { "type": ["string", "null"], "maxLength": 4096 },
+        "text": { "type": ["string", "null"], "maxLength": 50000 },
+        "value": {},
+        "digest": { "$ref": "#/$defs/nullable_digest" },
+        "mime_type": { "type": ["string", "null"], "maxLength": 500 },
+        "size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+        "redaction_ref": { "$ref": "#/$defs/nullable_id" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "mode": { "const": "external" } }, "required": ["mode"] },
+          "then": { "properties": { "content_ref": { "type": "string", "minLength": 1 }, "digest": { "$ref": "#/$defs/digest" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "inline_text" } }, "required": ["mode"] },
+          "then": { "properties": { "text": { "type": "string", "minLength": 1 }, "digest": { "$ref": "#/$defs/digest" } } }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "redacted" } }, "required": ["mode"] },
+          "then": {
+            "properties": {
+              "content_ref": { "type": "null" },
+              "text": { "type": "null" },
+              "redaction_ref": { "$ref": "#/$defs/id" }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "mode": { "const": "none" } }, "required": ["mode"] },
+          "then": {
+            "properties": {
+              "content_ref": { "type": "null" },
+              "text": { "type": "null" },
+              "digest": { "type": "null" },
+              "redaction_ref": { "type": "null" }
+            }
+          }
+        }
+      ]
+    }
+  }
+}
