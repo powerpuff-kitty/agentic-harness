@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "id": "pattern/search-visibility/1",
+  "kind": "pattern",
+  "name": "Public web search visibility",
+  "version_selector": "1",
+  "authority": "harness",
+  "reviewed_at": "2026-09-21",
+  "description": "Provider-aware technical SEO rules for crawlability, indexability, canonical URL identity, rendering evidence, localization, sitemaps and structured data without inventing ranking factors.",
+  "capabilities": ["detect", "analyze", "check", "baseline", "diff"],
+  "rules": [
+    {
+      "id": "search.crawl.public-access-intent",
+      "title": "Keep intended public indexable pages accessible to target crawlers",
+      "category": "crawlability",
+      "severity": "error",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "A route declared public and indexable must not simultaneously require authentication, emit noindex, or be intentionally blocked from every target search crawler.",
+      "source_refs": ["google.developer-seo", "google.robots", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "requires_project_indexability_intent": true,
+        "robots_disallow_is_not_noindex": true,
+        "target_crawlers_are_project_or_provider_specific": true
+      }
+    },
+    {
+      "id": "search.indexability.directives-consistent",
+      "title": "Keep crawl and indexing directives semantically consistent",
+      "category": "indexability",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "robots.txt, robots meta/X-Robots-Tag, authentication and publication policy must be evaluated as distinct controls; a crawler block must not be reported as proof that a URL cannot be indexed.",
+      "source_refs": ["google.developer-seo", "google.robots", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "distinguish_crawl_from_index": true,
+        "source_configuration_is_not_deployed_evidence": true
+      }
+    },
+    {
+      "id": "search.url.canonical-consistent",
+      "title": "Use a consistent canonical identity for duplicate or equivalent public representations",
+      "category": "url-architecture",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Equivalent public representations should converge on the intended canonical URL, and canonical hints should not contradict redirects, sitemaps or dominant internal links.",
+      "source_refs": ["google.canonical", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "canonical_is_a_hint_not_a_guarantee": true,
+        "compare_redirect_sitemap_internal_link_signals": true
+      }
+    },
+    {
+      "id": "search.sitemap.canonical-indexable-only",
+      "title": "Publish intentional canonical URLs in sitemaps",
+      "category": "indexability",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "A sitemap should enumerate URLs the project intends search engines to discover as canonical public pages, not private, preview, duplicate, redirected or deliberately noindexed variants.",
+      "source_refs": ["google.sitemap", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "absolute_urls": true,
+        "publication_policy_authoritative": true,
+        "sitemap_presence_does_not_prove_indexing": true
+      }
+    },
+    {
+      "id": "search.localization.hreflang-reciprocal",
+      "title": "Keep localized alternate declarations reciprocal and truthful",
+      "category": "localization",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "When localized alternatives are declared, each available version should identify itself and the same genuine alternates; unavailable translations must not be fabricated merely to complete an hreflang matrix.",
+      "source_refs": ["google.localized", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "self_reference": true,
+        "reciprocal_alternates": true,
+        "only_actual_localized_content": true,
+        "x_default_optional": true
+      }
+    },
+    {
+      "id": "search.structured-data.visible-supported",
+      "title": "Keep structured data representative of visible supported page content",
+      "category": "structured-data",
+      "severity": "warning",
+      "enforceability": "heuristic",
+      "authority": "harness",
+      "summary": "Structured data should describe the page's actual visible subject and supported facts; syntactic validity does not justify fabricated ratings, availability, identity, prices or other unsupported claims.",
+      "source_refs": ["google.structured-data", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "visible_content_alignment": true,
+        "freshness_required_for_time_sensitive_fields": true,
+        "rich_result_not_guaranteed": true
+      }
+    },
+    {
+      "id": "search.rendering.verify-target-crawlers",
+      "title": "Base rendering recommendations on crawler and artifact evidence",
+      "category": "rendering",
+      "severity": "recommendation",
+      "enforceability": "advisory",
+      "authority": "harness",
+      "summary": "Do not label a JavaScript framework as an SEO defect by itself. Inspect response HTML, rendered output, route freshness and the capabilities of the target crawlers before recommending CSR, SSR, SSG, prerender or hybrid changes.",
+      "source_refs": ["google.javascript-seo", "harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "framework_name_is_not_failure_evidence": true,
+        "migration_requires_concrete_capability_gap": true,
+        "distinguish_response_html_from_rendered_dom": true
+      }
+    },
+    {
+      "id": "search.evidence.deployed-separate-from-source",
+      "title": "Separate source intent from deployed crawl and indexing evidence",
+      "category": "indexability",
+      "severity": "warning",
+      "enforceability": "deterministic",
+      "authority": "harness",
+      "summary": "Source files, generated artifacts, deployed HTTP responses and external search-console/index evidence are different evidence classes and must not be collapsed into a single pass.",
+      "source_refs": ["harness.seo-epic"],
+      "tools": [],
+      "autofix": "none",
+      "constraints": {
+        "evidence_classes": ["source", "build-artifact", "deployed-http", "external-search"],
+        "not_checked_is_not_pass": true
+      }
+    }
+  ],
+  "sources": [
+    {
+      "id": "google.developer-seo",
+      "title": "SEO Guide for Web Developers",
+      "url": "https://developers.google.com/search/docs/fundamentals/get-started-developers",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "google.robots",
+      "title": "How Google interprets the robots.txt specification",
+      "url": "https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "google.canonical",
+      "title": "What is URL canonicalization",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/canonicalization",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "google.sitemap",
+      "title": "Build and submit a sitemap",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "google.localized",
+      "title": "Tell Google about localized versions of your page",
+      "url": "https://developers.google.com/search/docs/advanced/crawling/localized-versions",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "google.structured-data",
+      "title": "General structured data guidelines",
+      "url": "https://developers.google.com/search/docs/appearance/structured-data/sd-policies",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "google.javascript-seo",
+      "title": "Understand the JavaScript SEO basics",
+      "url": "https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics",
+      "authority": "official",
+      "reviewed_at": "2026-09-21"
+    },
+    {
+      "id": "harness.seo-epic",
+      "title": "Agentic Harness SEO/GEO engineering epic",
+      "url": "https://github.com/powerpuff-kitty/agentic-harness/issues/152",
+      "authority": "harness",
+      "reviewed_at": "2026-09-21"
+    }
+  ]
+}

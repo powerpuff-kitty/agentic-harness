@@ -31,6 +31,13 @@ CATEGORIES = {
     "documentation",
     "error-handling",
     "configuration",
+    "crawlability",
+    "indexability",
+    "url-architecture",
+    "rendering",
+    "metadata",
+    "structured-data",
+    "localization",
 }
 CAPABILITIES = {"detect", "analyze", "check", "fix", "baseline", "diff"}
 AUTOFIX = {"none", "safe", "conditional"}
