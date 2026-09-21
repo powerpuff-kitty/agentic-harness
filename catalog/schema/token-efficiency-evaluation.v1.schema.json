@@ -1,0 +1,387 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schema/token-efficiency-evaluation.v1.schema.json",
+  "title": "Agentic Harness token-efficiency evaluation v1",
+  "description": "Same-task full-context versus compiled-context evidence record. Lower usage alone never establishes success.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "created_at",
+    "task",
+    "required_evidence",
+    "baseline",
+    "candidate"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "token-efficiency-evaluation"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "maxLength": 64
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "fixture_digest",
+        "source_revision",
+        "required_checks"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "fixture_digest": {
+          "$ref": "#/$defs/digest"
+        },
+        "source_revision": {
+          "$ref": "#/$defs/text"
+        },
+        "required_checks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    },
+    "required_evidence": {
+      "type": "array",
+      "maxItems": 256,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "baseline": {
+      "$ref": "#/$defs/baseline"
+    },
+    "candidate": {
+      "$ref": "#/$defs/candidate"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "^[A-Za-z0-9_.:/+@-]+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 16384,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "estimate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_tokens",
+        "tool_output_tokens",
+        "output_tokens",
+        "estimator"
+      ],
+      "properties": {
+        "input_tokens": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tool_output_tokens": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "output_tokens": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "estimator": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "observed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token_usage_complete",
+        "input_tokens",
+        "tool_output_tokens",
+        "output_tokens",
+        "retries",
+        "latency_ms",
+        "cost_microunits",
+        "evidence_ref"
+      ],
+      "properties": {
+        "token_usage_complete": {
+          "type": "boolean"
+        },
+        "input_tokens": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tool_output_tokens": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "output_tokens": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retries": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "latency_ms": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 86400000
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cost_microunits": {
+          "oneOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "estimated",
+        "observed"
+      ],
+      "properties": {
+        "estimated": {
+          "$ref": "#/$defs/estimate"
+        },
+        "observed": {
+          "$ref": "#/$defs/observed"
+        }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "acceptance",
+        "verification",
+        "checks_passed",
+        "checks_failed",
+        "errors"
+      ],
+      "properties": {
+        "acceptance": {
+          "enum": [
+            "passed",
+            "failed",
+            "not-assessed"
+          ]
+        },
+        "verification": {
+          "enum": [
+            "passed",
+            "failed",
+            "blocked",
+            "not-run"
+          ]
+        },
+        "checks_passed": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "checks_failed": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "errors": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/text"
+          }
+        }
+      }
+    },
+    "treatment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_kind",
+        "context_identity",
+        "evidence_present",
+        "usage",
+        "outcome"
+      ],
+      "properties": {
+        "context_kind": {
+          "enum": [
+            "full",
+            "compiled"
+          ]
+        },
+        "context_identity": {
+          "$ref": "#/$defs/digest"
+        },
+        "evidence_present": {
+          "type": "array",
+          "maxItems": 256,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "usage": {
+          "$ref": "#/$defs/usage"
+        },
+        "outcome": {
+          "$ref": "#/$defs/outcome"
+        }
+      }
+    },
+    "baseline": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/treatment"
+        },
+        {
+          "properties": {
+            "context_kind": {
+              "const": "full"
+            }
+          }
+        }
+      ]
+    },
+    "candidate": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/treatment"
+        },
+        {
+          "properties": {
+            "context_kind": {
+              "const": "compiled"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
