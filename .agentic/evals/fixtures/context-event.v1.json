@@ -1,0 +1,26 @@
+{
+  "format_version": 1,
+  "kind": "context-event",
+  "id": "fixture.event.1",
+  "authority": "historical-navigation-only",
+  "sequence": 1,
+  "occurred_at": "2026-09-21T00:00:01Z",
+  "producer": {
+    "kind": "human",
+    "id": "reviewer",
+    "version": "recorded"
+  },
+  "event_type": "decision",
+  "subject": "service boundary",
+  "statement": "ADR-001 remains the accepted boundary.",
+  "canonical_refs": [
+    {
+      "kind": "adr",
+      "reference": ".agentic/decisions/ADR-001.md",
+      "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "revision": "abc123"
+    }
+  ],
+  "evidence_refs": [],
+  "supersedes": []
+}
