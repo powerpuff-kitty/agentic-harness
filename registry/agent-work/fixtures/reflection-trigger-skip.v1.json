@@ -1,0 +1,14 @@
+{
+  "format_version": 1,
+  "kind": "reflection-trigger-decision",
+  "id": "reflection-decision:deterministic-fix:1",
+  "policy_id": "reflection-policy:default",
+  "work_unit_id": "wu:reflection-demo",
+  "run_id": "run:reflection-demo",
+  "attempt_id": "attempt:format:1",
+  "trigger_kind": "failed_check",
+  "decision": "skip",
+  "reason": "The formatter produced a deterministic diff and the configured remediation is to apply the formatter and rerun the check.",
+  "evidence_refs": ["evidence:formatter-diff"],
+  "created_at": "2026-09-21T20:05:00Z"
+}
