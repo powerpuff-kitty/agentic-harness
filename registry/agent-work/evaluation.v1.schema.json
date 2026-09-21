@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/evaluation.v1.schema.json",
+  "title": "Agent Work Evaluation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "id", "work_unit_id", "run_id", "evaluator", "status", "created_at", "dimensions", "confidence", "findings"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-evaluation" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "run_id": { "$ref": "#/$defs/id" },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "connection_id", "name", "version"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["deterministic", "agent", "human", "composite"] },
+        "connection_id": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": ["string", "null"] }
+      }
+    },
+    "status": { "type": "string", "enum": ["completed", "partial", "failed"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "dimensions": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "status", "score", "method", "evidence_refs", "confidence"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "label": { "type": "string", "minLength": 1 },
+          "status": { "$ref": "#/$defs/measurement_status" },
+          "score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "method": { "type": ["string", "null"], "maxLength": 5000 },
+          "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+          "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "confidence": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "status", "value", "method", "evidence_refs"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["execution", "completion", "evidence_completeness", "evaluator", "agent_self_assessment"] },
+          "status": { "$ref": "#/$defs/measurement_status" },
+          "value": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+          "method": { "type": ["string", "null"], "maxLength": 5000 },
+          "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 5000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "severity", "message", "target", "evidence_refs", "remediation"],
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+          "message": { "type": "string", "minLength": 1, "maxLength": 10000 },
+          "target": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["kind", "reference"],
+            "properties": {
+              "kind": { "type": "string", "enum": ["work-unit", "run", "task", "file", "artifact", "requirement", "other"] },
+              "reference": { "type": "string", "minLength": 1 }
+            }
+          },
+          "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+          "remediation": { "type": ["string", "null"], "maxLength": 10000 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "measurement_status": { "type": "string", "enum": ["measured", "judged", "unknown", "not_checked", "blocked", "not_applicable"] }
+  }
+}

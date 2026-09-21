@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/work-action.v1.schema.json",
+  "title": "Agent Work Action v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "id", "target", "intent", "prompt", "agent_connection_id", "permissions", "finding_refs", "evidence_refs", "continuation", "status"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-action" },
+    "id": { "$ref": "#/$defs/id" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["work-unit", "run", "evaluation", "finding", "task"] },
+        "id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "intent": { "type": "string", "enum": ["execute", "inspect", "audit", "evaluate", "remediate", "reassess", "validate", "replan", "compare_requirements", "review", "custom"] },
+    "prompt": { "type": ["string", "null"], "maxLength": 50000 },
+    "agent_connection_id": { "$ref": "#/$defs/id" },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read", "write", "execute", "commit", "create_pr"],
+      "properties": {
+        "read": { "type": "boolean" },
+        "write": { "type": "boolean" },
+        "execute": { "type": "boolean" },
+        "commit": { "type": "boolean" },
+        "create_pr": { "type": "boolean" }
+      }
+    },
+    "finding_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "evidence_refs": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+    "continuation": { "type": "string", "enum": ["same_session", "linked_run", "new_run"] },
+    "status": { "type": "string", "enum": ["draft", "awaiting_approval", "approved", "running", "completed", "failed", "cancelled"] }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" }
+  }
+}

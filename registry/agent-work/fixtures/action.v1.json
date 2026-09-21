@@ -1,0 +1,14 @@
+{
+  "format_version": 1,
+  "kind": "work-action",
+  "id": "action:342:audit",
+  "target": { "kind": "run", "id": "run:1" },
+  "intent": "audit",
+  "prompt": "Audit the implementation against the ticket acceptance criteria.",
+  "agent_connection_id": "agent:reviewer",
+  "permissions": { "read": true, "write": false, "execute": true, "commit": false, "create_pr": false },
+  "finding_refs": [],
+  "evidence_refs": ["evidence:architecture"],
+  "continuation": "linked_run",
+  "status": "approved"
+}
