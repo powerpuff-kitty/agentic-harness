@@ -92,7 +92,8 @@
         "ordinal": { "type": "integer", "minimum": 1 },
         "state": { "$ref": "#/$defs/state" },
         "started_at": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
-        "completed_at": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] }
+        "completed_at": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
+        "triggered_by_reflection_ref": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] }
       }
     },
     "result": {
