@@ -58,7 +58,7 @@ def validate(kind: str, value, label: str) -> None:
 memories_value = load(FIXTURES / "memories.v1.json")
 operations_value = load(FIXTURES / "operations.v1.json")
 local_provider = load(FIXTURES / "provider-local.v1.json")
-remote_provider = load(FIXTURES / "provider-remote.v1.json")
+remote_provider = load(FIXTURES / "provider-remote.v1.json")\nhybrid_provider = load(FIXTURES / "provider-hybrid.v1.json")
 query = load(FIXTURES / "query-remote.v1.json")
 result = load(FIXTURES / "result-remote.v1.json")
 
@@ -223,7 +223,7 @@ for memory_id, memory in memory_by_id.items():
     if isinstance(invalidated_by, str) and invalidated_by not in operation_by_id:
         fail(f"{memory_id}: invalidated_by references unknown operation {invalidated_by}")
 
-for label, provider in (("local-provider", local_provider), ("remote-provider", remote_provider)):
+for label, provider in (("local-provider", local_provider), ("remote-provider", remote_provider), ("hybrid-provider", hybrid_provider)):
     if isinstance(provider, dict):
         validate("memory-provider", provider, label)
 
