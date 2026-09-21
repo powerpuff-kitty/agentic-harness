@@ -1,0 +1,65 @@
+{
+  "format_version": 1,
+  "kind": "work-unit",
+  "id": "wu:replay-demo",
+  "source": {
+    "kind": "issue",
+    "reference": "github:powerpuff-kitty/agentic-harness#163"
+  },
+  "objective": "Demonstrate deterministic event replay with evidence and artifact provenance.",
+  "acceptance_criteria": [
+    {
+      "id": "ac:replay",
+      "text": "Append-only events rebuild the expected WorkUnit projection."
+    },
+    {
+      "id": "ac:provenance",
+      "text": "Evidence, artifacts and redactions retain explicit provenance."
+    }
+  ],
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "commit": false,
+    "create_pr": false
+  },
+  "state": "queued",
+  "created_at": "2026-09-21T20:40:00Z",
+  "runs": [
+    {
+      "id": "run:replay",
+      "role": "implementer",
+      "agent_connection_id": "agent:fixture",
+      "state": "queued",
+      "plan_revisions": [
+        {
+          "revision": 1,
+          "created_at": "2026-09-21T20:40:01Z",
+          "task_ids": [
+            "task:primary"
+          ],
+          "change_summary": "Initial focused implementation."
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task:primary",
+          "parent_id": null,
+          "title": "Implement focused change",
+          "depends_on": [],
+          "state": "queued",
+          "evidence_refs": [],
+          "artifact_refs": []
+        }
+      ],
+      "attempts": [],
+      "result": {
+        "revision": null,
+        "branch": null,
+        "pull_request": null
+      }
+    }
+  ],
+  "current_run_id": "run:replay"
+}
