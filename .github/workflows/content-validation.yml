@@ -24,6 +24,7 @@ jobs:
           python3 -m pip install jsonschema==4.26.0
           python3 .github/scripts/validate_cli_contracts.py
           python3 .github/scripts/validate_agent_work_protocol.py
+          python3 .github/scripts/validate_project_memory.py
 
   reading-list:
     runs-on: ubuntu-latest
