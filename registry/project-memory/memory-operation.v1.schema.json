@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/project-memory/memory-operation.v1.schema.json",
+  "title": "Agentic Harness MemoryOperation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version", "kind", "id", "operation", "target_memory_refs",
+    "source_refs", "actor", "reason", "result_memory_ref", "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "memory-operation" },
+    "id": { "$ref": "#/$defs/id" },
+    "operation": {
+      "type": "string",
+      "enum": ["promote", "reverify", "supersede", "invalidate", "consolidate", "expire"]
+    },
+    "target_memory_refs": {
+      "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 256,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "source_refs": {
+      "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 256,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["human", "agent", "policy", "system"] },
+        "id": { "$ref": "#/$defs/text" }
+      }
+    },
+    "reason": { "$ref": "#/$defs/text" },
+    "result_memory_ref": { "anyOf": [{ "$ref": "#/$defs/id" }, { "type": "null" }] },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,255}$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 10000 }
+  }
+}
