@@ -1,0 +1,21 @@
+{
+  "format_version": 1,
+  "kind": "agent-connection",
+  "id": "agent:codex-local",
+  "provider": "openai",
+  "agent": "codex",
+  "model": null,
+  "auth_mode": "local_provider",
+  "environment": "local",
+  "capabilities": {
+    "read_repo": true,
+    "write_repo": true,
+    "execute": true,
+    "commit": true,
+    "create_pr": true,
+    "stream_events": true,
+    "continue_session": true,
+    "approvals": true
+  },
+  "readiness": "ready"
+}
