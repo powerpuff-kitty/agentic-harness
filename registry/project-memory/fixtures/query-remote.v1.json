@@ -1,0 +1,18 @@
+{
+  "format_version": 1,
+  "kind": "memory-query",
+  "id": "memory-query:context-rules",
+  "task": "Find current project memory relevant to context selection and privacy rules.",
+  "scope": {
+    "project_id": "project:agentic-harness",
+    "repository": "powerpuff-kitty/agentic-harness",
+    "path": ".agentic/docs/architecture/context-compiler.md",
+    "tags": ["context"]
+  },
+  "classes": ["procedural_knowledge", "constraint_gotcha"],
+  "states": ["accepted"],
+  "include_stale": false,
+  "max_results": 10,
+  "execution_environment": "remote",
+  "allowed_sensitivity": ["project", "team", "org"]
+}
