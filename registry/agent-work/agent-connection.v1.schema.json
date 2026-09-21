@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/agent-connection.v1.schema.json",
+  "title": "Agent Work AgentConnection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "kind", "id", "provider", "agent", "model", "auth_mode", "environment", "capabilities", "readiness"],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "agent-connection" },
+    "id": { "$ref": "#/$defs/id" },
+    "provider": { "type": "string", "minLength": 1 },
+    "agent": { "type": "string", "minLength": 1 },
+    "model": { "type": ["string", "null"] },
+    "auth_mode": { "type": "string", "enum": ["local_provider", "managed_oauth", "api_key", "cloud_provider", "none", "custom"] },
+    "environment": { "type": "string", "enum": ["local", "vendor_hosted", "loaftrail_cloud", "external_cloud", "custom"] },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read_repo", "write_repo", "execute", "commit", "create_pr", "stream_events", "continue_session", "approvals"],
+      "properties": {
+        "read_repo": { "type": "boolean" },
+        "write_repo": { "type": "boolean" },
+        "execute": { "type": "boolean" },
+        "commit": { "type": "boolean" },
+        "create_pr": { "type": "boolean" },
+        "stream_events": { "type": "boolean" },
+        "continue_session": { "type": "boolean" },
+        "approvals": { "type": "boolean" }
+      }
+    },
+    "readiness": { "type": "string", "enum": ["ready", "disconnected", "degraded", "rate_limited", "auth_expired", "unavailable"] }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" }
+  }
+}
