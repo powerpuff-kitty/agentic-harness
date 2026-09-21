@@ -8,14 +8,25 @@
     "statement": "Repository query adapters may require canonical domain tokens rather than presentation labels.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": ["registry/"],
-      "tags": ["query-boundary"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        "registry/"
+      ],
+      "tags": [
+        "query-boundary"
+      ]
     },
     "source": {
       "kind": "reflection",
-      "source_refs": ["reflection:test-failure:1"],
-      "evidence_refs": ["evidence:test-failure", "evidence:repository-query-contract"],
+      "source_refs": [
+        "reflection:test-failure:1"
+      ],
+      "evidence_refs": [
+        "evidence:test-failure",
+        "evidence:repository-query-contract"
+      ],
       "created_by": "agentic-harness/reflection"
     },
     "validity": {
@@ -31,7 +42,10 @@
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 0, "last_retrieved_at": null },
+    "usage": {
+      "retrieval_count": 0,
+      "last_retrieved_at": null
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -53,13 +67,22 @@
     "statement": "Local development authentication uses a machine-local credential reference that must never be sent to remote providers.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": [".agentic/"],
-      "tags": ["auth", "local-only"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        ".agentic/"
+      ],
+      "tags": [
+        "auth",
+        "local-only"
+      ]
     },
     "source": {
       "kind": "human",
-      "source_refs": ["decision:local-auth-policy"],
+      "source_refs": [
+        "decision:local-auth-policy"
+      ],
       "evidence_refs": [],
       "created_by": "project-maintainer"
     },
@@ -69,14 +92,17 @@
       "valid_until": null,
       "last_verified_at": "2026-09-21T20:10:00Z"
     },
-    "confidence": 1.0,
-    "importance": 1.0,
+    "confidence": 1,
+    "importance": 1,
     "sensitivity": {
       "level": "local_only",
       "remote_persistence_allowed": false,
       "remote_retrieval_allowed": false
     },
-    "usage": { "retrieval_count": 2, "last_retrieved_at": "2026-09-21T20:20:00Z" },
+    "usage": {
+      "retrieval_count": 2,
+      "last_retrieved_at": "2026-09-21T20:20:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -98,14 +124,25 @@
     "statement": "The CLI installer writes binaries to the legacy project-local bin directory.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness-cli"],
-      "paths": ["src/install/"],
-      "tags": ["cli", "installer"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness-cli"
+      ],
+      "paths": [
+        "src/install/"
+      ],
+      "tags": [
+        "cli",
+        "installer"
+      ]
     },
     "source": {
       "kind": "evidence",
-      "source_refs": ["evidence:installer-snapshot:old"],
-      "evidence_refs": ["evidence:installer-snapshot:old"],
+      "source_refs": [
+        "evidence:installer-snapshot:old"
+      ],
+      "evidence_refs": [
+        "evidence:installer-snapshot:old"
+      ],
       "created_by": "agentic-harness/repository-intelligence"
     },
     "validity": {
@@ -121,7 +158,10 @@
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 8, "last_retrieved_at": "2026-09-15T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 8,
+      "last_retrieved_at": "2026-09-15T00:00:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -143,13 +183,21 @@
     "statement": "Repository-derived context should be cached for one hour by default.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": ["catalog/schema/"],
-      "tags": ["cache"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        "catalog/schema/"
+      ],
+      "tags": [
+        "cache"
+      ]
     },
     "source": {
       "kind": "decision",
-      "source_refs": ["decision:cache-policy:a"],
+      "source_refs": [
+        "decision:cache-policy:a"
+      ],
       "evidence_refs": [],
       "created_by": "architecture-review"
     },
@@ -166,7 +214,10 @@
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 1, "last_retrieved_at": "2026-09-20T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 1,
+      "last_retrieved_at": "2026-09-20T00:00:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -174,7 +225,9 @@
       "invalidated_by": null,
       "consolidated_from": [],
       "consolidated_into": null,
-      "conflicts_with": ["memory:conflict:b"]
+      "conflicts_with": [
+        "memory:conflict:b"
+      ]
     },
     "created_at": "2026-09-18T00:00:00Z",
     "updated_at": "2026-09-20T00:00:00Z"
@@ -188,13 +241,21 @@
     "statement": "Repository-derived context should be invalidated immediately on source digest change with no time-based default.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": ["catalog/schema/"],
-      "tags": ["cache"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        "catalog/schema/"
+      ],
+      "tags": [
+        "cache"
+      ]
     },
     "source": {
       "kind": "decision",
-      "source_refs": ["decision:cache-policy:b"],
+      "source_refs": [
+        "decision:cache-policy:b"
+      ],
       "evidence_refs": [],
       "created_by": "architecture-review"
     },
@@ -211,7 +272,10 @@
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 1, "last_retrieved_at": "2026-09-20T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 1,
+      "last_retrieved_at": "2026-09-20T00:00:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -219,7 +283,9 @@
       "invalidated_by": null,
       "consolidated_from": [],
       "consolidated_into": null,
-      "conflicts_with": ["memory:conflict:a"]
+      "conflicts_with": [
+        "memory:conflict:a"
+      ]
     },
     "created_at": "2026-09-19T00:00:00Z",
     "updated_at": "2026-09-20T00:00:00Z"
@@ -233,13 +299,21 @@
     "statement": "Run the legacy full-context export before every audit.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": [".agentic/"],
-      "tags": ["context"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        ".agentic/"
+      ],
+      "tags": [
+        "context"
+      ]
     },
     "source": {
       "kind": "human",
-      "source_refs": ["decision:context-workflow:old"],
+      "source_refs": [
+        "decision:context-workflow:old"
+      ],
       "evidence_refs": [],
       "created_by": "project-maintainer"
     },
@@ -249,14 +323,17 @@
       "valid_until": "2026-09-20T00:00:00Z",
       "last_verified_at": "2026-09-15T00:00:00Z"
     },
-    "confidence": 1.0,
+    "confidence": 1,
     "importance": 0.8,
     "sensitivity": {
       "level": "project",
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 14, "last_retrieved_at": "2026-09-19T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 14,
+      "last_retrieved_at": "2026-09-19T00:00:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": "memory:superseded:new",
@@ -278,14 +355,24 @@
     "statement": "Compile task-scoped context first and disclose full files only when required.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": [".agentic/docs/architecture/context-compiler.md"],
-      "tags": ["context"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        ".agentic/docs/architecture/context-compiler.md"
+      ],
+      "tags": [
+        "context"
+      ]
     },
     "source": {
       "kind": "decision",
-      "source_refs": ["decision:context-workflow:new"],
-      "evidence_refs": ["evidence:context-compiler-contract"],
+      "source_refs": [
+        "decision:context-workflow:new"
+      ],
+      "evidence_refs": [
+        "evidence:context-compiler-contract"
+      ],
       "created_by": "architecture-review"
     },
     "validity": {
@@ -294,16 +381,21 @@
       "valid_until": null,
       "last_verified_at": "2026-09-20T00:00:00Z"
     },
-    "confidence": 1.0,
+    "confidence": 1,
     "importance": 0.9,
     "sensitivity": {
       "level": "project",
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 3, "last_retrieved_at": "2026-09-21T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 3,
+      "last_retrieved_at": "2026-09-21T00:00:00Z"
+    },
     "lineage": {
-      "supersedes": ["memory:superseded:old"],
+      "supersedes": [
+        "memory:superseded:old"
+      ],
       "superseded_by": null,
       "invalidates": [],
       "invalidated_by": null,
@@ -323,13 +415,21 @@
     "statement": "Remote providers may receive all project memory when retrieval confidence exceeds 0.9.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": ["registry/project-memory/"],
-      "tags": ["privacy"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        "registry/project-memory/"
+      ],
+      "tags": [
+        "privacy"
+      ]
     },
     "source": {
       "kind": "other",
-      "source_refs": ["import:legacy-memory-policy"],
+      "source_refs": [
+        "import:legacy-memory-policy"
+      ],
       "evidence_refs": [],
       "created_by": "legacy-import"
     },
@@ -340,13 +440,16 @@
       "last_verified_at": null
     },
     "confidence": 0.3,
-    "importance": 1.0,
+    "importance": 1,
     "sensitivity": {
       "level": "project",
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 0, "last_retrieved_at": null },
+    "usage": {
+      "retrieval_count": 0,
+      "last_retrieved_at": null
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -368,14 +471,25 @@
     "statement": "Mandatory project truth cannot be dropped by relevance ranking.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": [".agentic/docs/architecture/context-compiler.md"],
-      "tags": ["context", "mandatory"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        ".agentic/docs/architecture/context-compiler.md"
+      ],
+      "tags": [
+        "context",
+        "mandatory"
+      ]
     },
     "source": {
       "kind": "evidence",
-      "source_refs": ["source:context-doc:a"],
-      "evidence_refs": ["evidence:context-doc:a"],
+      "source_refs": [
+        "source:context-doc:a"
+      ],
+      "evidence_refs": [
+        "evidence:context-doc:a"
+      ],
       "created_by": "repository-intelligence"
     },
     "validity": {
@@ -384,14 +498,17 @@
       "valid_until": null,
       "last_verified_at": "2026-09-21T00:00:00Z"
     },
-    "confidence": 1.0,
-    "importance": 1.0,
+    "confidence": 1,
+    "importance": 1,
     "sensitivity": {
       "level": "project",
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 2, "last_retrieved_at": "2026-09-21T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 2,
+      "last_retrieved_at": "2026-09-21T00:00:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -413,14 +530,25 @@
     "statement": "If mandatory context exceeds the budget, the plan must report over-budget instead of silently omitting it.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": [".agentic/docs/architecture/context-compiler.md"],
-      "tags": ["context", "budget"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        ".agentic/docs/architecture/context-compiler.md"
+      ],
+      "tags": [
+        "context",
+        "budget"
+      ]
     },
     "source": {
       "kind": "evidence",
-      "source_refs": ["source:context-doc:b"],
-      "evidence_refs": ["evidence:context-doc:b"],
+      "source_refs": [
+        "source:context-doc:b"
+      ],
+      "evidence_refs": [
+        "evidence:context-doc:b"
+      ],
       "created_by": "repository-intelligence"
     },
     "validity": {
@@ -429,14 +557,17 @@
       "valid_until": null,
       "last_verified_at": "2026-09-21T00:00:00Z"
     },
-    "confidence": 1.0,
-    "importance": 1.0,
+    "confidence": 1,
+    "importance": 1,
     "sensitivity": {
       "level": "project",
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 2, "last_retrieved_at": "2026-09-21T00:00:00Z" },
+    "usage": {
+      "retrieval_count": 2,
+      "last_retrieved_at": "2026-09-21T00:00:00Z"
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
@@ -458,14 +589,28 @@
     "statement": "Mandatory project truth is always included; budget overflow is explicit rather than resolved by dropping required context.",
     "scope": {
       "project_id": "project:agentic-harness",
-      "repositories": ["powerpuff-kitty/agentic-harness"],
-      "paths": [".agentic/docs/architecture/context-compiler.md"],
-      "tags": ["context", "mandatory", "budget"]
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        ".agentic/docs/architecture/context-compiler.md"
+      ],
+      "tags": [
+        "context",
+        "mandatory",
+        "budget"
+      ]
     },
     "source": {
       "kind": "evidence",
-      "source_refs": ["source:context-doc:a", "source:context-doc:b"],
-      "evidence_refs": ["evidence:context-doc:a", "evidence:context-doc:b"],
+      "source_refs": [
+        "source:context-doc:a",
+        "source:context-doc:b"
+      ],
+      "evidence_refs": [
+        "evidence:context-doc:a",
+        "evidence:context-doc:b"
+      ],
       "created_by": "memory-consolidator"
     },
     "validity": {
@@ -474,24 +619,91 @@
       "valid_until": null,
       "last_verified_at": "2026-09-21T20:35:00Z"
     },
-    "confidence": 1.0,
-    "importance": 1.0,
+    "confidence": 1,
+    "importance": 1,
     "sensitivity": {
       "level": "project",
       "remote_persistence_allowed": true,
       "remote_retrieval_allowed": true
     },
-    "usage": { "retrieval_count": 0, "last_retrieved_at": null },
+    "usage": {
+      "retrieval_count": 0,
+      "last_retrieved_at": null
+    },
     "lineage": {
       "supersedes": [],
       "superseded_by": null,
       "invalidates": [],
       "invalidated_by": null,
-      "consolidated_from": ["memory:consolidated:a", "memory:consolidated:b"],
+      "consolidated_from": [
+        "memory:consolidated:a",
+        "memory:consolidated:b"
+      ],
       "consolidated_into": null,
       "conflicts_with": []
     },
     "created_at": "2026-09-21T20:35:00Z",
     "updated_at": "2026-09-21T20:35:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "project-memory",
+    "id": "memory:accepted:strict-query-boundary",
+    "memory_class": "reusable_lesson",
+    "state": "accepted",
+    "statement": "Repository query adapters may require canonical domain tokens rather than presentation labels.",
+    "scope": {
+      "project_id": "project:agentic-harness",
+      "repositories": [
+        "powerpuff-kitty/agentic-harness"
+      ],
+      "paths": [
+        "registry/"
+      ],
+      "tags": [
+        "query-boundary"
+      ]
+    },
+    "source": {
+      "kind": "reflection",
+      "source_refs": [
+        "reflection:test-failure:1",
+        "memory:candidate:strict-query-boundary"
+      ],
+      "evidence_refs": [
+        "evidence:test-failure",
+        "evidence:repository-query-contract",
+        "evidence:test-pass"
+      ],
+      "created_by": "project-maintainer"
+    },
+    "validity": {
+      "status": "current",
+      "valid_from": "2026-09-21T20:25:00Z",
+      "valid_until": null,
+      "last_verified_at": "2026-09-21T20:25:00Z"
+    },
+    "confidence": 0.98,
+    "importance": 0.7,
+    "sensitivity": {
+      "level": "project",
+      "remote_persistence_allowed": true,
+      "remote_retrieval_allowed": true
+    },
+    "usage": {
+      "retrieval_count": 0,
+      "last_retrieved_at": null
+    },
+    "lineage": {
+      "supersedes": [],
+      "superseded_by": null,
+      "invalidates": [],
+      "invalidated_by": null,
+      "consolidated_from": [],
+      "consolidated_into": null,
+      "conflicts_with": []
+    },
+    "created_at": "2026-09-21T20:25:00Z",
+    "updated_at": "2026-09-21T20:25:00Z"
   }
 ]
