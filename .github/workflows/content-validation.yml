@@ -19,10 +19,11 @@ jobs:
         run: python3 .github/scripts/validate_architecture_registry.py
       - name: Validate quality registry
         run: python3 .github/scripts/validate_quality_registry.py
-      - name: Validate CLI evidence contracts
+      - name: Validate machine contracts
         run: |
           python3 -m pip install jsonschema==4.26.0
           python3 .github/scripts/validate_cli_contracts.py
+          python3 .github/scripts/validate_agent_work_protocol.py
 
   reading-list:
     runs-on: ubuntu-latest
