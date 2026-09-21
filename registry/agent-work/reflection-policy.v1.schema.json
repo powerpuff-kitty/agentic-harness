@@ -16,7 +16,7 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "priority", "trigger_kind", "decision", "reason"],
+        "required": ["id", "priority", "trigger_kind", "when", "decision", "reason"],
         "properties": {
           "id": { "$ref": "#/$defs/id" },
           "priority": { "type": "integer", "minimum": 0 },
@@ -27,6 +27,20 @@
               "security_violation", "contradicted_assumption", "human_request",
               "low_confidence", "other"
             ]
+          },
+          "when": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "deterministic_remediation_available",
+              "evidence_available",
+              "confidence_below"
+            ],
+            "properties": {
+              "deterministic_remediation_available": { "type": ["boolean", "null"] },
+              "evidence_available": { "type": ["boolean", "null"] },
+              "confidence_below": { "type": ["number", "null"], "minimum": 0, "maximum": 1 }
+            }
           },
           "decision": { "type": "string", "enum": ["reflect", "skip"] },
           "reason": { "type": "string", "minLength": 1, "maxLength": 5000 }
