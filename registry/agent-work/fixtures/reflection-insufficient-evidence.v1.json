@@ -1,7 +1,7 @@
 {
   "format_version": 1,
   "kind": "work-reflection",
-  "id": "reflection:abstained:1",
+  "id": "reflection:insufficient-evidence:1",
   "work_unit_id": "wu:reflection-demo",
   "run_id": "run:reflection-demo",
   "attempt_id": "attempt:security:1",
@@ -9,7 +9,9 @@
     "kind": "evaluator_finding",
     "summary": "A security finding requested reflection, but the referenced evidence artifact is unavailable.",
     "evidence_refs": [],
-    "finding_refs": ["finding:security-unavailable"]
+    "finding_refs": [
+      "finding:security-unavailable"
+    ]
   },
   "status": "insufficient_evidence",
   "observation": {
