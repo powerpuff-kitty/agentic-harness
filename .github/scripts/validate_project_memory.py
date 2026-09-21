@@ -227,6 +227,11 @@ for label, provider in (("local-provider", local_provider), ("remote-provider", 
     if isinstance(provider, dict):
         validate("memory-provider", provider, label)
 
+if isinstance(hybrid_provider, dict):
+    hybrid_policy = hybrid_provider.get("sensitivity_policy", {})
+    if hybrid_provider.get("mode") == "hybrid" and hybrid_policy.get("enforce_before_remote_handoff") is not True:
+        fail("hybrid-provider: sensitivity must be enforced before remote handoff")
+
 if isinstance(remote_provider, dict):
     policy = remote_provider.get("sensitivity_policy", {})
     accepted = policy.get("accepted_levels", []) if isinstance(policy, dict) else []
