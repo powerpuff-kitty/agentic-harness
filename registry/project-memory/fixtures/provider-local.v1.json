@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "kind": "memory-provider",
+  "id": "memory-provider:local-sqlite",
+  "mode": "local",
+  "storage": "sqlite",
+  "capabilities": {
+    "lexical_search": true,
+    "semantic_search": false,
+    "upsert": true,
+    "invalidate": true,
+    "consolidate": true,
+    "reverify": true
+  },
+  "sensitivity_policy": {
+    "accepted_levels": ["local_only", "project", "team", "org"],
+    "enforce_before_remote_handoff": true
+  },
+  "configuration_ref": ".agentic/local/memory-provider.json"
+}
