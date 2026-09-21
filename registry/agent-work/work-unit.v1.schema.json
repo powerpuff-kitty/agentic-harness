@@ -40,6 +40,7 @@
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$" },
+    "digest": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
     "timestamp": { "type": "string", "format": "date-time" },
     "state": {
       "type": "string",
@@ -108,11 +109,26 @@
     "run": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "role", "agent_connection_id", "state", "plan_revisions", "tasks", "attempts", "result"],
+      "required": ["id", "role", "agent_connection_id", "session_ref", "input_revision", "state", "plan_revisions", "tasks", "attempts", "result"],
       "properties": {
         "id": { "$ref": "#/$defs/id" },
         "role": { "type": "string", "enum": ["implementer", "collaborator", "reviewer", "validator", "evaluator", "specialist"] },
         "agent_connection_id": { "$ref": "#/$defs/id" },
+        "session_ref": {
+          "anyOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "input_revision": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source_revision", "context_fingerprint"],
+          "properties": {
+            "source_revision": { "type": "string", "minLength": 1, "maxLength": 1000 },
+            "context_fingerprint": { "$ref": "#/$defs/digest" }
+          }
+        },
         "state": { "$ref": "#/$defs/state" },
         "plan_revisions": { "type": "array", "maxItems": 1000, "items": { "$ref": "#/$defs/plan_revision" } },
         "tasks": { "type": "array", "maxItems": 5000, "items": { "$ref": "#/$defs/task" } },
