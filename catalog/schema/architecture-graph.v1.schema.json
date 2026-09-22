@@ -1,0 +1,314 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/powerpuff-kitty/agentic-harness/catalog/schema/architecture-graph.v1.schema.json",
+  "title": "Agentic Harness Architecture Graph v1",
+  "description": "Provider- and language-neutral project architecture graph. Structural validity records declared architecture; it does not by itself prove dependency enforcement, runtime behavior, deployment state, or architectural quality.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "project",
+    "graph_state",
+    "nodes",
+    "edges",
+    "constraints",
+    "coverage",
+    "not_checked"
+  ],
+  "properties": {
+    "format_version": {
+      "const": 1
+    },
+    "kind": {
+      "const": "architecture-graph"
+    },
+    "project": {
+      "$ref": "#/$defs/project"
+    },
+    "graph_state": {
+      "enum": [
+        "observed",
+        "target",
+        "migration"
+      ]
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      },
+      "minItems": 1,
+      "maxItems": 4096
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      },
+      "maxItems": 32768
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      },
+      "maxItems": 4096
+    },
+    "coverage": {
+      "$ref": "#/$defs/coverage"
+    },
+    "not_checked": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/text"
+      },
+      "maxItems": 128
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9_.:/+-]+$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "pattern": "^[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "name",
+        "lifecycle",
+        "path"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "capability",
+            "contract",
+            "provider",
+            "adapter",
+            "app",
+            "engine",
+            "surface",
+            "infrastructure",
+            "authority"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/text"
+        },
+        "lifecycle": {
+          "enum": [
+            "current",
+            "target",
+            "compatibility",
+            "planned"
+          ]
+        },
+        "path": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/path"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "kind"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/id"
+        },
+        "to": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "depends-on",
+            "owns",
+            "implements",
+            "exposes",
+            "adapts",
+            "persists-to",
+            "authoritative-for",
+            "composes",
+            "calls",
+            "backed-by"
+          ]
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        }
+      }
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "subject",
+        "target",
+        "status",
+        "mechanism",
+        "evidence_refs",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "kind": {
+          "enum": [
+            "allowed-dependency",
+            "forbidden-dependency",
+            "single-owner",
+            "surface-through-contract",
+            "authority-boundary"
+          ]
+        },
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "target": {
+          "$ref": "#/$defs/id"
+        },
+        "status": {
+          "enum": [
+            "declared",
+            "checked",
+            "enforced",
+            "unsupported"
+          ]
+        },
+        "mechanism": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/text"
+          },
+          "maxItems": 64,
+          "uniqueItems": true
+        },
+        "description": {
+          "$ref": "#/$defs/text"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "checked",
+                  "enforced"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "mechanism": {
+                "$ref": "#/$defs/text"
+              },
+              "evidence_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodes_declared",
+        "edges_declared",
+        "paths_checked",
+        "complete"
+      ],
+      "properties": {
+        "nodes_declared": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "edges_declared": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 32768
+        },
+        "paths_checked": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4096
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
