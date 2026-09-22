@@ -35,6 +35,21 @@ Decision graphs describe dependencies between atomic decisions and deterministic
 
 The canonical schemas live under `catalog/schema/decision-*.v1.schema.json`. The CLI may implement deterministic validation, provider adapters, fan-out, cache/replay and executable policy checks, but published schemas alone are not evidence that those runtime capabilities are installed or enforced.
 
+## Architecture-intelligence boundary
+
+The language-neutral [Architecture Graph v1](docs/architecture/architecture-graph.md), accepted in
+[ADR-012](decisions/ADR-012-architecture-capability-graph.md), models capabilities,
+contracts, providers, adapters, apps, engines, surfaces, infrastructure and authorities
+without requiring a directory convention. Observed, target and migration graphs remain
+distinct from enforcement evidence.
+
+`depends-on` edges define the capability dependency graph and must be acyclic.
+Architecture constraints distinguish declared, checked, enforced and unsupported states;
+checked/enforced claims require mechanism and evidence. The canonical schema lives at
+`catalog/schema/architecture-graph.v1.schema.json`. Deterministic repository discovery,
+import checking, drift analysis and generated guardrails belong in the CLI and are not
+implied by publishing the schema.
+
 ## Target-project contract
 
 ```text
