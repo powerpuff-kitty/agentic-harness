@@ -17,6 +17,8 @@ SCHEMA_PATH = WORK / "otel-export.v1.schema.json"
 SENSITIVE_ATTRIBUTE_KEYS = {
     "gen_ai.input.messages",
     "gen_ai.output.messages",
+    "gen_ai.system_instructions",
+    "gen_ai.tool.definitions",
     "gen_ai.prompt",
     "gen_ai.completion",
     "agent.work.prompt",
@@ -35,6 +37,18 @@ SENSITIVE_KEY_SEGMENTS = {
     "access_key",
     "private_key",
 }
+
+INFERENCE_OPERATIONS = {
+    "chat",
+    "generate_content",
+    "text_completion",
+    "embeddings",
+    "retrieval",
+    "invoke_agent",
+    "invoke_workflow",
+    "plan",
+}
+CANONICAL_ENTITY_KINDS = {"work-unit", "run", "task", "attempt"}
 
 
 def load_json(path: Path) -> Any:
@@ -97,7 +111,7 @@ def canonical_entities(work_unit: dict[str, Any] | None) -> dict[str, Any]:
 
 def sensitive_attribute_error(key: str) -> bool:
     lowered = key.lower()
-    if lowered in SENSITIVE_ATTRIBUTE_KEYS:
+    if lowered in SENSITIVE_ATTRIBUTE_KEYS or lowered.startswith("gen_ai.prompt.variable"):
         return True
     segments = {segment.replace("-", "_") for segment in lowered.split(".")}
     return bool(segments & SENSITIVE_KEY_SEGMENTS)
@@ -176,6 +190,57 @@ def semantic_errors(
                     f"semantic:spans[{index}]: metadata-only export forbids sensitive/content attribute {attr_key}"
                 )
 
+        gen_ai_keys = [key for key in attributes if key.startswith("gen_ai.")]
+        semantic_conventions = export.get("semantic_conventions", {})
+        gen_ai_status = (
+            semantic_conventions.get("gen_ai_status")
+            if isinstance(semantic_conventions, dict)
+            else None
+        )
+        if gen_ai_keys and gen_ai_status == "not_used":
+            errors.append(
+                f"semantic:spans[{index}]: gen_ai attributes present while gen_ai_status=not_used"
+            )
+
+        operation = attributes.get("gen_ai.operation.name")
+        if entity_kind == "model" and gen_ai_keys and operation not in INFERENCE_OPERATIONS:
+            errors.append(
+                f"semantic:spans[{index}]: model GenAI span has unsupported/missing operation {operation}"
+            )
+        if entity_kind == "tool" and gen_ai_keys:
+            if operation != "execute_tool":
+                errors.append(
+                    f"semantic:spans[{index}]: GenAI tool span must use execute_tool"
+                )
+            if not attributes.get("gen_ai.tool.name"):
+                errors.append(
+                    f"semantic:spans[{index}]: GenAI tool span requires gen_ai.tool.name"
+                )
+
+        for attr_key, value in attributes.items():
+            if attr_key.startswith("gen_ai.usage.") and attr_key.endswith("tokens"):
+                if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                    errors.append(
+                        f"semantic:spans[{index}]: {attr_key} must be a non-negative integer"
+                    )
+
+        if "agent.work.cost.amount" in attributes:
+            amount = attributes.get("agent.work.cost.amount")
+            currency = attributes.get("agent.work.cost.currency")
+            source = attributes.get("agent.work.cost.source")
+            if isinstance(amount, bool) or not isinstance(amount, (int, float)) or amount < 0:
+                errors.append(
+                    f"semantic:spans[{index}]: observed cost amount must be non-negative"
+                )
+            if not isinstance(currency, str) or len(currency) != 3 or currency.upper() != currency:
+                errors.append(
+                    f"semantic:spans[{index}]: observed cost currency must be an uppercase 3-letter code"
+                )
+            if not isinstance(source, str) or not source:
+                errors.append(
+                    f"semantic:spans[{index}]: observed cost requires agent.work.cost.source"
+                )
+
         parent_span_id = span.get("parent_span_id")
         if parent_span_id is not None and (trace_id, parent_span_id) not in span_by_key:
             # Parent may appear later in the array. Defer until every span is indexed.
@@ -206,6 +271,21 @@ def semantic_errors(
             if parent is None:
                 break
             cursor = (current.get("trace_id"), parent)
+
+        trace_ids = {
+            item.get("trace_id")
+            for item in spans
+            if isinstance(item, dict) and isinstance(item.get("trace_id"), str)
+        }
+        for link_index, link in enumerate(span.get("links", [])):
+            if not isinstance(link, dict):
+                continue
+            linked_trace = link.get("trace_id")
+            linked_span = link.get("span_id")
+            if linked_trace in trace_ids and (linked_trace, linked_span) not in span_by_key:
+                errors.append(
+                    f"semantic:spans[{index}].links[{link_index}]: dangling link inside collected trace"
+                )
 
     entities = canonical_entities(work_unit)
     if isinstance(work_unit, dict):
@@ -258,6 +338,28 @@ def semantic_errors(
                 errors.append(
                     "semantic:spans: collected export requires exactly one root WorkUnit span"
                 )
+
+            observed_entities: dict[tuple[str, str], int] = {}
+            for span in spans:
+                if not isinstance(span, dict):
+                    continue
+                entity = span.get("entity", {})
+                if not isinstance(entity, dict):
+                    continue
+                kind = entity.get("kind")
+                entity_id = entity.get("id")
+                if kind in CANONICAL_ENTITY_KINDS and isinstance(entity_id, str):
+                    key = (kind, entity_id)
+                    observed_entities[key] = observed_entities.get(key, 0) + 1
+
+            for kind in CANONICAL_ENTITY_KINDS:
+                for entity_id in entities[kind]:
+                    count = observed_entities.get((kind, entity_id), 0)
+                    if count != 1:
+                        errors.append(
+                            f"semantic:spans: collected export requires exactly one canonical "
+                            f"{kind} span for {entity_id}; found {count}"
+                        )
 
     event_by_id: dict[str, dict[str, Any]] = {}
     if isinstance(canonical_events, list):
@@ -344,7 +446,7 @@ def semantic_errors(
             for item in canonical_redactions
             if isinstance(item, dict) and isinstance(item.get("id"), str)
         }
-    if redaction_ids:
+    if canonical_redactions is not None:
         content_policy = export.get("content_policy", {})
         if isinstance(content_policy, dict):
             for redaction_ref in content_policy.get("redaction_refs", []):
@@ -400,6 +502,32 @@ def run_self_test(
     missing_event = copy.deepcopy(export)
     missing_event["spans"][0]["events"] = missing_event["spans"][0]["events"][1:]
     expect(missing_event, "collected export is missing canonical events", "event-coverage")
+
+    missing_entity = copy.deepcopy(export)
+    missing_entity["spans"] = [
+        span for span in missing_entity["spans"]
+        if span.get("entity") != {"kind": "attempt", "id": "attempt:retry:1"}
+    ]
+    expect(missing_entity, "requires exactly one canonical attempt span", "entity-coverage")
+
+    bad_tool_operation = copy.deepcopy(export)
+    tool_span = next(span for span in bad_tool_operation["spans"] if span.get("entity", {}).get("kind") == "tool")
+    tool_span["attributes"]["gen_ai.operation.name"] = "chat"
+    expect(bad_tool_operation, "GenAI tool span must use execute_tool", "tool-operation")
+
+    negative_tokens = copy.deepcopy(export)
+    model_span = next(span for span in negative_tokens["spans"] if span.get("entity", {}).get("kind") == "model")
+    model_span["attributes"]["gen_ai.usage.input_tokens"] = -1
+    expect(negative_tokens, "must be a non-negative integer", "token-usage")
+
+    dangling_link = copy.deepcopy(export)
+    retry_span = next(span for span in dangling_link["spans"] if span.get("entity", {}).get("id") == "task:retry")
+    retry_span["links"][0]["span_id"] = "ffffffffffffffff"
+    expect(dangling_link, "dangling link inside collected trace", "link-correlation")
+
+    system_content = copy.deepcopy(export)
+    system_content["spans"][0]["attributes"]["gen_ai.system_instructions"] = "sensitive"
+    expect(system_content, "metadata-only export forbids", "system-content")
 
     return failures
 
