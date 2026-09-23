@@ -1,0 +1,235 @@
+[
+  {
+    "format_version": 2,
+    "kind": "agent-connection",
+    "id": "agent:reviewer",
+    "provider": {
+      "id": "synthetic-local",
+      "agent": "reviewer",
+      "model_id": "review-model",
+      "model_version": "fixture-v1"
+    },
+    "auth": {
+      "mode": "local_identity",
+      "credential_ref": null,
+      "scopes": ["repository:read"]
+    },
+    "environment": {
+      "mode": "local_runner",
+      "host_ref": "fixture:local-runner",
+      "region": null
+    },
+    "capabilities": {
+      "read_repo": "supported",
+      "write_repo": "unsupported",
+      "execute": "supported",
+      "commit": "unsupported",
+      "create_pr": "unsupported",
+      "stream_events": "supported",
+      "continue_session": "supported",
+      "approvals": "supported",
+      "tool_calls": "supported"
+    },
+    "repositories": [
+      {
+        "repository": "synthetic/example",
+        "scope_status": "known",
+        "branches": ["main"],
+        "permissions": {
+          "read": true,
+          "write": false,
+          "execute": true,
+          "commit": false,
+          "create_pr": false
+        }
+      }
+    ],
+    "tools": [
+      {
+        "id": "tool:filesystem-read",
+        "name": "fixture filesystem",
+        "kind": "filesystem",
+        "availability": "ready",
+        "permissions": ["read"]
+      },
+      {
+        "id": "tool:test-runner",
+        "name": "fixture test runner",
+        "kind": "shell",
+        "availability": "ready",
+        "permissions": ["execute"]
+      }
+    ],
+    "usage": {
+      "status": "unknown",
+      "captured_at": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    "rate_limits": {
+      "status": "unknown",
+      "captured_at": null,
+      "limit": null,
+      "remaining": null,
+      "reset_at": null
+    },
+    "readiness": {
+      "status": "ready",
+      "checked_at": "2026-09-23T05:00:00Z",
+      "reason": "Synthetic fixture readiness observation.",
+      "evidence_refs": ["evidence:reviewer-ready"]
+    },
+    "continuation": {
+      "support": "supported",
+      "modes": ["same_session", "linked_run"],
+      "reference_kind": "opaque_reference"
+    }
+  },
+  {
+    "format_version": 2,
+    "kind": "agent-connection",
+    "id": "agent:implementer",
+    "provider": {
+      "id": "synthetic-cloud",
+      "agent": "implementer",
+      "model_id": "implementation-model",
+      "model_version": "fixture-v1"
+    },
+    "auth": {
+      "mode": "managed_oauth",
+      "credential_ref": "credential-ref:fixture-managed",
+      "scopes": ["repository:read", "repository:write"]
+    },
+    "environment": {
+      "mode": "vendor_hosted",
+      "host_ref": "fixture:vendor-host",
+      "region": "test-region"
+    },
+    "capabilities": {
+      "read_repo": "supported",
+      "write_repo": "supported",
+      "execute": "supported",
+      "commit": "unsupported",
+      "create_pr": "unsupported",
+      "stream_events": "supported",
+      "continue_session": "supported",
+      "approvals": "supported",
+      "tool_calls": "supported"
+    },
+    "repositories": [
+      {
+        "repository": "synthetic/example",
+        "scope_status": "known",
+        "branches": ["main"],
+        "permissions": {
+          "read": true,
+          "write": true,
+          "execute": true,
+          "commit": false,
+          "create_pr": false
+        }
+      }
+    ],
+    "tools": [
+      {
+        "id": "tool:editor",
+        "name": "fixture editor",
+        "kind": "filesystem",
+        "availability": "ready",
+        "permissions": ["read", "write"]
+      },
+      {
+        "id": "tool:test-runner-cloud",
+        "name": "fixture cloud test runner",
+        "kind": "shell",
+        "availability": "ready",
+        "permissions": ["execute"]
+      }
+    ],
+    "usage": {
+      "status": "observed",
+      "captured_at": "2026-09-23T05:00:00Z",
+      "input_tokens": 1200,
+      "output_tokens": 300,
+      "cost": null
+    },
+    "rate_limits": {
+      "status": "observed",
+      "captured_at": "2026-09-23T05:00:00Z",
+      "limit": 100,
+      "remaining": 80,
+      "reset_at": "2026-09-23T06:00:00Z"
+    },
+    "readiness": {
+      "status": "ready",
+      "checked_at": "2026-09-23T05:00:00Z",
+      "reason": "Synthetic fixture readiness observation.",
+      "evidence_refs": ["evidence:implementer-ready"]
+    },
+    "continuation": {
+      "support": "supported",
+      "modes": ["resume_session", "linked_run"],
+      "reference_kind": "provider_handle"
+    }
+  },
+  {
+    "format_version": 2,
+    "kind": "agent-connection",
+    "id": "agent:api-evaluator",
+    "provider": {
+      "id": "synthetic-api",
+      "agent": "evaluator",
+      "model_id": "evaluation-model",
+      "model_version": null
+    },
+    "auth": {
+      "mode": "api_key_ref",
+      "credential_ref": "credential-ref:fixture-api",
+      "scopes": ["inference"]
+    },
+    "environment": {
+      "mode": "byo_api",
+      "host_ref": "fixture:api",
+      "region": null
+    },
+    "capabilities": {
+      "read_repo": "unsupported",
+      "write_repo": "unsupported",
+      "execute": "unsupported",
+      "commit": "unsupported",
+      "create_pr": "unsupported",
+      "stream_events": "unknown",
+      "continue_session": "unsupported",
+      "approvals": "unsupported",
+      "tool_calls": "unsupported"
+    },
+    "repositories": [],
+    "tools": [],
+    "usage": {
+      "status": "unavailable",
+      "captured_at": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "cost": null
+    },
+    "rate_limits": {
+      "status": "unknown",
+      "captured_at": null,
+      "limit": null,
+      "remaining": null,
+      "reset_at": null
+    },
+    "readiness": {
+      "status": "unknown",
+      "checked_at": null,
+      "reason": "No live provider probe was performed for this synthetic API fixture.",
+      "evidence_refs": []
+    },
+    "continuation": {
+      "support": "unsupported",
+      "modes": [],
+      "reference_kind": "none"
+    }
+  }
+]
