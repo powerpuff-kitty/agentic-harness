@@ -19,6 +19,9 @@ SCHEMAS = {
     "work-artifact": WORK / "artifact.v1.schema.json",
     "work-redaction": WORK / "redaction.v1.schema.json",
     "work-evaluation": WORK / "evaluation.v1.schema.json",
+    "work-evaluation-v2": WORK / "evaluation.v2.schema.json",
+    "work-metric": WORK / "metric.v1.schema.json",
+    "work-finding": WORK / "finding.v1.schema.json",
     "work-action": WORK / "work-action.v1.schema.json",
     "work-action-v2": WORK / "work-action.v2.schema.json",
     "agent-connection": WORK / "agent-connection.v1.schema.json",
@@ -97,6 +100,9 @@ def validate_event_list(value, label: str) -> None:
 
 work_unit = load(FIXTURES / "replanned-work-unit.v1.json")
 evaluation = load(FIXTURES / "evaluation.v1.json")
+evaluations_v2 = load(FIXTURES / "evaluations.v2.json")
+metrics_v1 = load(FIXTURES / "metrics.v1.json")
+findings_v1 = load(FIXTURES / "findings.v1.json")
 action = load(FIXTURES / "action.v1.json")
 action_lineage = load(FIXTURES / "action-lineage.v2.json")
 connection = load(FIXTURES / "agent-connection.v1.json")
@@ -508,6 +514,213 @@ if isinstance(connections_v2, list):
         )
         if eligible or not reasons:
             fail("agent-connections-v2 mutation: unavailable API advisor was incorrectly eligible")
+
+
+def evaluation_bundle_errors(evaluations, metrics, findings) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(evaluations, list) or not isinstance(metrics, list) or not isinstance(findings, list):
+        return ["evaluation bundle fixtures must all be arrays"]
+
+    evaluation_validator = validators.get("work-evaluation-v2")
+    metric_validator = validators.get("work-metric")
+    finding_validator = validators.get("work-finding")
+
+    evaluation_by_id: dict[str, dict] = {}
+    metric_by_id: dict[str, dict] = {}
+    finding_by_id: dict[str, dict] = {}
+
+    for label, values, validator, target in (
+        ("evaluation", evaluations, evaluation_validator, evaluation_by_id),
+        ("metric", metrics, metric_validator, metric_by_id),
+        ("finding", findings, finding_validator, finding_by_id),
+    ):
+        for index, value in enumerate(values):
+            if validator is not None:
+                for error in sorted(validator.iter_errors(value), key=lambda item: list(item.path)):
+                    location = ".".join(str(part) for part in error.path) or "<root>"
+                    problems.append(f"{label}[{index}].{location}: {error.message}")
+            if not isinstance(value, dict) or not isinstance(value.get("id"), str):
+                continue
+            identifier = value["id"]
+            if identifier in target:
+                problems.append(f"duplicate {label} id {identifier}")
+            target[identifier] = value
+
+    non_measured = {"unknown", "not_checked", "blocked", "not_applicable"}
+    for metric_id, metric in metric_by_id.items():
+        measurement = metric.get("measurement", {})
+        if not isinstance(measurement, dict):
+            continue
+        populated = any(
+            measurement.get(key) is not None
+            for key in ("value", "normalized_score", "grade")
+        )
+        if metric.get("status") in non_measured and populated:
+            problems.append(f"{metric_id}: non-measured status carries a measurement")
+        if populated:
+            method = metric.get("method", {})
+            if not isinstance(method, dict) or not method.get("description"):
+                problems.append(f"{metric_id}: measurement requires an explicit method")
+            if not metric.get("input_refs"):
+                problems.append(f"{metric_id}: measurement requires input refs")
+            if not metric.get("evidence_refs"):
+                problems.append(f"{metric_id}: measurement requires evidence refs")
+
+    confidence_dimensions = {
+        "evidence_completeness", "evaluator_confidence", "completion_confidence"
+    }
+    for evaluation_id, evaluation_record in evaluation_by_id.items():
+        run_id = evaluation_record.get("run_id")
+        implementer = evaluation_record.get("implementer", {})
+        evaluator = evaluation_record.get("evaluator", {})
+        if isinstance(implementer, dict):
+            if implementer.get("run_id") != run_id:
+                problems.append(f"{evaluation_id}: implementer run does not match evaluation run")
+        if isinstance(implementer, dict) and isinstance(evaluator, dict):
+            implementer_connection = implementer.get("connection_id")
+            evaluator_connection = evaluator.get("connection_id")
+            if (
+                evaluator.get("kind") == "agent"
+                and evaluator_connection is not None
+                and evaluator_connection == implementer_connection
+            ):
+                problems.append(f"{evaluation_id}: evaluator identity must remain distinct from implementer")
+
+        metric_refs = evaluation_record.get("metric_refs", [])
+        confidence_refs = evaluation_record.get("confidence_metric_refs", [])
+        finding_refs = evaluation_record.get("finding_refs", [])
+
+        for metric_ref in metric_refs:
+            metric = metric_by_id.get(metric_ref)
+            if metric is None:
+                problems.append(f"{evaluation_id}: unknown metric ref {metric_ref}")
+            elif metric.get("evaluation_id") != evaluation_id:
+                problems.append(f"{evaluation_id}: metric {metric_ref} belongs to another evaluation")
+
+        for confidence_ref in confidence_refs:
+            metric = metric_by_id.get(confidence_ref)
+            if confidence_ref not in metric_refs:
+                problems.append(f"{evaluation_id}: confidence metric {confidence_ref} is not in metric_refs")
+            if isinstance(metric, dict) and metric.get("dimension") not in confidence_dimensions:
+                problems.append(f"{evaluation_id}: {confidence_ref} is not a confidence/evidence metric")
+
+        for finding_ref in finding_refs:
+            finding = finding_by_id.get(finding_ref)
+            if finding is None:
+                problems.append(f"{evaluation_id}: unknown finding ref {finding_ref}")
+            elif finding.get("evaluation_id") != evaluation_id:
+                problems.append(f"{evaluation_id}: finding {finding_ref} belongs to another evaluation")
+
+    for metric_id, metric in metric_by_id.items():
+        evaluation_id = metric.get("evaluation_id")
+        owner = evaluation_by_id.get(evaluation_id)
+        if owner is None:
+            problems.append(f"{metric_id}: references unknown evaluation {evaluation_id}")
+        elif metric_id not in owner.get("metric_refs", []):
+            problems.append(f"{metric_id}: owning evaluation does not reference metric")
+
+    for finding_id, finding in finding_by_id.items():
+        evaluation_id = finding.get("evaluation_id")
+        owner = evaluation_by_id.get(evaluation_id)
+        if owner is None:
+            problems.append(f"{finding_id}: references unknown evaluation {evaluation_id}")
+        elif finding_id not in owner.get("finding_refs", []):
+            problems.append(f"{finding_id}: owning evaluation does not reference finding")
+
+        prior_finding = finding.get("prior_finding_id")
+        if prior_finding is not None:
+            if prior_finding == finding_id:
+                problems.append(f"{finding_id}: finding cannot supersede itself")
+            elif prior_finding not in finding_by_id:
+                problems.append(f"{finding_id}: unknown prior finding {prior_finding}")
+
+    for evaluation_id, evaluation_record in evaluation_by_id.items():
+        lineage = evaluation_record.get("lineage", {})
+        if not isinstance(lineage, dict):
+            continue
+        prior = lineage.get("prior_evaluation_id")
+        if prior is None:
+            continue
+        if prior == evaluation_id:
+            problems.append(f"{evaluation_id}: evaluation cannot reassess itself")
+            continue
+        prior_record = evaluation_by_id.get(prior)
+        if prior_record is None:
+            problems.append(f"{evaluation_id}: unknown prior evaluation {prior}")
+            continue
+        if prior_record.get("work_unit_id") != evaluation_record.get("work_unit_id"):
+            problems.append(f"{evaluation_id}: reassessment crosses work units")
+
+        seen = {evaluation_id}
+        cursor = prior
+        while cursor is not None:
+            if cursor in seen:
+                problems.append(f"{evaluation_id}: evaluation lineage contains a cycle at {cursor}")
+                break
+            seen.add(cursor)
+            ancestor = evaluation_by_id.get(cursor)
+            if not isinstance(ancestor, dict):
+                break
+            ancestor_lineage = ancestor.get("lineage", {})
+            cursor = ancestor_lineage.get("prior_evaluation_id") if isinstance(ancestor_lineage, dict) else None
+
+    run_evaluators: dict[tuple[str, str], set[tuple[str, object, str]]] = {}
+    for evaluation_record in evaluations:
+        if not isinstance(evaluation_record, dict):
+            continue
+        evaluator = evaluation_record.get("evaluator", {})
+        if not isinstance(evaluator, dict):
+            continue
+        key = (evaluation_record.get("work_unit_id"), evaluation_record.get("run_id"))
+        identity = (evaluator.get("kind"), evaluator.get("connection_id"), evaluator.get("name"))
+        run_evaluators.setdefault(key, set()).add(identity)
+    if not any(len(identities) >= 2 for identities in run_evaluators.values()):
+        problems.append("fixture must demonstrate independent evaluators on the same run")
+
+    if not any(
+        isinstance(item, dict)
+        and isinstance(item.get("lineage"), dict)
+        and item["lineage"].get("prior_evaluation_id") is not None
+        for item in evaluations
+    ):
+        problems.append("fixture must demonstrate immutable reassessment lineage")
+
+    return problems
+
+
+if isinstance(evaluations_v2, list) and isinstance(metrics_v1, list) and isinstance(findings_v1, list):
+    for problem in evaluation_bundle_errors(evaluations_v2, metrics_v1, findings_v1):
+        fail(f"evaluation-bundle:{problem}")
+
+    unknown_score = copy.deepcopy(metrics_v1)
+    unknown_score[1]["measurement"]["normalized_score"] = 1.0
+    if not any("non-measured status carries a measurement" in item or "None was expected" in item
+               for item in evaluation_bundle_errors(evaluations_v2, unknown_score, findings_v1)):
+        fail("evaluation-bundle mutation: not-checked metric accepted a score")
+
+    no_evidence = copy.deepcopy(metrics_v1)
+    no_evidence[0]["evidence_refs"] = []
+    if not any("measurement requires evidence refs" in item
+               for item in evaluation_bundle_errors(evaluations_v2, no_evidence, findings_v1)):
+        fail("evaluation-bundle mutation: scored metric without evidence was not rejected")
+
+    self_reassessment = copy.deepcopy(evaluations_v2)
+    self_reassessment[-1]["lineage"]["prior_evaluation_id"] = self_reassessment[-1]["id"]
+    if not any("evaluation cannot reassess itself" in item
+               for item in evaluation_bundle_errors(self_reassessment, metrics_v1, findings_v1)):
+        fail("evaluation-bundle mutation: self-reassessment was not rejected")
+
+    same_evaluator = copy.deepcopy(evaluations_v2)
+    same_evaluator[1]["evaluator"]["connection_id"] = same_evaluator[1]["implementer"]["connection_id"]
+    if not any("evaluator identity must remain distinct" in item
+               for item in evaluation_bundle_errors(same_evaluator, metrics_v1, findings_v1)):
+        fail("evaluation-bundle mutation: implementer/evaluator identity collapse was not rejected")
+
+    ineligible_remediation = copy.deepcopy(findings_v1)
+    ineligible_remediation[-1]["remediation"]["action_intents"] = ["remediate"]
+    if not any("is expected to be empty" in item or "is too long" in item
+               for item in evaluation_bundle_errors(evaluations_v2, metrics_v1, ineligible_remediation)):
+        fail("evaluation-bundle mutation: ineligible remediation exposed an action")
 
 
 validate_event_list(events, "events")
