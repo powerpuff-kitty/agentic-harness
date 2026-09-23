@@ -1,0 +1,21 @@
+{
+  "format_version": 1,
+  "kind": "work-progress",
+  "work_unit_id": "wu:identity-progress",
+  "run_id": "run:identity-progress",
+  "plan_revision": 2,
+  "basis": "latest-plan-task-state-counts",
+  "active_task_count": 2,
+  "state_counts": {
+    "proposed": 0,
+    "queued": 0,
+    "running": 1,
+    "validating": 0,
+    "completed": 1,
+    "blocked": 0,
+    "waiting_for_user": 0,
+    "waiting_for_approval": 0,
+    "failed": 0,
+    "cancelled": 0
+  }
+}

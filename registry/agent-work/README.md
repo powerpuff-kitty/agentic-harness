@@ -4,9 +4,11 @@ Agent Work is the provider-neutral, versioned contract for observable AI work.
 
 It models execution as structured work rather than a chat transcript. Consumers can render plans, tasks, attempts, evidence, artifacts, evaluations, reflections and follow-up actions without requiring or storing private chain-of-thought.
 
-## V1 contracts
+## Versioned contracts
 
-- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt structure.
+- work-unit.v1.schema.json — compatibility WorkUnit, Run, Plan revision, Task and Attempt structure.
+- work-unit.v2.schema.json — preferred WorkUnit contract with opaque session correlation and immutable Run input identity separate from output revision.
+- work-progress.v1.schema.json — deterministic latest-plan Task-state projection for progress UIs; no estimated percentage field.
 - lifecycle.v1.schema.json + lifecycle.v1.json — canonical state domain and allowed WorkUnit/Run/Task/Attempt transitions; retries create new attempts.
 - work-event.v1.schema.json — append-only execution event envelope with optional replay deltas.
 - evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
@@ -37,6 +39,16 @@ It models execution as structured work rather than a chat transcript. Consumers 
 | Context | Task-specific compiled view shown to a model | Ephemeral projection | It is the model input |
 
 Reflection is not memory. A reflection may emit only memory candidate references; promotion, consolidation, supersession and remote-storage policy belong to the Project Memory subsystem. Reflection is also not hidden reasoning capture: it stores concise inspectable conclusions, uncertainty, evidence and proposed corrective actions.
+
+## Run identity and deterministic progress
+
+WorkUnit v2 is additive; WorkUnit v1 remains valid. Each v2 Run keeps `agent_connection_id` as the executable connection reference, adds nullable `session_ref` for opaque provider-session correlation, and requires an immutable `input_revision` made of a source revision plus context fingerprint. The Run `result.revision` remains a separate output identity, so consumers do not conflate what was executed with what was produced.
+
+The protocol does not serialize provider-private session state or credentials. A session reference is correlation metadata only, and a context fingerprint is identity evidence rather than proof that every relevant source was included.
+
+`work-progress.v1` is derived from the current Run's **latest plan revision**. Historical Tasks removed from the active plan remain in WorkUnit history but do not inflate current progress counts. The projection records active Task count plus exact counts for every lifecycle state and deliberately has no percentage field. This makes progress reproducible from canonical WorkUnit state instead of a model estimate.
+
+The fixture pair `work-unit-v2.v2.json` and `work-progress.v1.json` proves the derivation: a completed inspection Task remains historical after replanning, while only the active implementation and verification Tasks contribute to current progress.
 
 ## Work lifecycle and retries
 
@@ -108,4 +120,4 @@ Run:
 
     python3 .github/scripts/validate_agent_work_protocol.py
 
-The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including DAG cycles, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
+The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including WorkUnit v2 Run identity, Task parent/dependency cycles, deterministic latest-plan progress, lifecycle/retry rules, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.

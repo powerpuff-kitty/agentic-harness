@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added compatibility-safe WorkUnit v2 Run input/session identity and deterministic WorkProgress v1 latest-plan Task-state projections, completing the remaining observable-work identity/progress scope without changing WorkUnit v1 or lifecycle v1.
+
 - Added a canonical Agent Work lifecycle transition table, replay enforcement, terminal/retry invariants, and success/blocked/failure/retry fixtures; replanning remains append-only.
 
 - Added normalized Agent Work Metric and Finding contracts plus Evaluation v2 with evidence-backed scoring, explicit remediation eligibility, independent evaluator identity, and immutable reassessment lineage; Evaluation v1 remains compatible.
