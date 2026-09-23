@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/agent-connection.v2.schema.json",
+  "title": "Agent Work AgentConnection v2",
+  "description": "Provider-neutral executable-agent connection metadata. Authentication is descriptive only and never stores raw credentials.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "provider",
+    "agent",
+    "model",
+    "auth",
+    "environment",
+    "capabilities",
+    "connected_tools",
+    "repository_access",
+    "usage",
+    "session",
+    "readiness"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 2 },
+    "kind": { "type": "string", "const": "agent-connection" },
+    "id": { "$ref": "#/$defs/id" },
+    "provider": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "agent": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "model": { "type": ["string", "null"], "maxLength": 300 },
+    "auth": { "$ref": "#/$defs/auth" },
+    "environment": { "$ref": "#/$defs/environment" },
+    "capabilities": { "$ref": "#/$defs/capabilities" },
+    "connected_tools": {
+      "type": "array",
+      "maxItems": 256,
+      "items": { "$ref": "#/$defs/tool" }
+    },
+    "repository_access": { "$ref": "#/$defs/repository_access" },
+    "usage": { "$ref": "#/$defs/usage" },
+    "session": { "$ref": "#/$defs/session" },
+    "readiness": { "$ref": "#/$defs/readiness" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "nullable_id": {
+      "oneOf": [
+        { "$ref": "#/$defs/id" },
+        { "type": "null" }
+      ]
+    },
+    "capability_state": {
+      "type": "string",
+      "enum": ["supported", "requires_approval", "unsupported", "unknown"]
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "credential_source", "subject_ref"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["local_provider", "managed_oauth", "api_key", "cloud_provider", "none", "custom"]
+        },
+        "credential_source": {
+          "type": "string",
+          "enum": ["none", "host_managed", "environment", "keychain", "cloud_managed", "custom"]
+        },
+        "subject_ref": {
+          "type": ["string", "null"],
+          "maxLength": 500
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "runtime", "region"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["local_runner", "vendor_hosted", "loaftrail_cloud", "byo_api", "custom"]
+        },
+        "runtime": { "type": ["string", "null"], "maxLength": 500 },
+        "region": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_repo",
+        "write_repo",
+        "execute",
+        "commit",
+        "create_pr",
+        "stream_events",
+        "continue_session",
+        "approvals"
+      ],
+      "properties": {
+        "read_repo": { "$ref": "#/$defs/capability_state" },
+        "write_repo": { "$ref": "#/$defs/capability_state" },
+        "execute": { "$ref": "#/$defs/capability_state" },
+        "commit": { "$ref": "#/$defs/capability_state" },
+        "create_pr": { "$ref": "#/$defs/capability_state" },
+        "stream_events": { "$ref": "#/$defs/capability_state" },
+        "continue_session": { "$ref": "#/$defs/capability_state" },
+        "approvals": { "$ref": "#/$defs/capability_state" }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "readiness", "capabilities"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "type": "string", "enum": ["mcp", "connector", "cli", "native", "custom"] },
+        "readiness": { "type": "string", "enum": ["ready", "degraded", "unavailable", "unknown"] },
+        "capabilities": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 100,
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      }
+    },
+    "repository_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "repositories"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": ["none", "selected", "workspace", "all_authorized"]
+        },
+        "repositories": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 500,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["repository", "access"],
+            "properties": {
+              "repository": { "type": "string", "minLength": 1, "maxLength": 500 },
+              "access": { "type": "string", "enum": ["read", "write"] }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "scope": { "const": "none" } },
+            "required": ["scope"]
+          },
+          "then": {
+            "properties": { "repositories": { "maxItems": 0 } }
+          }
+        }
+      ]
+    },
+    "limit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "limit", "remaining", "unit", "resets_at"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["requests", "tokens", "cost", "time", "custom"] },
+        "limit": { "type": ["number", "null"], "minimum": 0 },
+        "remaining": { "type": ["number", "null"], "minimum": 0 },
+        "unit": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "resets_at": {
+          "oneOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "observed_at", "limits"],
+      "properties": {
+        "status": { "type": "string", "enum": ["unknown", "available", "rate_limited", "unavailable"] },
+        "observed_at": {
+          "oneOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "limits": {
+          "type": "array",
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/limit" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "unknown" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "observed_at": { "type": "null" },
+              "limits": { "maxItems": 0 }
+            }
+          }
+        }
+      ]
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["continuation", "session_ref", "resumable_until"],
+      "properties": {
+        "continuation": { "type": "string", "enum": ["supported", "unsupported", "unknown"] },
+        "session_ref": { "$ref": "#/$defs/nullable_id" },
+        "resumable_until": {
+          "oneOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "continuation": { "const": "unsupported" } },
+            "required": ["continuation"]
+          },
+          "then": {
+            "properties": {
+              "session_ref": { "type": "null" },
+              "resumable_until": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "observed_at", "reason"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["ready", "disconnected", "degraded", "rate_limited", "auth_expired", "unavailable", "unknown"]
+        },
+        "observed_at": {
+          "oneOf": [
+            { "type": "string", "format": "date-time" },
+            { "type": "null" }
+          ]
+        },
+        "reason": { "type": ["string", "null"], "maxLength": 2000 }
+      }
+    }
+  }
+}
