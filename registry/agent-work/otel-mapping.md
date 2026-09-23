@@ -2,13 +2,16 @@
 
 OpenTelemetry is an optional observability projection of canonical Agent Work state. An OTLP exporter, collector, backend, sampling decision, dropped span, or missing telemetry must never create, delete, complete, fail, approve or otherwise mutate a canonical WorkUnit, Run, Task, Attempt, Action, Evaluation, Finding, Metric or WorkEvent.
 
-This mapping follows OpenTelemetry semantic-convention 1.44.0 as the reviewed baseline. OpenTelemetry treats operations with meaningful duration as spans and point-in-time occurrences such as state changes as events. Span links may connect related operations without inventing a parent/child relationship. The `otel.*` namespace is reserved by OpenTelemetry, so Agent Work uses the custom `agent.work.*` namespace.
+This mapping follows OpenTelemetry semantic-convention 1.44.0 as the reviewed baseline. The separate OpenTelemetry GenAI semantic-conventions repository still marks GenAI and agent conventions as Development. OpenTelemetry treats operations with meaningful duration as spans and point-in-time occurrences such as state changes as events. Span links may connect related operations without inventing a parent/child relationship. The `otel.*` namespace is reserved by OpenTelemetry, so Agent Work uses the custom `agent.work.*` namespace.
 
 References:
 - https://opentelemetry.io/docs/specs/semconv/
 - https://opentelemetry.io/docs/specs/semconv/general/events/
 - https://opentelemetry.io/docs/specs/otel/trace/api/
 - https://opentelemetry.io/docs/specs/semconv/registry/attributes/gen-ai/
+- https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/README.md
+- https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md
+- https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md
 
 ## Canonical entity mapping
 
@@ -21,6 +24,8 @@ References:
 | WorkAction | INTERNAL span when it has an execution duration; otherwise a WorkEvent-style event | work-unit id when known, action id, entity kind/id |
 | WorkEvent | span event on the closest owning span | canonical event id/type and exact timestamp |
 | model/tool operation | child span under the owning Attempt/Action | provider/tool/model metadata when observed; input/output identities rather than content |
+
+WorkUnit, Run, Task and Attempt spans are Agent Work's custom observability projection; they are not relabeled as standard GenAI agent spans merely because an AI agent performed the work. When the instrumented operation really is a GenAI agent invocation, workflow invocation, planning phase or tool execution, producers may additionally apply the reviewed `gen_ai.operation.name` values such as `invoke_agent`, `invoke_workflow`, `plan` and `execute_tool` according to the Development conventions.
 
 A producer may choose additional spans, attributes, resources, metrics or logs. Those extensions must not change the canonical entity IDs or reinterpret missing telemetry as missing work.
 
@@ -41,7 +46,7 @@ For a mapped WorkEvent, the event attributes carry `agent.work.event.id` and `ag
 
 Provider/model/version, token usage and cost are observations. Record them only when the producer actually has them. Agent Work identity attributes remain stable even when GenAI semantic conventions evolve.
 
-When an implementation supports the reviewed GenAI conventions, it may emit current attributes such as `gen_ai.provider.name`, `gen_ai.request.model`, `gen_ai.response.model`, `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`. The GenAI conventions are currently development/moved into their dedicated semantic-conventions repository, so producers must retain the semantic-convention version/status in the export envelope and must not fabricate missing usage.
+When an implementation supports the reviewed GenAI conventions, it may emit current attributes such as `gen_ai.operation.name`, `gen_ai.provider.name`, `gen_ai.request.model`, `gen_ai.response.model`, `gen_ai.tool.name`, `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`. For example, a local tool execution may use `gen_ai.operation.name=execute_tool` only when the operation is actually a GenAI tool call; an ordinary shell command need not be relabeled. The GenAI conventions are currently Development and live in their dedicated semantic-conventions repository, so producers must retain the reviewed semantic-convention version/status in the export envelope and must not fabricate missing usage.
 
 Use Agent Work metadata such as `agent.work.model.version`, `agent.work.input.identity`, `agent.work.output.identity`, `agent.work.cost.amount`, `agent.work.cost.currency` and `agent.work.cost.source` when needed to preserve provider-neutral provenance. Input/output identity is a digest/reference, never the raw model content.
 
