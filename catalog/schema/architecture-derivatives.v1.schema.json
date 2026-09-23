@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/powerpuff-kitty/agentic-harness/catalog/schema/architecture-derivatives.v1.schema.json",
+  "title": "Agentic Harness Architecture Derivatives v1",
+  "description": "Graph-only guardrail, surface-inventory and diagram metadata derived from one Architecture Graph. It does not establish repository conformance or enforcement.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version","kind","project_id","graph_state","guardrail_plan","surface_inventory","diagram","not_checked"],
+  "properties": {
+    "format_version": { "const": 1 },
+    "kind": { "const": "architecture-derivatives" },
+    "project_id": { "$ref": "#/$defs/id" },
+    "graph_state": { "enum": ["observed","target","migration"] },
+    "guardrail_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["entries","ready_count","unresolved_count","enforcement_claim"],
+      "properties": {
+        "entries": { "type": "array", "items": { "$ref": "#/$defs/guardrail" } },
+        "ready_count": { "type": "integer", "minimum": 0 },
+        "unresolved_count": { "type": "integer", "minimum": 0 },
+        "enforcement_claim": { "const": false }
+      }
+    },
+    "surface_inventory": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/surface_item" }
+    },
+    "diagram": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["format","sha256","bytes"],
+      "properties": {
+        "format": { "const": "mermaid" },
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "not_checked": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/text" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 160, "pattern": "^[A-Za-z0-9_.:/+-]+$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "path": { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "guardrail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["constraint_id","effect","subject_id","target_id","subject_path","target_path","source_status","plan_status","unresolved_reasons","enforcement_claim"],
+      "properties": {
+        "constraint_id": { "$ref": "#/$defs/id" },
+        "effect": { "enum": ["allow","forbid"] },
+        "subject_id": { "$ref": "#/$defs/id" },
+        "target_id": { "$ref": "#/$defs/id" },
+        "subject_path": { "oneOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+        "target_path": { "oneOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+        "source_status": { "enum": ["declared","checked","enforced","unsupported"] },
+        "plan_status": { "enum": ["ready","unresolved"] },
+        "unresolved_reasons": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "enum": ["subject-path-missing","target-path-missing"] }
+        },
+        "enforcement_claim": { "const": false }
+      }
+    },
+    "surface_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["capability_id","surface_ids","status"],
+      "properties": {
+        "capability_id": { "$ref": "#/$defs/id" },
+        "surface_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "status": { "enum": ["exposed","internal_or_unexposed"] }
+      }
+    }
+  }
+}
