@@ -1,0 +1,510 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/work-action.v2.schema.json",
+  "title": "Agent Work Action v2",
+  "description": "Provider-neutral action contract with explicit approval state, immutable action lineage and evidence-linked results. It records observable control flow, not private chain-of-thought.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "target",
+    "intent",
+    "prompt",
+    "agent_connection_id",
+    "permissions",
+    "finding_refs",
+    "evidence_refs",
+    "continuation",
+    "status",
+    "approval",
+    "lineage",
+    "result"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "integer",
+      "const": 2
+    },
+    "kind": {
+      "type": "string",
+      "const": "work-action"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "work-unit",
+            "run",
+            "evaluation",
+            "finding",
+            "task",
+            "reflection"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "execute",
+        "inspect",
+        "audit",
+        "evaluate",
+        "reflect",
+        "remediate",
+        "reassess",
+        "validate",
+        "replan",
+        "compare_requirements",
+        "review",
+        "custom"
+      ]
+    },
+    "prompt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "maxLength": 50000
+    },
+    "agent_connection_id": {
+      "$ref": "#/$defs/id"
+    },
+    "permissions": {
+      "$ref": "#/$defs/permissions"
+    },
+    "finding_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": {
+        "$ref": "#/$defs/id"
+      }
+    },
+    "continuation": {
+      "type": "string",
+      "enum": [
+        "same_session",
+        "linked_run",
+        "new_run"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "awaiting_approval",
+        "approved",
+        "running",
+        "completed",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "approval": {
+      "$ref": "#/$defs/approval"
+    },
+    "lineage": {
+      "$ref": "#/$defs/lineage"
+    },
+    "result": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/result"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "intent": {
+            "enum": [
+              "inspect",
+              "audit",
+              "evaluate",
+              "reflect",
+              "reassess",
+              "validate",
+              "compare_requirements",
+              "review"
+            ]
+          }
+        },
+        "required": [
+          "intent"
+        ]
+      },
+      "then": {
+        "properties": {
+          "permissions": {
+            "properties": {
+              "write": {
+                "const": false
+              },
+              "commit": {
+                "const": false
+              },
+              "create_pr": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "result": {
+            "$ref": "#/$defs/result"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "awaiting_approval"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "approval": {
+            "properties": {
+              "required": {
+                "const": true
+              },
+              "status": {
+                "const": "pending"
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "nullable_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read",
+        "write",
+        "execute",
+        "commit",
+        "create_pr"
+      ],
+      "properties": {
+        "read": {
+          "type": "boolean"
+        },
+        "write": {
+          "type": "boolean"
+        },
+        "execute": {
+          "type": "boolean"
+        },
+        "commit": {
+          "type": "boolean"
+        },
+        "create_pr": {
+          "type": "boolean"
+        }
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "status",
+        "approval_ref"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "not_required",
+            "pending",
+            "granted",
+            "denied"
+          ]
+        },
+        "approval_ref": {
+          "$ref": "#/$defs/nullable_id"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "required": {
+                "const": false
+              }
+            },
+            "required": [
+              "required"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "const": "not_required"
+              },
+              "approval_ref": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "required": {
+                "const": true
+              }
+            },
+            "required": [
+              "required"
+            ]
+          },
+          "then": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "pending",
+                  "granted",
+                  "denied"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "enum": [
+                  "granted",
+                  "denied"
+                ]
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          "then": {
+            "properties": {
+              "approval_ref": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parent_action_id",
+        "root_action_id"
+      ],
+      "properties": {
+        "parent_action_id": {
+          "$ref": "#/$defs/nullable_id"
+        },
+        "root_action_id": {
+          "$ref": "#/$defs/nullable_id"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "parent_action_id": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "parent_action_id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "root_action_id": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "parent_action_id": {
+                "$ref": "#/$defs/id"
+              }
+            },
+            "required": [
+              "parent_action_id"
+            ]
+          },
+          "then": {
+            "properties": {
+              "root_action_id": {
+                "$ref": "#/$defs/id"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_refs",
+        "evaluation_refs",
+        "artifact_refs",
+        "finding_refs"
+      ],
+      "properties": {
+        "run_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "evaluation_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 1000,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "artifact_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 5000,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "finding_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 5000,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "run_refs"
+          ],
+          "properties": {
+            "run_refs": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "evaluation_refs"
+          ],
+          "properties": {
+            "evaluation_refs": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "artifact_refs"
+          ],
+          "properties": {
+            "artifact_refs": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "finding_refs"
+          ],
+          "properties": {
+            "finding_refs": {
+              "minItems": 1
+            }
+          }
+        }
+      ]
+    }
+  }
+}

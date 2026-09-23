@@ -20,6 +20,7 @@ SCHEMAS = {
     "work-redaction": WORK / "redaction.v1.schema.json",
     "work-evaluation": WORK / "evaluation.v1.schema.json",
     "work-action": WORK / "work-action.v1.schema.json",
+    "work-action-v2": WORK / "work-action.v2.schema.json",
     "agent-connection": WORK / "agent-connection.v1.schema.json",
     "work-reflection": WORK / "reflection.v1.schema.json",
     "reflection-policy": WORK / "reflection-policy.v1.schema.json",
@@ -96,6 +97,7 @@ def validate_event_list(value, label: str) -> None:
 work_unit = load(FIXTURES / "replanned-work-unit.v1.json")
 evaluation = load(FIXTURES / "evaluation.v1.json")
 action = load(FIXTURES / "action.v1.json")
+action_lineage = load(FIXTURES / "action-lineage.v2.json")
 connection = load(FIXTURES / "agent-connection.v1.json")
 events = load(FIXTURES / "events.v1.json")
 evidence_records = load(FIXTURES / "evidence.v1.json")
@@ -221,6 +223,120 @@ if isinstance(action, dict):
     if action.get("intent") in {"inspect", "audit", "evaluate", "reflect", "reassess", "validate", "compare_requirements", "review"}:
         if isinstance(permissions, dict) and any(permissions.get(key) for key in ("write", "commit", "create_pr")):
             fail("action: read/review/reflection intent requests write-capable permissions")
+
+def action_v2_semantic_errors(value) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(value, list):
+        return ["expected an array of WorkAction v2 records"]
+
+    validator = validators.get("work-action-v2")
+    by_id: dict[str, dict] = {}
+    read_only_intents = {
+        "inspect", "audit", "evaluate", "reflect", "reassess",
+        "validate", "compare_requirements", "review",
+    }
+
+    for index, candidate in enumerate(value):
+        if validator is not None:
+            for error in sorted(validator.iter_errors(candidate), key=lambda item: list(item.path)):
+                location = ".".join(str(part) for part in error.path) or "<root>"
+                problems.append(f"[{index}].{location}: {error.message}")
+        if not isinstance(candidate, dict):
+            continue
+        action_id = candidate.get("id")
+        if not isinstance(action_id, str):
+            continue
+        if action_id in by_id:
+            problems.append(f"duplicate action id {action_id}")
+        by_id[action_id] = candidate
+
+        permissions = candidate.get("permissions", {})
+        if candidate.get("intent") in read_only_intents and isinstance(permissions, dict):
+            if any(permissions.get(key) for key in ("write", "commit", "create_pr")):
+                problems.append(f"{action_id}: read/review intent requests write-capable permissions")
+
+        approval = candidate.get("approval", {})
+        if isinstance(approval, dict):
+            if candidate.get("status") == "completed" and approval.get("required") is True:
+                if approval.get("status") != "granted":
+                    problems.append(f"{action_id}: completed approval-gated action requires granted approval")
+
+    for action_id, candidate in by_id.items():
+        lineage = candidate.get("lineage", {})
+        if not isinstance(lineage, dict):
+            continue
+        parent = lineage.get("parent_action_id")
+        declared_root = lineage.get("root_action_id")
+        if parent is None:
+            if declared_root is not None:
+                problems.append(f"{action_id}: root action must have null root_action_id")
+            continue
+        if parent == action_id:
+            problems.append(f"{action_id}: action cannot parent itself")
+            continue
+        if parent not in by_id:
+            problems.append(f"{action_id}: unknown parent action {parent}")
+            continue
+        if not isinstance(declared_root, str) or declared_root not in by_id:
+            problems.append(f"{action_id}: unknown root action {declared_root}")
+            continue
+
+        seen = {action_id}
+        cursor = parent
+        computed_root = None
+        while True:
+            if cursor in seen:
+                problems.append(f"{action_id}: action lineage contains a cycle at {cursor}")
+                break
+            seen.add(cursor)
+            ancestor = by_id.get(cursor)
+            if not isinstance(ancestor, dict):
+                break
+            ancestor_lineage = ancestor.get("lineage", {})
+            if not isinstance(ancestor_lineage, dict):
+                break
+            ancestor_parent = ancestor_lineage.get("parent_action_id")
+            if ancestor_parent is None:
+                computed_root = cursor
+                break
+            if ancestor_parent not in by_id:
+                problems.append(f"{action_id}: ancestor references unknown parent {ancestor_parent}")
+                break
+            cursor = ancestor_parent
+
+        if computed_root is not None and declared_root != computed_root:
+            problems.append(
+                f"{action_id}: declared root {declared_root} does not match computed root {computed_root}"
+            )
+
+    return problems
+
+
+if isinstance(action_lineage, list):
+    for problem in action_v2_semantic_errors(action_lineage):
+        fail(f"action-lineage:{problem}")
+
+    self_parent = copy.deepcopy(action_lineage)
+    self_parent[-1]["lineage"]["parent_action_id"] = self_parent[-1]["id"]
+    if not any("cannot parent itself" in item for item in action_v2_semantic_errors(self_parent)):
+        fail("action-lineage mutation: self-parenting action was not rejected")
+
+    wrong_root = copy.deepcopy(action_lineage)
+    wrong_root[-1]["lineage"]["root_action_id"] = wrong_root[-2]["id"]
+    if not any("does not match computed root" in item for item in action_v2_semantic_errors(wrong_root)):
+        fail("action-lineage mutation: incorrect root lineage was not rejected")
+
+    read_write = copy.deepcopy(action_lineage)
+    read_write[0]["permissions"]["write"] = True
+    if not any("write-capable permissions" in item or "False was expected" in item
+               for item in action_v2_semantic_errors(read_write)):
+        fail("action-lineage mutation: read-only audit gained write permission")
+
+    missing_result = copy.deepcopy(action_lineage)
+    missing_result[-1]["result"] = None
+    if not any("not of type 'object'" in item for item in action_v2_semantic_errors(missing_result)):
+        fail("action-lineage mutation: completed action without result was not rejected")
+
 
 if isinstance(connection, dict):
     validate("agent-connection", connection, "agent-connection")
