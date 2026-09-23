@@ -15,6 +15,8 @@ FIXTURES = WORK / "fixtures"
 
 SCHEMAS = {
     "work-unit": WORK / "work-unit.v1.schema.json",
+    "work-unit-v2": WORK / "work-unit.v2.schema.json",
+    "work-progress": WORK / "work-progress.v1.schema.json",
     "work-lifecycle": WORK / "lifecycle.v1.schema.json",
     "work-event": WORK / "work-event.v1.schema.json",
     "work-evidence": WORK / "evidence.v1.schema.json",
@@ -102,6 +104,8 @@ def validate_event_list(value, label: str) -> None:
 
 
 work_unit = load(FIXTURES / "replanned-work-unit.v1.json")
+work_unit_v2 = load(FIXTURES / "work-unit-v2.v2.json")
+work_progress = load(FIXTURES / "work-progress.v1.json")
 lifecycle = load(WORK / "lifecycle.v1.json")
 lifecycle_work_units = load(FIXTURES / "lifecycle-work-units.v1.json")
 evaluation = load(FIXTURES / "evaluation.v1.json")
@@ -348,6 +352,185 @@ if isinstance(lifecycle_work_units, list):
         if not any("retry requires prior failed/cancelled attempt" in item
                    for item in attempt_invariant_errors(resurrected, "retry-mutation")):
             fail("lifecycle mutation: retry after completed attempt was not rejected")
+
+
+def work_unit_v2_errors(value) -> list[str]:
+    problems: list[str] = []
+    validator = validators.get("work-unit-v2")
+    if validator is not None:
+        for error in sorted(validator.iter_errors(value), key=lambda item: list(item.path)):
+            location = ".".join(str(part) for part in error.path) or "<root>"
+            problems.append(f"{location}: {error.message}")
+
+    if not isinstance(value, dict):
+        return problems
+
+    runs = value.get("runs", [])
+    run_ids = [run.get("id") for run in runs if isinstance(run, dict)]
+    if len(run_ids) != len(set(run_ids)):
+        problems.append("run ids must be unique")
+    if value.get("current_run_id") is not None and value.get("current_run_id") not in set(run_ids):
+        problems.append("current_run_id must reference an existing run")
+
+    for run in runs:
+        if not isinstance(run, dict):
+            continue
+        run_id = run.get("id")
+        tasks = run.get("tasks", [])
+        task_ids = [task.get("id") for task in tasks if isinstance(task, dict)]
+        known = set(task_ids)
+        if len(task_ids) != len(known):
+            problems.append(f"{run_id}: task ids must be unique")
+
+        dependencies: dict[str, list[str]] = {}
+        parents: dict[str, list[str]] = {}
+        for task in tasks:
+            if not isinstance(task, dict) or not isinstance(task.get("id"), str):
+                continue
+            task_id = task["id"]
+            parent = task.get("parent_id")
+            if parent is not None and parent not in known:
+                problems.append(f"{run_id}: {task_id} references missing parent {parent}")
+            if parent == task_id:
+                problems.append(f"{run_id}: {task_id} cannot parent itself")
+            parents[task_id] = [parent] if isinstance(parent, str) and parent in known else []
+
+            deps = task.get("depends_on", [])
+            dependencies[task_id] = list(deps) if isinstance(deps, list) else []
+            for dependency in dependencies[task_id]:
+                if dependency not in known:
+                    problems.append(f"{run_id}: {task_id} references missing dependency {dependency}")
+                if dependency == task_id:
+                    problems.append(f"{run_id}: {task_id} cannot depend on itself")
+
+        def detect_cycle(graph: dict[str, list[str]], label: str) -> None:
+            visiting: set[str] = set()
+            visited: set[str] = set()
+
+            def visit(node_id: str) -> None:
+                if node_id in visited:
+                    return
+                if node_id in visiting:
+                    problems.append(f"{run_id}: {label} graph contains a cycle at {node_id}")
+                    return
+                visiting.add(node_id)
+                for target in graph.get(node_id, []):
+                    if target in graph:
+                        visit(target)
+                visiting.remove(node_id)
+                visited.add(node_id)
+
+            for node_id in graph:
+                visit(node_id)
+
+        detect_cycle(dependencies, "task dependency")
+        detect_cycle(parents, "task parent")
+
+        revisions = run.get("plan_revisions", [])
+        numbers = [item.get("revision") for item in revisions if isinstance(item, dict)]
+        if numbers != sorted(numbers) or len(numbers) != len(set(numbers)):
+            problems.append(f"{run_id}: plan revisions must be unique and monotonically increasing")
+        for revision in revisions:
+            if not isinstance(revision, dict):
+                continue
+            for task_id in revision.get("task_ids", []):
+                if task_id not in known:
+                    problems.append(f"{run_id}: plan revision references unknown task {task_id}")
+
+    return problems
+
+
+def derive_work_progress(value):
+    if not isinstance(value, dict):
+        raise ValueError("work unit must be an object")
+
+    current_run_id = value.get("current_run_id")
+    runs = [run for run in value.get("runs", []) if isinstance(run, dict)]
+    run = next((item for item in runs if item.get("id") == current_run_id), None)
+    if run is None:
+        raise ValueError("current_run_id must reference an existing run")
+
+    revisions = [item for item in run.get("plan_revisions", []) if isinstance(item, dict)]
+    if not revisions:
+        raise ValueError("current run must have at least one plan revision")
+    latest = max(revisions, key=lambda item: item.get("revision", 0))
+
+    tasks = {
+        task.get("id"): task
+        for task in run.get("tasks", [])
+        if isinstance(task, dict) and isinstance(task.get("id"), str)
+    }
+    active_ids = latest.get("task_ids", [])
+    if len(active_ids) != len(set(active_ids)):
+        raise ValueError("latest plan task ids must be unique")
+    missing = [task_id for task_id in active_ids if task_id not in tasks]
+    if missing:
+        raise ValueError(f"latest plan references unknown tasks: {missing}")
+
+    states = [
+        "proposed", "queued", "running", "validating", "completed",
+        "blocked", "waiting_for_user", "waiting_for_approval", "failed", "cancelled",
+    ]
+    counts = {state: 0 for state in states}
+    for task_id in active_ids:
+        state = tasks[task_id].get("state")
+        if state not in counts:
+            raise ValueError(f"active task {task_id} has unknown state {state}")
+        counts[state] += 1
+
+    return {
+        "format_version": 1,
+        "kind": "work-progress",
+        "work_unit_id": value.get("id"),
+        "run_id": current_run_id,
+        "plan_revision": latest.get("revision"),
+        "basis": "latest-plan-task-state-counts",
+        "active_task_count": len(active_ids),
+        "state_counts": counts,
+    }
+
+
+if isinstance(work_unit_v2, dict):
+    for problem in work_unit_v2_errors(work_unit_v2):
+        fail(f"work-unit-v2:{problem}")
+
+    missing_input = copy.deepcopy(work_unit_v2)
+    missing_input["runs"][0].pop("input_revision", None)
+    if not any("'input_revision' is a required property" in item
+               for item in work_unit_v2_errors(missing_input)):
+        fail("work-unit-v2 mutation: missing immutable input identity was not rejected")
+
+    missing_session = copy.deepcopy(work_unit_v2)
+    missing_session["runs"][0].pop("session_ref", None)
+    if not any("'session_ref' is a required property" in item
+               for item in work_unit_v2_errors(missing_session)):
+        fail("work-unit-v2 mutation: missing session reference field was not rejected")
+
+    parent_cycle = copy.deepcopy(work_unit_v2)
+    parent_cycle["runs"][0]["tasks"][0]["parent_id"] = "task:verify"
+    parent_cycle["runs"][0]["tasks"][2]["parent_id"] = "task:inspect"
+    if not any("task parent graph contains a cycle" in item
+               for item in work_unit_v2_errors(parent_cycle)):
+        fail("work-unit-v2 mutation: task parent cycle was not rejected")
+
+if isinstance(work_progress, dict):
+    validate("work-progress", work_progress, "work-progress")
+    if isinstance(work_unit_v2, dict):
+        try:
+            derived_progress = derive_work_progress(work_unit_v2)
+        except ValueError as exc:
+            fail(f"work-progress: derivation failed: {exc}")
+        else:
+            if derived_progress != work_progress:
+                fail("work-progress: fixture does not equal deterministic latest-plan derivation")
+            if derived_progress["active_task_count"] != sum(derived_progress["state_counts"].values()):
+                fail("work-progress: active task count must equal state-count sum")
+
+    percentage = copy.deepcopy(work_progress)
+    percentage["percentage"] = 50
+    progress_validator = validators.get("work-progress")
+    if progress_validator is not None and progress_validator.is_valid(percentage):
+        fail("work-progress mutation: invented percentage was accepted")
 
 
 if isinstance(evaluation, dict):
