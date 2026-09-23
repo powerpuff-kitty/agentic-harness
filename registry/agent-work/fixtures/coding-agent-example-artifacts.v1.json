@@ -1,0 +1,31 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-artifact",
+    "id": "artifact:example:patch",
+    "work_unit_id": "wu:example-coding-agent",
+    "produced_by": {
+      "run_id": "run:example-coding-agent",
+      "task_id": "task:implement",
+      "attempt_id": "attempt:example:implement:1",
+      "action_id": null
+    },
+    "artifact_kind": "patch",
+    "identity": {
+      "uri": "artifact://example/focused.patch",
+      "digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+      "revision": "fixture-v1",
+      "mime_type": "text/x-diff",
+      "size_bytes": 42
+    },
+    "payload": {
+      "mode": "inline_text",
+      "content_ref": null,
+      "text": "Synthetic focused patch; no private source data.",
+      "value": null,
+      "redaction_ref": null
+    },
+    "sensitivity": "project",
+    "created_at": "2026-09-23T05:40:55Z"
+  }
+]
