@@ -25,6 +25,17 @@ jobs:
           python3 .github/scripts/validate_cli_contracts.py
           python3 .github/scripts/validate_architecture_contracts.py
           python3 .github/scripts/validate_agent_work_protocol.py
+          python3 registry/agent-work/conformance/validate_otel_export.py \
+            registry/agent-work/fixtures/otel-export-collected.v1.json \
+            --canonical-work-unit registry/agent-work/fixtures/replay-expected-work-unit.v1.json \
+            --canonical-events registry/agent-work/fixtures/replay-events.v1.json \
+            --canonical-redactions registry/agent-work/fixtures/redactions.v1.json \
+            --self-test
+          python3 registry/agent-work/conformance/validate_otel_export.py \
+            registry/agent-work/fixtures/otel-export-not-collected.v1.json \
+            --canonical-work-unit registry/agent-work/fixtures/replay-expected-work-unit.v1.json \
+            --canonical-events registry/agent-work/fixtures/replay-events.v1.json \
+            --canonical-redactions registry/agent-work/fixtures/redactions.v1.json
           python3 .github/scripts/validate_project_memory.py
           python3 .github/scripts/validate_context_gateway.py
 
