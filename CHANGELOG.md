@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added Architecture Graph v1, a language-neutral capability/contract/provider/adapter model with semantic dependency validation and explicit declaration/check/enforcement states.
+
 - License authored content under MIT and retain copied Harness attribution without licensing generated application code.
 
 - Continue beta validation, migration fixtures, release hardening, and ecosystem compatibility work.

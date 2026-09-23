@@ -1,0 +1,138 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "synthetic-marketplace",
+    "description": "Synthetic marketplace used to validate the public architecture graph contract."
+  },
+  "graph_state": "migration",
+  "nodes": [
+    {
+      "id": "capability.property",
+      "kind": "capability",
+      "name": "Property",
+      "lifecycle": "current",
+      "path": "packages/property"
+    },
+    {
+      "id": "capability.listing",
+      "kind": "capability",
+      "name": "Listing",
+      "lifecycle": "target",
+      "path": "packages/listing"
+    },
+    {
+      "id": "capability.search",
+      "kind": "capability",
+      "name": "Search",
+      "lifecycle": "target",
+      "path": "packages/search"
+    },
+    {
+      "id": "contract.listing",
+      "kind": "contract",
+      "name": "Listing contract",
+      "lifecycle": "target",
+      "path": "contracts/listing.json"
+    },
+    {
+      "id": "app.web",
+      "kind": "app",
+      "name": "Marketplace web app",
+      "lifecycle": "current",
+      "path": "apps/web"
+    },
+    {
+      "id": "surface.rest",
+      "kind": "surface",
+      "name": "Public REST surface",
+      "lifecycle": "current",
+      "path": "apps/api"
+    },
+    {
+      "id": "adapter.postgres",
+      "kind": "adapter",
+      "name": "PostgreSQL adapter",
+      "lifecycle": "current",
+      "path": "adapters/postgres"
+    },
+    {
+      "id": "adapter.search-index",
+      "kind": "adapter",
+      "name": "Search index adapter",
+      "lifecycle": "current",
+      "path": "adapters/search-index"
+    },
+    {
+      "id": "authority.primary-store",
+      "kind": "authority",
+      "name": "Primary transactional store",
+      "lifecycle": "current",
+      "path": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.listing",
+      "to": "capability.property",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.search",
+      "to": "capability.listing",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.listing",
+      "to": "contract.listing",
+      "kind": "owns"
+    },
+    {
+      "from": "app.web",
+      "to": "capability.listing",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.listing",
+      "to": "surface.rest",
+      "kind": "exposes"
+    },
+    {
+      "from": "adapter.postgres",
+      "to": "contract.listing",
+      "kind": "implements"
+    },
+    {
+      "from": "adapter.search-index",
+      "to": "capability.search",
+      "kind": "adapts"
+    },
+    {
+      "from": "authority.primary-store",
+      "to": "capability.listing",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [
+    {
+      "id": "boundary.web-no-postgres",
+      "kind": "forbidden-dependency",
+      "subject": "app.web",
+      "target": "adapter.postgres",
+      "status": "declared",
+      "mechanism": null,
+      "evidence_refs": [],
+      "description": "The presentation app must reach persistence through capability contracts rather than importing the PostgreSQL adapter."
+    }
+  ],
+  "coverage": {
+    "nodes_declared": 9,
+    "edges_declared": 8,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "Repository paths are illustrative and were not resolved against a checkout.",
+    "Declared dependency constraints are not enforcement evidence."
+  ]
+}

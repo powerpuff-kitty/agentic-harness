@@ -44,3 +44,7 @@ decisions:
     title: Add an optional project presentation contract
     status: proposed
     file: ADR-011-project-presentation-contract.md
+  - id: ADR-012
+    title: Add a language-neutral architecture capability graph
+    status: accepted
+    file: ADR-012-architecture-capability-graph.md
