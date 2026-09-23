@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added Architecture Derivatives v1 and Architecture Drift v1 for graph-only guardrail plans, explicit unresolved paths, descriptive surface inventory, stable Mermaid diagrams, and deterministic observed/target graph differences without claiming source enforcement.
+
 - Added graph-only Architecture Analysis v1 with language-neutral task-to-capability routing, explicit ambiguity/unresolved coverage, review-required duplicate-capability candidates, stable Markdown summaries, and TypeScript/Rust/mixed-language conformance fixtures.
 
 - Added a coherent Agent Work reference coding run tying nested tasks, replanning, failed/passing test evidence, patch artifact provenance and Evaluation to the same WorkUnit/Run with deterministic cross-record validation.
