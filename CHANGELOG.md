@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a coherent Agent Work reference coding run tying nested tasks, replanning, failed/passing test evidence, patch artifact provenance and Evaluation to the same WorkUnit/Run with deterministic cross-record validation.
+
 - Added optional Agent Work OpenTelemetry conformance: metadata-only export schema, canonical WorkUnit/Run/Task/Attempt/event correlation, current Development GenAI operation mapping, sensitive-content boundaries, collected/not-collected fixtures, and deterministic adversarial validation.
 
 - Added compatibility-safe WorkUnit v2 Run input/session identity and deterministic WorkProgress v1 latest-plan Task-state projections, completing the remaining observable-work identity/progress scope without changing WorkUnit v1 or lifecycle v1.

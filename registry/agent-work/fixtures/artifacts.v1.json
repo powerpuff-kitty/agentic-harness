@@ -61,7 +61,7 @@
       "text": null,
       "value": {
         "id": "task:retry",
-        "parent_id": null,
+        "parent_id": "task:primary",
         "title": "Retry after focused validation failure",
         "depends_on": [],
         "state": "queued",

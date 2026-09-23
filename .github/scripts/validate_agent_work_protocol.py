@@ -109,6 +109,7 @@ work_progress = load(FIXTURES / "work-progress.v1.json")
 lifecycle = load(WORK / "lifecycle.v1.json")
 lifecycle_work_units = load(FIXTURES / "lifecycle-work-units.v1.json")
 evaluation = load(FIXTURES / "evaluation.v1.json")
+reference_run_evaluation = load(FIXTURES / "reference-run-evaluation.v1.json")
 evaluations_v2 = load(FIXTURES / "evaluations.v2.json")
 metrics_v1 = load(FIXTURES / "metrics.v1.json")
 findings_v1 = load(FIXTURES / "findings.v1.json")
@@ -1133,6 +1134,81 @@ if isinstance(evidence_records, list):
         elif status == "unavailable":
             fail(f"{evidence_id}: non-unavailable evidence cannot use unavailable status")
 
+if isinstance(reference_run_evaluation, dict):
+    validate("work-evaluation", reference_run_evaluation, "reference-run-evaluation")
+
+    if not isinstance(replay_expected, dict):
+        fail("reference-run: replay expected WorkUnit is unavailable")
+    else:
+        if reference_run_evaluation.get("work_unit_id") != replay_expected.get("id"):
+            fail("reference-run: evaluation WorkUnit id does not match replay WorkUnit")
+
+        runs = [
+            run for run in replay_expected.get("runs", [])
+            if isinstance(run, dict)
+        ]
+        run = next(
+            (item for item in runs if item.get("id") == reference_run_evaluation.get("run_id")),
+            None,
+        )
+        if run is None:
+            fail("reference-run: evaluation run_id does not match replay Run")
+        else:
+            tasks = {
+                task.get("id"): task
+                for task in run.get("tasks", [])
+                if isinstance(task, dict) and isinstance(task.get("id"), str)
+            }
+            primary = tasks.get("task:primary")
+            retry = tasks.get("task:retry")
+            if not isinstance(primary, dict) or not isinstance(retry, dict):
+                fail("reference-run: expected primary and retry tasks")
+            elif retry.get("parent_id") != primary.get("id"):
+                fail("reference-run: retry task must be nested under the failed primary task")
+
+            revisions = [
+                revision for revision in run.get("plan_revisions", [])
+                if isinstance(revision, dict)
+            ]
+            if len(revisions) < 2:
+                fail("reference-run: expected append-only replanning history")
+            else:
+                first_ids = revisions[0].get("task_ids", [])
+                latest_ids = revisions[-1].get("task_ids", [])
+                if first_ids == latest_ids:
+                    fail("reference-run: replanning must change the active task set")
+                if "task:primary" not in tasks:
+                    fail("reference-run: replanning removed historical primary task")
+                if "task:primary" in latest_ids:
+                    fail("reference-run: failed historical task should not remain in latest active plan")
+                if "task:retry" not in latest_ids:
+                    fail("reference-run: retry task must be active in latest plan")
+
+            if retry and "artifact:patch" not in retry.get("artifact_refs", []):
+                fail("reference-run: retry task must retain produced patch artifact reference")
+            if primary and "evidence:test-failure" not in primary.get("evidence_refs", []):
+                fail("reference-run: failed task must retain failing test evidence")
+            if retry and "evidence:test-pass" not in retry.get("evidence_refs", []):
+                fail("reference-run: retry task must retain passing test evidence")
+
+    referenced_evidence: set[str] = set()
+    for dimension in reference_run_evaluation.get("dimensions", []):
+        if isinstance(dimension, dict):
+            referenced_evidence.update(
+                item for item in dimension.get("evidence_refs", [])
+                if isinstance(item, str)
+            )
+    for signal in reference_run_evaluation.get("confidence", []):
+        if isinstance(signal, dict):
+            referenced_evidence.update(
+                item for item in signal.get("evidence_refs", [])
+                if isinstance(item, str)
+            )
+    missing_evidence = sorted(referenced_evidence - set(evidence_by_id))
+    if missing_evidence:
+        fail(f"reference-run: evaluation references unknown evidence {missing_evidence}")
+
+
 if isinstance(artifacts, list):
     for index, artifact in enumerate(artifacts):
         validate("work-artifact", artifact, f"artifacts[{index}]")
@@ -1165,6 +1241,21 @@ if isinstance(artifacts, list):
             payload = artifact.get("payload", {})
             if payload.get("mode") != "inline_json" or not isinstance(payload.get("value"), dict):
                 fail(f"{artifact_id}: replay snapshot must be inline structured JSON")
+
+if isinstance(reference_run_evaluation, dict):
+    if "artifact:patch" not in artifact_by_id:
+        fail("reference-run: produced patch artifact is missing from canonical artifacts")
+    else:
+        patch = artifact_by_id["artifact:patch"]
+        producer = patch.get("produced_by", {}) if isinstance(patch, dict) else {}
+        if (
+            not isinstance(producer, dict)
+            or producer.get("run_id") != "run:replay"
+            or producer.get("task_id") != "task:retry"
+            or producer.get("attempt_id") != "attempt:retry:1"
+        ):
+            fail("reference-run: patch artifact producer lineage does not match retry attempt")
+
 
 if isinstance(redactions, list):
     for index, redaction in enumerate(redactions):
