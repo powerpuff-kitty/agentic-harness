@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/agent-connection.v2.schema.json",
+  "title": "Agent Work AgentConnection v2",
+  "description": "Provider-neutral description of an executable agent connection. Capability support, effective access, tool availability, readiness and usage observations remain explicit; credential material is referenced rather than embedded.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "provider",
+    "auth",
+    "environment",
+    "capabilities",
+    "repositories",
+    "tools",
+    "usage",
+    "rate_limits",
+    "readiness",
+    "continuation"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 2 },
+    "kind": { "type": "string", "const": "agent-connection" },
+    "id": { "$ref": "#/$defs/id" },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "agent", "model_id", "model_version"],
+      "properties": {
+        "id": { "$ref": "#/$defs/text" },
+        "agent": { "$ref": "#/$defs/text" },
+        "model_id": { "type": ["string", "null"], "maxLength": 300 },
+        "model_version": { "type": ["string", "null"], "maxLength": 300 }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "credential_ref", "scopes"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["local_identity", "managed_oauth", "api_key_ref", "cloud_identity", "none", "custom"]
+        },
+        "credential_ref": {
+          "type": ["string", "null"],
+          "maxLength": 500,
+          "description": "Opaque reference to credential storage. Raw secret values are outside this contract."
+        },
+        "scopes": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/text" }
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "host_ref", "region"],
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["local_runner", "vendor_hosted", "third_party_cloud", "byo_api", "custom_local_model", "custom"]
+        },
+        "host_ref": { "type": ["string", "null"], "maxLength": 500 },
+        "region": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_repo",
+        "write_repo",
+        "execute",
+        "commit",
+        "create_pr",
+        "stream_events",
+        "continue_session",
+        "approvals",
+        "tool_calls"
+      ],
+      "properties": {
+        "read_repo": { "$ref": "#/$defs/capability_state" },
+        "write_repo": { "$ref": "#/$defs/capability_state" },
+        "execute": { "$ref": "#/$defs/capability_state" },
+        "commit": { "$ref": "#/$defs/capability_state" },
+        "create_pr": { "$ref": "#/$defs/capability_state" },
+        "stream_events": { "$ref": "#/$defs/capability_state" },
+        "continue_session": { "$ref": "#/$defs/capability_state" },
+        "approvals": { "$ref": "#/$defs/capability_state" },
+        "tool_calls": { "$ref": "#/$defs/capability_state" }
+      }
+    },
+    "repositories": {
+      "type": "array",
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/repository_access" }
+    },
+    "tools": {
+      "type": "array",
+      "maxItems": 500,
+      "items": { "$ref": "#/$defs/tool" }
+    },
+    "usage": { "$ref": "#/$defs/usage_observation" },
+    "rate_limits": { "$ref": "#/$defs/rate_limit_observation" },
+    "readiness": { "$ref": "#/$defs/readiness" },
+    "continuation": { "$ref": "#/$defs/continuation" }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "capability_state": {
+      "type": "string",
+      "enum": ["supported", "unsupported", "unknown"]
+    },
+    "permission_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["read", "write", "execute", "commit", "create_pr"],
+      "properties": {
+        "read": { "type": "boolean" },
+        "write": { "type": "boolean" },
+        "execute": { "type": "boolean" },
+        "commit": { "type": "boolean" },
+        "create_pr": { "type": "boolean" }
+      }
+    },
+    "repository_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "scope_status", "branches", "permissions"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/text" },
+        "scope_status": { "type": "string", "enum": ["known", "unknown"] },
+        "branches": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/text" }
+        },
+        "permissions": { "$ref": "#/$defs/permission_set" }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "kind", "availability", "permissions"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/text" },
+        "kind": {
+          "type": "string",
+          "enum": ["filesystem", "shell", "vcs", "browser", "mcp", "api", "database", "custom"]
+        },
+        "availability": {
+          "type": "string",
+          "enum": ["ready", "unavailable", "unsupported", "unknown"]
+        },
+        "permissions": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 20,
+          "items": {
+            "type": "string",
+            "enum": ["read", "write", "execute", "network", "commit", "create_pr", "approve"]
+          }
+        }
+      }
+    },
+    "usage_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "captured_at", "input_tokens", "output_tokens", "cost"],
+      "properties": {
+        "status": { "type": "string", "enum": ["observed", "unknown", "unavailable"] },
+        "captured_at": { "type": ["string", "null"], "format": "date-time" },
+        "input_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "output_tokens": { "type": ["integer", "null"], "minimum": 0 },
+        "cost": {
+          "oneOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["amount", "currency"],
+              "properties": {
+                "amount": { "type": "number", "minimum": 0 },
+                "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }
+              }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "rate_limit_observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "captured_at", "limit", "remaining", "reset_at"],
+      "properties": {
+        "status": { "type": "string", "enum": ["observed", "unknown", "unavailable"] },
+        "captured_at": { "type": ["string", "null"], "format": "date-time" },
+        "limit": { "type": ["integer", "null"], "minimum": 0 },
+        "remaining": { "type": ["integer", "null"], "minimum": 0 },
+        "reset_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "checked_at", "reason", "evidence_refs"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ready", "disconnected", "degraded", "rate_limited", "auth_expired", "unavailable", "unknown"]
+        },
+        "checked_at": { "type": ["string", "null"], "format": "date-time" },
+        "reason": { "type": ["string", "null"], "maxLength": 2000 },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 100,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["support", "modes", "reference_kind"],
+      "properties": {
+        "support": { "$ref": "#/$defs/capability_state" },
+        "modes": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 10,
+          "items": {
+            "type": "string",
+            "enum": ["same_session", "resume_session", "new_session", "linked_run"]
+          }
+        },
+        "reference_kind": {
+          "type": "string",
+          "enum": ["none", "opaque_reference", "provider_handle", "custom"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "support": { "const": "unsupported" } },
+            "required": ["support"]
+          },
+          "then": {
+            "properties": {
+              "modes": { "maxItems": 0 },
+              "reference_kind": { "const": "none" }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "support": { "const": "supported" } },
+            "required": ["support"]
+          },
+          "then": {
+            "properties": { "modes": { "minItems": 1 } }
+          }
+        }
+      ]
+    }
+  }
+}
