@@ -260,7 +260,7 @@ class ArchitectureGraphContracts(unittest.TestCase):
         self.assertFalse(
             graph_analysis.check_markdown(
                 WEB_FIXTURE,
-                WEB_SUMMARY.replace("Catalog UI", "Catalog screen"),
+                WEB_SUMMARY.replace("surface.catalog-ui", "surface.catalog-screen"),
             )
         )
 
