@@ -22,6 +22,7 @@ SCHEMAS = {
     "work-action": WORK / "work-action.v1.schema.json",
     "work-action-v2": WORK / "work-action.v2.schema.json",
     "agent-connection": WORK / "agent-connection.v1.schema.json",
+    "agent-connection-v2": WORK / "agent-connection.v2.schema.json",
     "work-reflection": WORK / "reflection.v1.schema.json",
     "reflection-policy": WORK / "reflection-policy.v1.schema.json",
     "reflection-trigger-decision": WORK / "reflection-trigger-decision.v1.schema.json",
@@ -99,6 +100,7 @@ evaluation = load(FIXTURES / "evaluation.v1.json")
 action = load(FIXTURES / "action.v1.json")
 action_lineage = load(FIXTURES / "action-lineage.v2.json")
 connection = load(FIXTURES / "agent-connection.v1.json")
+connections_v2 = load(FIXTURES / "agent-connections.v2.json")
 events = load(FIXTURES / "events.v1.json")
 evidence_records = load(FIXTURES / "evidence.v1.json")
 artifacts = load(FIXTURES / "artifacts.v1.json")
@@ -346,6 +348,167 @@ if isinstance(connection, dict):
             fail("agent-connection: commit capability requires write_repo")
         if capabilities.get("create_pr") and not capabilities.get("commit"):
             fail("agent-connection: create_pr capability requires commit")
+
+def connection_v2_semantic_errors(value) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(value, list):
+        return ["expected an array of AgentConnection v2 records"]
+
+    validator = validators.get("agent-connection-v2")
+    by_id: dict[str, dict] = {}
+    usable = {"supported", "requires_approval"}
+
+    for index, candidate in enumerate(value):
+        if validator is not None:
+            for error in sorted(validator.iter_errors(candidate), key=lambda item: list(item.path)):
+                location = ".".join(str(part) for part in error.path) or "<root>"
+                problems.append(f"[{index}].{location}: {error.message}")
+        if not isinstance(candidate, dict):
+            continue
+
+        connection_id = candidate.get("id")
+        if not isinstance(connection_id, str):
+            continue
+        if connection_id in by_id:
+            problems.append(f"duplicate connection id {connection_id}")
+        by_id[connection_id] = candidate
+
+        capabilities = candidate.get("capabilities", {})
+        if isinstance(capabilities, dict):
+            if capabilities.get("commit") in usable and capabilities.get("write_repo") not in usable:
+                problems.append(f"{connection_id}: commit capability requires usable write_repo")
+            if capabilities.get("create_pr") in usable and capabilities.get("commit") not in usable:
+                problems.append(f"{connection_id}: create_pr capability requires usable commit")
+
+            session = candidate.get("session", {})
+            continuation = session.get("continuation") if isinstance(session, dict) else None
+            continuation_capability = capabilities.get("continue_session")
+            if continuation == "supported" and continuation_capability not in usable:
+                problems.append(f"{connection_id}: supported session continuation lacks usable capability")
+            if continuation == "unsupported" and continuation_capability in usable:
+                problems.append(f"{connection_id}: continuation capability conflicts with unsupported session")
+
+        repository_access = candidate.get("repository_access", {})
+        if isinstance(repository_access, dict) and isinstance(capabilities, dict):
+            scope = repository_access.get("scope")
+            repositories = repository_access.get("repositories", [])
+            if scope == "none" and (
+                capabilities.get("read_repo") in usable or capabilities.get("write_repo") in usable
+            ):
+                problems.append(f"{connection_id}: repository capabilities conflict with access scope none")
+            if capabilities.get("write_repo") in usable and scope == "selected":
+                if not any(
+                    isinstance(item, dict) and item.get("access") == "write"
+                    for item in repositories
+                ):
+                    problems.append(f"{connection_id}: usable write_repo lacks selected write access")
+
+        tools = candidate.get("connected_tools", [])
+        if isinstance(tools, list):
+            tool_ids = [item.get("id") for item in tools if isinstance(item, dict)]
+            if len(tool_ids) != len(set(tool_ids)):
+                problems.append(f"{connection_id}: connected tool ids must be unique")
+
+        readiness = candidate.get("readiness", {})
+        usage = candidate.get("usage", {})
+        readiness_state = readiness.get("state") if isinstance(readiness, dict) else None
+        usage_status = usage.get("status") if isinstance(usage, dict) else None
+        if readiness_state == "rate_limited" and usage_status != "rate_limited":
+            problems.append(f"{connection_id}: rate-limited readiness requires rate-limited usage evidence")
+
+    return problems
+
+
+def action_connection_eligibility(action: dict, connection: dict) -> tuple[bool, list[str]]:
+    reasons: list[str] = []
+    readiness = connection.get("readiness", {})
+    if not isinstance(readiness, dict) or readiness.get("state") != "ready":
+        reasons.append(f"connection-not-ready:{readiness.get('state') if isinstance(readiness, dict) else 'unknown'}")
+
+    capabilities = connection.get("capabilities", {})
+    approval = action.get("approval", {})
+    approval_granted = isinstance(approval, dict) and approval.get("status") == "granted"
+    permission_to_capability = {
+        "read": "read_repo",
+        "write": "write_repo",
+        "execute": "execute",
+        "commit": "commit",
+        "create_pr": "create_pr",
+    }
+    permissions = action.get("permissions", {})
+    if isinstance(permissions, dict) and isinstance(capabilities, dict):
+        for permission, capability in permission_to_capability.items():
+            if not permissions.get(permission):
+                continue
+            state = capabilities.get(capability)
+            if state == "supported":
+                continue
+            if state == "requires_approval" and approval_granted:
+                continue
+            reasons.append(f"capability:{capability}:{state or 'unknown'}")
+
+    repository_access = connection.get("repository_access", {})
+    if isinstance(permissions, dict) and isinstance(repository_access, dict):
+        scope = repository_access.get("scope")
+        repositories = repository_access.get("repositories", [])
+        if (permissions.get("read") or permissions.get("write")) and scope == "none":
+            reasons.append("repository-access:none")
+        if permissions.get("write") and scope == "selected":
+            if not any(
+                isinstance(item, dict) and item.get("access") == "write"
+                for item in repositories
+            ):
+                reasons.append("repository-access:no-selected-write")
+
+    return (not reasons, reasons)
+
+
+if isinstance(connections_v2, list):
+    for problem in connection_v2_semantic_errors(connections_v2):
+        fail(f"agent-connections-v2:{problem}")
+
+    connections_by_id = {
+        item.get("id"): item
+        for item in connections_v2
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    if isinstance(action_lineage, list):
+        for candidate in action_lineage:
+            if not isinstance(candidate, dict):
+                continue
+            connection_id = candidate.get("agent_connection_id")
+            selected = connections_by_id.get(connection_id)
+            if selected is None:
+                fail(f"agent-connections-v2: action {candidate.get('id')} references unknown connection {connection_id}")
+                continue
+            eligible, reasons = action_connection_eligibility(candidate, selected)
+            if not eligible:
+                fail(
+                    f"agent-connections-v2: action {candidate.get('id')} is not eligible for "
+                    f"{connection_id}: {', '.join(reasons)}"
+                )
+
+    bad_commit = copy.deepcopy(connections_v2)
+    bad_commit[0]["capabilities"]["commit"] = "supported"
+    if not any("commit capability requires usable write_repo" in item
+               for item in connection_v2_semantic_errors(bad_commit)):
+        fail("agent-connections-v2 mutation: commit without write capability was not rejected")
+
+    leaked_secret = copy.deepcopy(connections_v2)
+    leaked_secret[-1]["auth"]["api_key_value"] = "must-not-be-stored"
+    if not any("Additional properties are not allowed" in item
+               for item in connection_v2_semantic_errors(leaked_secret)):
+        fail("agent-connections-v2 mutation: raw credential-like field was not rejected")
+
+    if isinstance(action_lineage, list) and action_lineage:
+        unavailable = copy.deepcopy(action_lineage[0])
+        unavailable["agent_connection_id"] = "agent:api-advisor"
+        eligible, reasons = action_connection_eligibility(
+            unavailable, connections_by_id["agent:api-advisor"]
+        )
+        if eligible or not reasons:
+            fail("agent-connections-v2 mutation: unavailable API advisor was incorrectly eligible")
+
 
 validate_event_list(events, "events")
 validate_event_list(reflection_events, "reflection-correction-events")
