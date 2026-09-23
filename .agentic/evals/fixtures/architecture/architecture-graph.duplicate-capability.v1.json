@@ -1,0 +1,69 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "fixture.duplicate-capability",
+    "description": "Synthetic fixture.duplicate-capability architecture fixture."
+  },
+  "graph_state": "observed",
+  "nodes": [
+    {
+      "id": "capability.listing.web",
+      "kind": "capability",
+      "name": "Listing",
+      "lifecycle": "current",
+      "path": "apps/web/listing",
+      "metadata": {
+        "capability_key": "listing",
+        "language": "typescript"
+      }
+    },
+    {
+      "id": "capability.listing.api",
+      "kind": "capability",
+      "name": "Listing API",
+      "lifecycle": "current",
+      "path": "services/api/listing",
+      "metadata": {
+        "capability_key": "listing",
+        "language": "rust"
+      }
+    },
+    {
+      "id": "surface.listing-web",
+      "kind": "surface",
+      "name": "Listing web surface",
+      "lifecycle": "current",
+      "path": "apps/web/routes/listing"
+    },
+    {
+      "id": "surface.listing-api",
+      "kind": "surface",
+      "name": "Listing API surface",
+      "lifecycle": "current",
+      "path": "services/api/routes/listing"
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.listing.web",
+      "to": "surface.listing-web",
+      "kind": "exposes"
+    },
+    {
+      "from": "capability.listing.api",
+      "to": "surface.listing-api",
+      "kind": "exposes"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "nodes_declared": 4,
+    "edges_declared": 2,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "Duplicate logical identity is intentional fixture data for review-required candidate detection."
+  ]
+}
