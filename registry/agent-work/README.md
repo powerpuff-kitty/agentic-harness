@@ -89,6 +89,12 @@ The compatibility `work-action.v1` schema remains unchanged. New producers that 
 
 Authentication metadata records only the mode and credential source/subject reference; there is no raw credential field. The fixture at `fixtures/agent-connections.v2.json` covers local, hosted and BYO-API modes. Validation checks capability dependencies and uses WorkAction v2 permissions to derive eligibility deterministically. Connection readiness and tool readiness are observations, not proof that an external provider will remain available.
 
+## Integrated coding-agent example
+
+[The integrated example](coding-agent-example.md) ties the protocol together in one synthetic coding run: a parent feature Task owns nested inspection/implementation/test Tasks, replanning appends a verification Task, a patch artifact retains producer lineage, a `test.passed` event carries verified evidence, and an independent Evaluation links an evidence-backed Metric. Cross-fixture validation fails on missing test evidence or dangling evaluation references.
+
+This example is conformance data, not a real model outcome or private reasoning trace.
+
 ## OpenTelemetry conformance
 
 `otel-export.v1` is an optional observability projection. WorkUnit, Run, Task, Attempt and WorkAction identities remain canonical Agent Work records; dropped, sampled, unavailable or malformed telemetry cannot complete, fail, approve or otherwise mutate them.
