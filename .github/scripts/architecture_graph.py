@@ -358,5 +358,197 @@ def analyze(graph: dict[str, Any], paths: list[str]) -> dict[str, Any]:
     }
 
 
+
+def derive_guardrail_plan(graph: dict[str, Any]) -> dict[str, Any]:
+    by_id, _ = _index(graph)
+    entries: list[dict[str, Any]] = []
+    for constraint in sorted(graph.get("constraints", []), key=lambda item: item.get("id", "")):
+        if constraint.get("kind") not in {"allowed-dependency", "forbidden-dependency"}:
+            continue
+        subject_id = constraint.get("subject")
+        target_id = constraint.get("target")
+        subject = by_id.get(subject_id, {})
+        target = by_id.get(target_id, {})
+        subject_path = subject.get("path") if isinstance(subject.get("path"), str) else None
+        target_path = target.get("path") if isinstance(target.get("path"), str) else None
+        reasons: list[str] = []
+        if subject_path is None:
+            reasons.append("subject-path-missing")
+        if target_path is None:
+            reasons.append("target-path-missing")
+        entries.append(
+            {
+                "constraint_id": constraint.get("id"),
+                "effect": "allow" if constraint.get("kind") == "allowed-dependency" else "forbid",
+                "subject_id": subject_id,
+                "target_id": target_id,
+                "subject_path": subject_path,
+                "target_path": target_path,
+                "source_status": constraint.get("status"),
+                "plan_status": "unresolved" if reasons else "ready",
+                "unresolved_reasons": reasons,
+                "enforcement_claim": False,
+            }
+        )
+    return {
+        "entries": entries,
+        "ready_count": sum(item["plan_status"] == "ready" for item in entries),
+        "unresolved_count": sum(item["plan_status"] == "unresolved" for item in entries),
+        "enforcement_claim": False,
+    }
+
+
+def surface_inventory(graph: dict[str, Any]) -> list[dict[str, Any]]:
+    by_id, edges = _index(graph)
+    result: list[dict[str, Any]] = []
+    for node_id, node in sorted(by_id.items()):
+        if node.get("kind") != "capability":
+            continue
+        surfaces = _surfaces_for(node_id, by_id, edges)
+        result.append(
+            {
+                "capability_id": node_id,
+                "surface_ids": surfaces,
+                "status": "exposed" if surfaces else "internal_or_unexposed",
+            }
+        )
+    return result
+
+
+def _mermaid_id(node_id: str) -> str:
+    return "n_" + re.sub(r"[^A-Za-z0-9_]", "_", node_id)
+
+
+def _mermaid_label(value: Any) -> str:
+    text = str(value).replace('"', "'")
+    return text.replace("\n", " ")
+
+
+def render_mermaid(graph: dict[str, Any]) -> str:
+    by_id, edges = _index(graph)
+    lines = ["flowchart LR"]
+    for node_id, node in sorted(by_id.items()):
+        label = _mermaid_label(node.get("name"))
+        kind = _mermaid_label(node.get("kind"))
+        lines.append(f'  {_mermaid_id(node_id)}["{label}<br/>{kind}"]')
+    for edge in sorted(
+        edges,
+        key=lambda item: (item.get("from", ""), item.get("kind", ""), item.get("to", "")),
+    ):
+        lines.append(
+            f"  {_mermaid_id(edge['from'])} -->|{edge['kind']}| {_mermaid_id(edge['to'])}"
+        )
+    return "\n".join(lines) + "\n"
+
+
+def check_mermaid(graph: dict[str, Any], mermaid: str) -> bool:
+    return isinstance(mermaid, str) and mermaid == render_mermaid(graph)
+
+
+def derive_graph_outputs(graph: dict[str, Any]) -> dict[str, Any]:
+    mermaid = render_mermaid(graph)
+    return {
+        "format_version": 1,
+        "kind": "architecture-derivatives",
+        "project_id": graph.get("project", {}).get("id"),
+        "graph_state": graph.get("graph_state"),
+        "guardrail_plan": derive_guardrail_plan(graph),
+        "surface_inventory": surface_inventory(graph),
+        "diagram": {
+            "format": "mermaid",
+            "sha256": "sha256:" + hashlib.sha256(mermaid.encode("utf-8")).hexdigest(),
+            "bytes": len(mermaid.encode("utf-8")),
+        },
+        "not_checked": [
+            "Guardrail entries are plans derived from declared paths; no source imports were inspected or enforced.",
+            "Surface inventory is descriptive and does not require every capability to be externally exposed.",
+        ],
+    }
+
+
+def _edge_signature(edge: dict[str, Any]) -> str:
+    return f"{edge.get('from')}|{edge.get('kind')}|{edge.get('to')}"
+
+
+def _entity_changes(
+    before_items: list[dict[str, Any]],
+    after_items: list[dict[str, Any]],
+    fields: tuple[str, ...],
+) -> dict[str, Any]:
+    before = {
+        item["id"]: item
+        for item in before_items
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    after = {
+        item["id"]: item
+        for item in after_items
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    changed: list[dict[str, Any]] = []
+    for item_id in sorted(set(before) & set(after)):
+        differences = []
+        for field in fields:
+            left = before[item_id].get(field)
+            right = after[item_id].get(field)
+            if left != right:
+                differences.append({"field": field, "before": left, "after": right})
+        if differences:
+            changed.append({"id": item_id, "fields": differences})
+    return {
+        "added_ids": sorted(set(after) - set(before)),
+        "removed_ids": sorted(set(before) - set(after)),
+        "changed": changed,
+    }
+
+
+def compare_graphs(before: dict[str, Any], after: dict[str, Any]) -> dict[str, Any]:
+    _index(before)
+    _index(after)
+    before_project = before.get("project", {}).get("id")
+    after_project = after.get("project", {}).get("id")
+    if before_project != after_project:
+        raise ArchitectureAnalysisError("project-id-mismatch")
+
+    before_edges = {_edge_signature(edge) for edge in before.get("edges", [])}
+    after_edges = {_edge_signature(edge) for edge in after.get("edges", [])}
+    node_fields = ("kind", "name", "lifecycle", "path", "description", "metadata")
+    constraint_fields = (
+        "kind",
+        "subject",
+        "target",
+        "status",
+        "mechanism",
+        "evidence_refs",
+        "description",
+    )
+    before_coverage = before.get("coverage", {})
+    after_coverage = after.get("coverage", {})
+    before_not_checked = set(before.get("not_checked", []))
+    after_not_checked = set(after.get("not_checked", []))
+    return {
+        "format_version": 1,
+        "kind": "architecture-drift",
+        "project_id": before_project,
+        "before_state": before.get("graph_state"),
+        "after_state": after.get("graph_state"),
+        "node_changes": _entity_changes(before.get("nodes", []), after.get("nodes", []), node_fields),
+        "edge_changes": {
+            "added": sorted(after_edges - before_edges),
+            "removed": sorted(before_edges - after_edges),
+        },
+        "constraint_changes": _entity_changes(
+            before.get("constraints", []),
+            after.get("constraints", []),
+            constraint_fields,
+        ),
+        "coverage_changed": before_coverage != after_coverage,
+        "coverage_before": before_coverage,
+        "coverage_after": after_coverage,
+        "not_checked_added": sorted(after_not_checked - before_not_checked),
+        "not_checked_removed": sorted(before_not_checked - after_not_checked),
+    }
+
+
 def stable_json(value: Any) -> str:
     return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False)

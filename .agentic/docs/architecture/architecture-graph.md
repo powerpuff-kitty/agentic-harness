@@ -68,6 +68,40 @@ The analyzer can render a stable Markdown summary of capability paths, dependenc
 
 The machine-readable derived result conforms to `catalog/schema/architecture-analysis.v1.schema.json`. Synthetic TypeScript/Vue, Rust-workspace and mixed-language fixtures demonstrate the same semantics without special-case folder rules.
 
+## Graph-derived guardrails, drift and diagrams
+
+The same reference analyzer can derive additional artifacts from already-declared graph data. These outputs remain descriptive/planning evidence and do not turn declarations into repository enforcement.
+
+### Guardrail plans
+
+Declared `allowed-dependency` and `forbidden-dependency` constraints can become provider-neutral guardrail-plan entries when both subject and target nodes have paths. An entry records the source constraint/status, path pair and an `allow` or `forbid` effect. Its `enforcement_claim` is always false.
+
+If either path is absent, the entry is `unresolved` with an explicit missing-path reason. The analyzer never invents a directory rule, substitutes another node, or upgrades `declared`/`checked` metadata into enforcement.
+
+Actual ESLint, dependency-cruiser, Nx, Rust or other generated rules belong to CLI/runtime adapters and require separate source/enforcement evidence.
+
+### Graph-to-graph drift
+
+`compare_graphs(before, after)` compares two supplied graphs for the same project and reports:
+
+- added, removed and changed nodes;
+- added/removed typed edges;
+- added, removed and field-level changed constraints;
+- coverage changes;
+- added/removed `not_checked` declarations.
+
+The result is deterministic under node/edge/constraint ordering. It is graph-document drift only. It does not detect source/import drift unless a repository analyzer first supplies a graph based on observed source.
+
+### Surface inventory
+
+Every capability receives a descriptive surface state: `exposed` with its declared surfaces, or `internal_or_unexposed`. Internal capabilities are valid; absence of a surface is not a universal violation.
+
+### Stable Mermaid
+
+The analyzer renders stable Mermaid from declared node IDs/names/kinds and typed edges. Exact comparison can detect diagram drift against the supplied graph. The diagram does not independently prove runtime or repository architecture.
+
+Machine-readable outputs use `catalog/schema/architecture-derivatives.v1.schema.json` and `catalog/schema/architecture-drift.v1.schema.json`.
+
 ## Runtime boundary
 
 This repository owns the canonical schema and semantic meaning. Deterministic repository inspection, generated dependency checks and drift analysis belong in `agentic-harness-cli`. Reusable agent procedures belong in `agentic-harness-agents`.
