@@ -40,6 +40,34 @@ Architecture constraints carry an explicit status:
 
 A graph may be `observed`, `target` or `migration`. Individual nodes also carry lifecycle state. This allows a repository to model today's runtime-first structure and a capability-first target in one bounded artifact without pretending the migration is already complete.
 
+## Graph-only reference analysis
+
+The canonical repository includes a deterministic reference analyzer at `.github/scripts/architecture_graph.py`. It consumes an already-supplied Architecture Graph plus explicit task paths. It does **not** scan a checkout, resolve imports, authenticate declarations or establish enforcement.
+
+### Task-to-capability routing
+
+Routing uses the most-specific declared node path for each task path, then follows typed graph relationships back to capability ownership:
+
+- a capability routes to itself;
+- a contract routes through incoming `owns`;
+- a surface routes through incoming `exposes`;
+- an app/engine routes through `composes` or `adapts`;
+- an adapter/provider may route through `implements` to a contract and its owning capability;
+- infrastructure routes through incoming `persists-to`;
+- an authority routes through `authoritative-for`.
+
+The result preserves matched capabilities, their declared owner paths, contracts and surfaces. A path mapping to multiple capabilities is `ambiguous`; a path with no declared mapping is `unresolved`. Neither case is guessed away.
+
+### Duplicate-capability candidates
+
+A capability node may optionally declare `metadata.capability_key` as a stable logical identity for graph-level review. When it is absent, the reference analyzer falls back to a normalized capability name. Multiple active capability nodes with the same identity at different paths are emitted as `review_required` duplicate **candidates**. Equal identity is not proof that behavior is duplicated, so this result is never an automatic architecture violation.
+
+### Stable architecture summaries
+
+The analyzer can render a stable Markdown summary of capability paths, dependencies, contracts, surfaces, constraints, coverage and explicit `not_checked` items. Exact comparison can detect documentation drift against the supplied graph. This checks generated summary consistency only; it does not prove the graph matches source code.
+
+The machine-readable derived result conforms to `catalog/schema/architecture-analysis.v1.schema.json`. Synthetic TypeScript/Vue, Rust-workspace and mixed-language fixtures demonstrate the same semantics without special-case folder rules.
+
 ## Runtime boundary
 
 This repository owns the canonical schema and semantic meaning. Deterministic repository inspection, generated dependency checks and drift analysis belong in `agentic-harness-cli`. Reusable agent procedures belong in `agentic-harness-agents`.
