@@ -1,0 +1,489 @@
+{
+  "format_version": 1,
+  "kind": "agent-work-otel-export",
+  "work_unit_id": "wu:replay-demo",
+  "status": "collected",
+  "semantic_conventions": {
+    "otel_semconv_version": "1.44.0",
+    "gen_ai_status": "development",
+    "custom_namespace": "agent.work"
+  },
+  "content_policy": {
+    "mode": "metadata_only",
+    "omitted_classes": [
+      "model_input",
+      "model_output",
+      "tool_payload",
+      "user_content",
+      "secret"
+    ],
+    "redaction_refs": [
+      "redaction:sensitive-log"
+    ]
+  },
+  "spans": [
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000001",
+      "parent_span_id": null,
+      "name": "agent.work.work_unit",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "work-unit",
+        "id": "wu:replay-demo"
+      },
+      "started_at": "2026-09-21T20:40:00Z",
+      "ended_at": "2026-09-21T20:42:43Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "work-unit",
+        "agent.work.entity.id": "wu:replay-demo",
+        "agent.work.state": "completed"
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:05Z",
+          "canonical_event_id": "event:replay:1",
+          "attributes": {
+            "agent.work.event.id": "event:replay:1",
+            "agent.work.event.type": "work_unit.started",
+            "agent.work.state.previous": "queued",
+            "agent.work.state.next": "running"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:42:43Z",
+          "canonical_event_id": "event:replay:19",
+          "attributes": {
+            "agent.work.event.id": "event:replay:19",
+            "agent.work.event.type": "work_unit.completed",
+            "agent.work.state.previous": "running",
+            "agent.work.state.next": "completed"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000002",
+      "parent_span_id": "0000000000000001",
+      "name": "agent.work.run",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "run",
+        "id": "run:replay"
+      },
+      "started_at": "2026-09-21T20:40:10Z",
+      "ended_at": "2026-09-21T20:42:42Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "run",
+        "agent.work.entity.id": "run:replay",
+        "agent.work.run.id": "run:replay",
+        "agent.work.state": "completed"
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:10Z",
+          "canonical_event_id": "event:replay:2",
+          "attributes": {
+            "agent.work.event.id": "event:replay:2",
+            "agent.work.event.type": "run.started",
+            "agent.work.state.previous": "queued",
+            "agent.work.state.next": "running"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:35Z",
+          "canonical_event_id": "event:replay:6",
+          "attributes": {
+            "agent.work.event.id": "event:replay:6",
+            "agent.work.event.type": "evidence.recorded"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:36Z",
+          "canonical_event_id": "event:replay:7",
+          "attributes": {
+            "agent.work.event.id": "event:replay:7",
+            "agent.work.event.type": "redaction.applied"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:41:10Z",
+          "canonical_event_id": "event:replay:11",
+          "attributes": {
+            "agent.work.event.id": "event:replay:11",
+            "agent.work.event.type": "plan.revised"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:42:42Z",
+          "canonical_event_id": "event:replay:18",
+          "attributes": {
+            "agent.work.event.id": "event:replay:18",
+            "agent.work.event.type": "run.completed",
+            "agent.work.state.previous": "running",
+            "agent.work.state.next": "completed"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000003",
+      "parent_span_id": "0000000000000002",
+      "name": "agent.work.task",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "task",
+        "id": "task:primary"
+      },
+      "started_at": "2026-09-21T20:40:15Z",
+      "ended_at": "2026-09-21T20:40:51Z",
+      "status": "error",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "task",
+        "agent.work.entity.id": "task:primary",
+        "agent.work.run.id": "run:replay",
+        "agent.work.task.id": "task:primary",
+        "agent.work.state": "failed"
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:15Z",
+          "canonical_event_id": "event:replay:3",
+          "attributes": {
+            "agent.work.event.id": "event:replay:3",
+            "agent.work.event.type": "task.started",
+            "agent.work.state.previous": "queued",
+            "agent.work.state.next": "running"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:30Z",
+          "canonical_event_id": "event:replay:5",
+          "attributes": {
+            "agent.work.event.id": "event:replay:5",
+            "agent.work.event.type": "evidence.recorded"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:51Z",
+          "canonical_event_id": "event:replay:9",
+          "attributes": {
+            "agent.work.event.id": "event:replay:9",
+            "agent.work.event.type": "task.failed",
+            "agent.work.state.previous": "running",
+            "agent.work.state.next": "failed"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000004",
+      "parent_span_id": "0000000000000003",
+      "name": "agent.work.attempt",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "attempt",
+        "id": "attempt:primary:1"
+      },
+      "started_at": "2026-09-21T20:40:20Z",
+      "ended_at": "2026-09-21T20:40:50Z",
+      "status": "error",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "attempt",
+        "agent.work.entity.id": "attempt:primary:1",
+        "agent.work.run.id": "run:replay",
+        "agent.work.task.id": "task:primary",
+        "agent.work.attempt.id": "attempt:primary:1",
+        "agent.work.state": "failed"
+      },
+      "links": [],
+      "events": [
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:20Z",
+          "canonical_event_id": "event:replay:4",
+          "attributes": {
+            "agent.work.event.id": "event:replay:4",
+            "agent.work.event.type": "attempt.started"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:40:50Z",
+          "canonical_event_id": "event:replay:8",
+          "attributes": {
+            "agent.work.event.id": "event:replay:8",
+            "agent.work.event.type": "attempt.failed",
+            "agent.work.state.previous": "running",
+            "agent.work.state.next": "failed"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000005",
+      "parent_span_id": "0000000000000002",
+      "name": "agent.work.task",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "task",
+        "id": "task:retry"
+      },
+      "started_at": "2026-09-21T20:41:00Z",
+      "ended_at": "2026-09-21T20:42:41Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "task",
+        "agent.work.entity.id": "task:retry",
+        "agent.work.run.id": "run:replay",
+        "agent.work.task.id": "task:retry",
+        "agent.work.state": "completed"
+      },
+      "links": [
+        {
+          "trace_id": "11111111111111111111111111111111",
+          "span_id": "0000000000000003",
+          "relationship": "retry",
+          "attributes": {
+            "agent.work.link.reason": "replacement-after-failed-task"
+          }
+        }
+      ],
+      "events": [
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:41:00Z",
+          "canonical_event_id": "event:replay:10",
+          "attributes": {
+            "agent.work.event.id": "event:replay:10",
+            "agent.work.event.type": "task.created"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:41:20Z",
+          "canonical_event_id": "event:replay:12",
+          "attributes": {
+            "agent.work.event.id": "event:replay:12",
+            "agent.work.event.type": "task.started",
+            "agent.work.state.previous": "queued",
+            "agent.work.state.next": "running"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:42:00Z",
+          "canonical_event_id": "event:replay:14",
+          "attributes": {
+            "agent.work.event.id": "event:replay:14",
+            "agent.work.event.type": "artifact.created"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:42:30Z",
+          "canonical_event_id": "event:replay:15",
+          "attributes": {
+            "agent.work.event.id": "event:replay:15",
+            "agent.work.event.type": "evidence.recorded"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:42:41Z",
+          "canonical_event_id": "event:replay:17",
+          "attributes": {
+            "agent.work.event.id": "event:replay:17",
+            "agent.work.event.type": "task.completed",
+            "agent.work.state.previous": "running",
+            "agent.work.state.next": "completed"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000006",
+      "parent_span_id": "0000000000000005",
+      "name": "agent.work.attempt",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "attempt",
+        "id": "attempt:retry:1"
+      },
+      "started_at": "2026-09-21T20:41:30Z",
+      "ended_at": "2026-09-21T20:42:40Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "attempt",
+        "agent.work.entity.id": "attempt:retry:1",
+        "agent.work.run.id": "run:replay",
+        "agent.work.task.id": "task:retry",
+        "agent.work.attempt.id": "attempt:retry:1",
+        "agent.work.state": "completed"
+      },
+      "links": [
+        {
+          "trace_id": "11111111111111111111111111111111",
+          "span_id": "0000000000000004",
+          "relationship": "retry",
+          "attributes": {
+            "agent.work.link.reason": "corrective-attempt"
+          }
+        }
+      ],
+      "events": [
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:41:30Z",
+          "canonical_event_id": "event:replay:13",
+          "attributes": {
+            "agent.work.event.id": "event:replay:13",
+            "agent.work.event.type": "attempt.started"
+          }
+        },
+        {
+          "name": "agent.work.event",
+          "occurred_at": "2026-09-21T20:42:40Z",
+          "canonical_event_id": "event:replay:16",
+          "attributes": {
+            "agent.work.event.id": "event:replay:16",
+            "agent.work.event.type": "attempt.completed",
+            "agent.work.state.previous": "running",
+            "agent.work.state.next": "completed"
+          }
+        }
+      ]
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000007",
+      "parent_span_id": "0000000000000006",
+      "name": "gen_ai.chat",
+      "span_kind": "client",
+      "entity": {
+        "kind": "model",
+        "id": "model:synthetic-example"
+      },
+      "started_at": "2026-09-21T20:41:31Z",
+      "ended_at": "2026-09-21T20:41:32Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "model",
+        "agent.work.entity.id": "model:synthetic-example",
+        "agent.work.run.id": "run:replay",
+        "agent.work.task.id": "task:retry",
+        "agent.work.attempt.id": "attempt:retry:1",
+        "agent.work.provider.name": "openai",
+        "agent.work.model.name": "synthetic-example-model",
+        "agent.work.model.version": "fixture",
+        "agent.work.input.identity": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "agent.work.output.identity": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "gen_ai.provider.name": "openai",
+        "gen_ai.request.model": "synthetic-example-model",
+        "gen_ai.response.model": "synthetic-example-model",
+        "gen_ai.usage.input_tokens": 120,
+        "gen_ai.usage.output_tokens": 30,
+        "agent.work.cost.amount": 0.001,
+        "agent.work.cost.currency": "USD",
+        "agent.work.cost.source": "fixture-observation"
+      },
+      "links": [],
+      "events": []
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000008",
+      "parent_span_id": "0000000000000006",
+      "name": "agent.work.tool",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "tool",
+        "id": "tool:test-runner"
+      },
+      "started_at": "2026-09-21T20:42:20Z",
+      "ended_at": "2026-09-21T20:42:30Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "tool",
+        "agent.work.entity.id": "tool:test-runner",
+        "agent.work.run.id": "run:replay",
+        "agent.work.task.id": "task:retry",
+        "agent.work.attempt.id": "attempt:retry:1",
+        "agent.work.tool.name": "test-runner",
+        "agent.work.input.identity": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+        "agent.work.output.identity": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+      },
+      "links": [],
+      "events": []
+    },
+    {
+      "trace_id": "11111111111111111111111111111111",
+      "span_id": "0000000000000009",
+      "parent_span_id": "0000000000000002",
+      "name": "agent.work.action",
+      "span_kind": "internal",
+      "entity": {
+        "kind": "action",
+        "id": "action:replay:retry"
+      },
+      "started_at": "2026-09-21T20:40:51Z",
+      "ended_at": "2026-09-21T20:41:10Z",
+      "status": "ok",
+      "attributes": {
+        "agent.work.protocol.version": 1,
+        "agent.work.work_unit.id": "wu:replay-demo",
+        "agent.work.entity.kind": "action",
+        "agent.work.entity.id": "action:replay:retry",
+        "agent.work.run.id": "run:replay",
+        "agent.work.action.id": "action:replay:retry"
+      },
+      "links": [
+        {
+          "trace_id": "11111111111111111111111111111111",
+          "span_id": "0000000000000004",
+          "relationship": "causal",
+          "attributes": {
+            "agent.work.link.reason": "failed-attempt-triggered-corrective-action"
+          }
+        }
+      ],
+      "events": []
+    }
+  ]
+}
