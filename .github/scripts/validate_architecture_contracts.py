@@ -539,14 +539,30 @@ class ArchitectureGraphContracts(unittest.TestCase):
                 "powerpuff-kitty/a-rich-text",
             },
         )
-        self.assertIn("authority", graph_shapes["powerpuff-kitty/lahaku"])
-        self.assertIn("adapter", graph_shapes["powerpuff-kitty/loaftrail"])
-        # Shape diversity is expressed by actual package/app/adapter/surface combinations,
-        # not by requiring every repository to expose the same role inventory.
-        self.assertNotEqual(
-            graph_shapes["powerpuff-kitty/lahaku"],
-            graph_shapes["powerpuff-kitty/a-rich-text"],
-        )
+        lahaku_graph = json.loads((REFERENCE_DIR / "lahaku.graph.v1.json").read_text())
+        loaftrail_graph = json.loads((REFERENCE_DIR / "loaftrail.graph.v1.json").read_text())
+        rich_graph = json.loads((REFERENCE_DIR / "a-rich-text.graph.v1.json").read_text())
+
+        lahaku_paths = {
+            node["path"] for node in lahaku_graph["nodes"]
+            if isinstance(node.get("path"), str)
+        }
+        loaftrail_paths = {
+            node["path"] for node in loaftrail_graph["nodes"]
+            if isinstance(node.get("path"), str)
+        }
+        rich_paths = {
+            node["path"] for node in rich_graph["nodes"]
+            if isinstance(node.get("path"), str)
+        }
+
+        self.assertTrue(any(path.startswith("packages/api/") for path in lahaku_paths))
+        self.assertTrue(any(path.startswith("packages/front/") for path in lahaku_paths))
+        self.assertTrue(any(path.startswith("apps/") for path in loaftrail_paths))
+        self.assertTrue(any(path.startswith("packages/") for path in loaftrail_paths))
+        self.assertTrue(rich_paths)
+        self.assertTrue(all(path.startswith("packages/") for path in rich_paths))
+        self.assertFalse(any(path.startswith("apps/") for path in rich_paths))
 
     def test_reference_snapshots_do_not_claim_source_conformance(self):
         for manifest_path in REFERENCE_MANIFESTS:
