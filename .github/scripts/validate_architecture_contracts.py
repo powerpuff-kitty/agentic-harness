@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import unittest
 
-from jsonschema import Draft202012Validator
+from jsonschema import Draft202012Validator, FormatChecker
 
 import architecture_graph as graph_analysis
 
@@ -18,6 +18,13 @@ FIXTURE_DIR = ROOT / ".agentic/evals/fixtures/architecture"
 ANALYSIS_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-analysis.v1.schema.json").read_text())
 DERIVATIVES_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-derivatives.v1.schema.json").read_text())
 DRIFT_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-drift.v1.schema.json").read_text())
+REFERENCE_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-reference.v1.schema.json").read_text())
+REFERENCE_DIR = ROOT / ".agentic/evals/references/architecture"
+REFERENCE_MANIFESTS = [
+    REFERENCE_DIR / "lahaku.reference.v1.json",
+    REFERENCE_DIR / "loaftrail.reference.v1.json",
+    REFERENCE_DIR / "a-rich-text.reference.v1.json",
+]
 WEB_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.web-ts.v1.json").read_text())
 RUST_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.rust-workspace.v1.json").read_text())
 MIXED_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.mixed-stack.v1.json").read_text())
@@ -33,6 +40,8 @@ VALIDATOR = Draft202012Validator(SCHEMA)
 ANALYSIS_VALIDATOR = Draft202012Validator(ANALYSIS_SCHEMA)
 DERIVATIVES_VALIDATOR = Draft202012Validator(DERIVATIVES_SCHEMA)
 DRIFT_VALIDATOR = Draft202012Validator(DRIFT_SCHEMA)
+Draft202012Validator.check_schema(REFERENCE_SCHEMA)
+REFERENCE_VALIDATOR = Draft202012Validator(REFERENCE_SCHEMA, format_checker=FormatChecker())
 
 
 def semantic_errors(document: dict) -> list[str]:
@@ -111,6 +120,92 @@ def semantic_errors(document: dict) -> list[str]:
         errors.append("coverage.edges_declared must equal the number of edges")
 
     return errors
+
+
+def reference_errors(manifest: dict) -> list[str]:
+    problems: list[str] = []
+    for error in sorted(
+        REFERENCE_VALIDATOR.iter_errors(manifest),
+        key=lambda item: list(item.path),
+    ):
+        location = ".".join(str(part) for part in error.path) or "<root>"
+        problems.append(f"schema:{location}: {error.message}")
+
+    if not isinstance(manifest, dict):
+        return problems
+
+    graph_path = manifest.get("graph_path")
+    if not isinstance(graph_path, str):
+        return problems
+
+    resolved = (ROOT / graph_path).resolve()
+    try:
+        resolved.relative_to(ROOT.resolve())
+    except ValueError:
+        problems.append("graph_path must remain inside the canonical repository")
+        return problems
+
+    if not resolved.is_file():
+        problems.append(f"graph_path does not exist: {graph_path}")
+        return problems
+
+    try:
+        graph = json.loads(resolved.read_text())
+    except Exception as exc:
+        problems.append(f"graph_path is invalid JSON: {exc}")
+        return problems
+
+    try:
+        VALIDATOR.validate(graph)
+    except Exception as exc:
+        problems.append(f"graph schema validation failed: {exc}")
+        return problems
+
+    problems.extend(f"graph:{item}" for item in semantic_errors(graph))
+
+    repository = manifest.get("source", {}).get("repository")
+    if graph.get("project", {}).get("id") != repository:
+        problems.append("graph project.id must equal source.repository")
+
+    coverage = graph.get("coverage", {})
+    if coverage.get("paths_checked") != 0:
+        problems.append("reference graph must not claim source paths were checked")
+    if coverage.get("complete") is not False:
+        problems.append("reference graph coverage.complete must remain false")
+
+    evidence = manifest.get("evidence", [])
+    evidence_paths = [
+        item.get("path")
+        for item in evidence
+        if isinstance(item, dict) and isinstance(item.get("path"), str)
+    ]
+    if len(evidence_paths) != len(set(evidence_paths)):
+        problems.append("reference evidence paths must be unique")
+
+    task_routes = manifest.get("task_routes", [])
+    for index, route in enumerate(task_routes):
+        if not isinstance(route, dict):
+            continue
+        path = route.get("path")
+        expected = route.get("expected_capability_ids")
+        if not isinstance(path, str) or not isinstance(expected, list):
+            continue
+        try:
+            result = graph_analysis.resolve_task_context(graph, [path])
+        except graph_analysis.ArchitectureAnalysisError as exc:
+            problems.append(f"task_routes[{index}] failed routing: {exc}")
+            continue
+        actual = sorted(item["id"] for item in result["capabilities"])
+        if actual != sorted(expected):
+            problems.append(
+                f"task_routes[{index}] expected {sorted(expected)} but resolved {actual}"
+            )
+        if result["unresolved_paths"]:
+            problems.append(f"task_routes[{index}] unexpectedly unresolved")
+        if len(expected) == 1 and result["ambiguous_paths"]:
+            problems.append(f"task_routes[{index}] unexpectedly ambiguous")
+
+    return problems
 
 
 class ArchitectureGraphContracts(unittest.TestCase):
@@ -414,6 +509,86 @@ class ArchitectureGraphContracts(unittest.TestCase):
         other["project"]["id"] = "fixture.other-project"
         with self.assertRaises(graph_analysis.ArchitectureAnalysisError):
             graph_analysis.compare_graphs(WEB_FIXTURE, other)
+
+
+    def test_real_project_reference_snapshots_are_revision_bound_and_coherent(self):
+        repositories = set()
+        graph_shapes = {}
+        for manifest_path in REFERENCE_MANIFESTS:
+            with self.subTest(manifest=manifest_path.name):
+                manifest = json.loads(manifest_path.read_text())
+                self.assertEqual(reference_errors(manifest), [])
+                repository = manifest["source"]["repository"]
+                repositories.add(repository)
+                graph = json.loads((ROOT / manifest["graph_path"]).read_text())
+                graph_shapes[repository] = {
+                    node["kind"] for node in graph["nodes"]
+                }
+                self.assertEqual(manifest["source"]["visibility"], "public")
+                self.assertEqual(len(manifest["source"]["revision"]), 40)
+                self.assertGreaterEqual(len(manifest["evidence"]), 2)
+                self.assertTrue(
+                    any("Snapshot freshness" in item for item in manifest["limitations"])
+                )
+
+        self.assertEqual(
+            repositories,
+            {
+                "powerpuff-kitty/lahaku",
+                "powerpuff-kitty/loaftrail",
+                "powerpuff-kitty/a-rich-text",
+            },
+        )
+        self.assertIn("authority", graph_shapes["powerpuff-kitty/lahaku"])
+        self.assertIn("adapter", graph_shapes["powerpuff-kitty/loaftrail"])
+        # Shape diversity is expressed by actual package/app/adapter/surface combinations,
+        # not by requiring every repository to expose the same role inventory.
+        self.assertNotEqual(
+            graph_shapes["powerpuff-kitty/lahaku"],
+            graph_shapes["powerpuff-kitty/a-rich-text"],
+        )
+
+    def test_reference_snapshots_do_not_claim_source_conformance(self):
+        for manifest_path in REFERENCE_MANIFESTS:
+            manifest = json.loads(manifest_path.read_text())
+            graph = json.loads((ROOT / manifest["graph_path"]).read_text())
+            self.assertFalse(graph["coverage"]["complete"])
+            self.assertEqual(graph["coverage"]["paths_checked"], 0)
+            self.assertTrue(graph["not_checked"])
+
+    def test_reference_graph_project_must_match_source_repository(self):
+        manifest = json.loads(REFERENCE_MANIFESTS[0].read_text())
+        mutated = copy.deepcopy(manifest)
+        mutated["source"]["repository"] = "powerpuff-kitty/not-lahaku"
+        self.assertIn(
+            "graph project.id must equal source.repository",
+            reference_errors(mutated),
+        )
+
+    def test_reference_graph_path_must_exist(self):
+        manifest = json.loads(REFERENCE_MANIFESTS[0].read_text())
+        mutated = copy.deepcopy(manifest)
+        mutated["graph_path"] = ".agentic/evals/references/architecture/missing.graph.v1.json"
+        self.assertTrue(
+            any("graph_path does not exist" in item for item in reference_errors(mutated))
+        )
+
+    def test_reference_route_expectation_drift_is_detected(self):
+        manifest = json.loads(REFERENCE_MANIFESTS[1].read_text())
+        mutated = copy.deepcopy(manifest)
+        mutated["task_routes"][0]["expected_capability_ids"] = ["capability.issues"]
+        self.assertTrue(
+            any("expected" in item and "resolved" in item for item in reference_errors(mutated))
+        )
+
+    def test_reference_evidence_paths_are_unique(self):
+        manifest = json.loads(REFERENCE_MANIFESTS[2].read_text())
+        mutated = copy.deepcopy(manifest)
+        mutated["evidence"].append(copy.deepcopy(mutated["evidence"][0]))
+        self.assertIn(
+            "reference evidence paths must be unique",
+            reference_errors(mutated),
+        )
 
 
 
