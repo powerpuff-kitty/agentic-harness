@@ -6,7 +6,9 @@ It models execution as structured work rather than a chat transcript. Consumers 
 
 ## V1 contracts
 
-- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt lifecycle.
+- work-unit.v1.schema.json — compatibility WorkUnit/Run/Plan/Task/Attempt structure.
+- work-unit.v2.schema.json — preferred WorkUnit contract with immutable run input identity, session reference and strict Attempt states.
+- lifecycle.v1.schema.json + lifecycle.v1.json — canonical WorkUnit/Run/Task/Attempt transitions, terminal/recovery semantics and derived-progress policy.
 - work-event.v1.schema.json — append-only execution event envelope with optional replay deltas.
 - evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
 - artifact.v1.schema.json — content-addressed produced artifacts linked to their producing run/task/attempt.
@@ -36,6 +38,16 @@ It models execution as structured work rather than a chat transcript. Consumers 
 | Context | Task-specific compiled view shown to a model | Ephemeral projection | It is the model input |
 
 Reflection is not memory. A reflection may emit only memory candidate references; promotion, consolidation, supersession and remote-storage policy belong to the Project Memory subsystem. Reflection is also not hidden reasoning capture: it stores concise inspectable conclusions, uncertainty, evidence and proposed corrective actions.
+
+## Lifecycle and progress
+
+WorkUnit v2 keeps each Run's input identity separate from its output: `source_revision` and `context_fingerprint` identify what was executed, while `result` identifies what was produced. An optional `session_ref` can correlate a provider session without embedding provider-private state.
+
+`lifecycle.v1.json` is the canonical transition policy. Runs and Attempts preserve terminal failure/completion/cancellation history; retrying them creates a new Run or Attempt. A failed Task may explicitly return to `queued` for a new Attempt. WorkUnits may recover through a new queued Run while cancelled work remains terminal. Replay state transitions are checked against the same policy.
+
+Plan revisions are append-only snapshots with contiguous revision numbers starting at 1. A later plan may change the active task set without deleting historical Tasks or Attempts. Parent and dependency graphs are validated independently for missing references and cycles.
+
+Progress is derived from the latest plan's Task states. The protocol intentionally does not persist a model-estimated percentage. The v2 lifecycle fixture set covers completed, blocked, failed, retried and replanned work.
 
 ## Evidence, artifacts and replay
 
@@ -99,4 +111,4 @@ Run:
 
     python3 .github/scripts/validate_agent_work_protocol.py
 
-The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including DAG cycles, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
+The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including lifecycle transitions, Task parent/dependency cycles, contiguous plan revisions and retry ordinals, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
