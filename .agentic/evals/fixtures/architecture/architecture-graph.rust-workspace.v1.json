@@ -1,0 +1,122 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "fixture.rust-workspace",
+    "description": "Synthetic fixture.rust-workspace architecture fixture."
+  },
+  "graph_state": "observed",
+  "nodes": [
+    {
+      "id": "capability.orders",
+      "kind": "capability",
+      "name": "Orders",
+      "lifecycle": "current",
+      "path": "crates/orders",
+      "metadata": {
+        "capability_key": "orders",
+        "language": "rust"
+      }
+    },
+    {
+      "id": "capability.payments",
+      "kind": "capability",
+      "name": "Payments",
+      "lifecycle": "current",
+      "path": "crates/payments",
+      "metadata": {
+        "capability_key": "payments",
+        "language": "rust"
+      }
+    },
+    {
+      "id": "contract.orders",
+      "kind": "contract",
+      "name": "Orders port",
+      "lifecycle": "current",
+      "path": "crates/contracts/orders"
+    },
+    {
+      "id": "app.api",
+      "kind": "app",
+      "name": "HTTP API",
+      "lifecycle": "current",
+      "path": "crates/api"
+    },
+    {
+      "id": "surface.orders-http",
+      "kind": "surface",
+      "name": "Orders HTTP routes",
+      "lifecycle": "current",
+      "path": "crates/api/src/routes/orders"
+    },
+    {
+      "id": "adapter.orders-pg",
+      "kind": "adapter",
+      "name": "Orders PostgreSQL adapter",
+      "lifecycle": "current",
+      "path": "crates/postgres/orders"
+    },
+    {
+      "id": "infrastructure.postgres",
+      "kind": "infrastructure",
+      "name": "PostgreSQL infrastructure",
+      "lifecycle": "current",
+      "path": "crates/postgres"
+    },
+    {
+      "id": "authority.orders-db",
+      "kind": "authority",
+      "name": "Orders database authority",
+      "lifecycle": "current",
+      "path": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.orders",
+      "to": "capability.payments",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.orders",
+      "to": "contract.orders",
+      "kind": "owns"
+    },
+    {
+      "from": "app.api",
+      "to": "capability.orders",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.orders",
+      "to": "surface.orders-http",
+      "kind": "exposes"
+    },
+    {
+      "from": "adapter.orders-pg",
+      "to": "contract.orders",
+      "kind": "implements"
+    },
+    {
+      "from": "capability.orders",
+      "to": "infrastructure.postgres",
+      "kind": "persists-to"
+    },
+    {
+      "from": "authority.orders-db",
+      "to": "capability.orders",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "nodes_declared": 8,
+    "edges_declared": 7,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "Repository paths are declared fixture data and were not inspected against a checkout."
+  ]
+}
