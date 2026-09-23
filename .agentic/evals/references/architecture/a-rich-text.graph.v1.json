@@ -1,0 +1,188 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "powerpuff-kitty/a-rich-text",
+    "description": "Revision-bound representative architecture reference for powerpuff-kitty/a-rich-text."
+  },
+  "graph_state": "observed",
+  "nodes": [
+    {
+      "id": "capability.document",
+      "kind": "capability",
+      "name": "ART document model",
+      "lifecycle": "current",
+      "path": "packages/core",
+      "description": "Canonical document validation, serialization, profiles and migrations.",
+      "metadata": {
+        "capability_key": "document-model"
+      }
+    },
+    {
+      "id": "capability.engine",
+      "kind": "capability",
+      "name": "Editing engine",
+      "lifecycle": "current",
+      "path": "packages/engine",
+      "description": "Immutable editor state and transactions.",
+      "metadata": {
+        "capability_key": "editing-engine"
+      }
+    },
+    {
+      "id": "capability.collaboration",
+      "kind": "capability",
+      "name": "Collaboration",
+      "lifecycle": "current",
+      "path": "packages/collaboration",
+      "description": "Provider-neutral collaboration capability.",
+      "metadata": {
+        "capability_key": "collaboration"
+      }
+    },
+    {
+      "id": "capability.ai",
+      "kind": "capability",
+      "name": "AI proposals",
+      "lifecycle": "current",
+      "path": "packages/ai",
+      "description": "Provider-neutral AI proposal capability.",
+      "metadata": {
+        "capability_key": "ai-proposals"
+      }
+    },
+    {
+      "id": "contract.art",
+      "kind": "contract",
+      "name": "ART JSON contract",
+      "lifecycle": "current",
+      "path": "packages/core",
+      "description": "Canonical persisted document representation."
+    },
+    {
+      "id": "app.editor",
+      "kind": "app",
+      "name": "Editor composition",
+      "lifecycle": "current",
+      "path": "packages/editor",
+      "description": "Editor composition/distribution package."
+    },
+    {
+      "id": "surface.web-component",
+      "kind": "surface",
+      "name": "Web Component",
+      "lifecycle": "current",
+      "path": "packages/web-component",
+      "description": "Primary native custom-element integration surface."
+    },
+    {
+      "id": "surface.ui",
+      "kind": "surface",
+      "name": "Optional UI",
+      "lifecycle": "current",
+      "path": "packages/ui",
+      "description": "Framework-independent optional UI surface."
+    },
+    {
+      "id": "adapter.dom",
+      "kind": "adapter",
+      "name": "DOM adapter",
+      "lifecycle": "current",
+      "path": "packages/dom",
+      "description": "Browser editing/selection translation adapter."
+    },
+    {
+      "id": "adapter.collaboration-editor",
+      "kind": "adapter",
+      "name": "Collaboration editor adapter",
+      "lifecycle": "current",
+      "path": "packages/collaboration-editor",
+      "description": "Editor binding for collaboration."
+    },
+    {
+      "id": "adapter.ai-editor",
+      "kind": "adapter",
+      "name": "AI editor adapter",
+      "lifecycle": "current",
+      "path": "packages/ai-editor",
+      "description": "Editor binding for proposal-first AI."
+    },
+    {
+      "id": "authority.art-json",
+      "kind": "authority",
+      "name": "ART JSON document authority",
+      "lifecycle": "current",
+      "path": null,
+      "description": "Architecture docs identify ART JSON as canonical persisted document representation."
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.engine",
+      "to": "capability.document",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.collaboration",
+      "to": "capability.document",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.ai",
+      "to": "capability.document",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.document",
+      "to": "contract.art",
+      "kind": "owns"
+    },
+    {
+      "from": "app.editor",
+      "to": "capability.engine",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.engine",
+      "to": "surface.web-component",
+      "kind": "exposes"
+    },
+    {
+      "from": "capability.engine",
+      "to": "surface.ui",
+      "kind": "exposes"
+    },
+    {
+      "from": "adapter.dom",
+      "to": "capability.engine",
+      "kind": "adapts"
+    },
+    {
+      "from": "adapter.collaboration-editor",
+      "to": "capability.collaboration",
+      "kind": "adapts"
+    },
+    {
+      "from": "adapter.ai-editor",
+      "to": "capability.ai",
+      "kind": "adapts"
+    },
+    {
+      "from": "authority.art-json",
+      "to": "capability.document",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "nodes_declared": 12,
+    "edges_declared": 11,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "This reference models representative package boundaries rather than all published/editor feature packages.",
+    "Dependency-policy execution, browser release gates and optional hosted products are not verified by this snapshot.",
+    "Framework examples/adapters and managed cloud services are outside this representative graph."
+  ]
+}

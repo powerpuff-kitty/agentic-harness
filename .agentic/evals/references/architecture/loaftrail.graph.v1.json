@@ -1,0 +1,172 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "powerpuff-kitty/loaftrail",
+    "description": "Revision-bound representative architecture reference for powerpuff-kitty/loaftrail."
+  },
+  "graph_state": "observed",
+  "nodes": [
+    {
+      "id": "capability.protocol",
+      "kind": "capability",
+      "name": "Trail Context Protocol",
+      "lifecycle": "current",
+      "path": "packages/core",
+      "description": "Stable shared protocol and contracts.",
+      "metadata": {
+        "capability_key": "trail-context-protocol"
+      }
+    },
+    {
+      "id": "capability.issues",
+      "kind": "capability",
+      "name": "Native Issues and Boards",
+      "lifecycle": "current",
+      "path": "packages/issues",
+      "description": "Issue/Board application behavior and persistence contracts.",
+      "metadata": {
+        "capability_key": "issues"
+      }
+    },
+    {
+      "id": "capability.feedback",
+      "kind": "capability",
+      "name": "Feedback capture",
+      "lifecycle": "current",
+      "path": "packages/feedback",
+      "description": "Visible feedback/capture UI capability.",
+      "metadata": {
+        "capability_key": "feedback"
+      }
+    },
+    {
+      "id": "capability.browser",
+      "kind": "capability",
+      "name": "Browser capture",
+      "lifecycle": "current",
+      "path": "packages/browser",
+      "description": "Headless browser capture and trace propagation.",
+      "metadata": {
+        "capability_key": "browser-capture"
+      }
+    },
+    {
+      "id": "contract.trail",
+      "kind": "contract",
+      "name": "Trail context contract",
+      "lifecycle": "current",
+      "path": "packages/core",
+      "description": "Representative protocol contract; shares the core package path."
+    },
+    {
+      "id": "app.dashboard",
+      "kind": "app",
+      "name": "Hosted dashboard",
+      "lifecycle": "current",
+      "path": "apps/dashboard",
+      "description": "Hosted control-plane/dashboard composition."
+    },
+    {
+      "id": "surface.dashboard",
+      "kind": "surface",
+      "name": "Dashboard feedback surface",
+      "lifecycle": "current",
+      "path": "apps/dashboard",
+      "description": "Representative hosted application surface."
+    },
+    {
+      "id": "adapter.github",
+      "kind": "adapter",
+      "name": "GitHub adapter",
+      "lifecycle": "current",
+      "path": "packages/github",
+      "description": "Trusted GitHub source/issue/PR/webhook capability adapter."
+    },
+    {
+      "id": "adapter.cloud",
+      "kind": "adapter",
+      "name": "Cloud destination adapter",
+      "lifecycle": "current",
+      "path": "packages/cloud",
+      "description": "Loaftrail Cloud destination client."
+    },
+    {
+      "id": "authority.native-issues",
+      "kind": "authority",
+      "name": "Native Issue/Board authority",
+      "lifecycle": "current",
+      "path": null,
+      "description": "Native issue writes precede optional downstream delivery."
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.issues",
+      "to": "capability.protocol",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.feedback",
+      "to": "capability.protocol",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.browser",
+      "to": "capability.protocol",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.protocol",
+      "to": "contract.trail",
+      "kind": "owns"
+    },
+    {
+      "from": "app.dashboard",
+      "to": "capability.issues",
+      "kind": "composes"
+    },
+    {
+      "from": "app.dashboard",
+      "to": "capability.feedback",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.issues",
+      "to": "surface.dashboard",
+      "kind": "exposes"
+    },
+    {
+      "from": "capability.feedback",
+      "to": "surface.dashboard",
+      "kind": "exposes"
+    },
+    {
+      "from": "adapter.github",
+      "to": "capability.issues",
+      "kind": "adapts"
+    },
+    {
+      "from": "adapter.cloud",
+      "to": "capability.issues",
+      "kind": "adapts"
+    },
+    {
+      "from": "authority.native-issues",
+      "to": "capability.issues",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "nodes_declared": 10,
+    "edges_declared": 11,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "This reference is representative and does not enumerate every Loaf or infrastructure route.",
+    "The Cargo workspace currently declares no members; optional future Rust/WASM boundaries are not modeled as active capabilities.",
+    "Hosted/local deployment behavior and third-party destinations are not executed by this snapshot."
+  ]
+}

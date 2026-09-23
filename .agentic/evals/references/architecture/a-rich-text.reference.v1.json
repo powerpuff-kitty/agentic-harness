@@ -1,0 +1,67 @@
+{
+  "format_version": 1,
+  "kind": "architecture-reference-snapshot",
+  "id": "reference.a-rich-text.2026-09-23",
+  "source": {
+    "repository": "powerpuff-kitty/a-rich-text",
+    "revision": "9b787fc896914e151f117ace2419de1f783119f1",
+    "branch": "main",
+    "visibility": "public"
+  },
+  "reviewed_at": "2026-09-23",
+  "graph_path": ".agentic/evals/references/architecture/a-rich-text.graph.v1.json",
+  "evidence": [
+    {
+      "path": "docs/architecture.md",
+      "git_blob_sha": "41bbdbd0eb29b70915525e7daa89cc77b4e2e6c2",
+      "role": "architecture-truth"
+    },
+    {
+      "path": "package.json",
+      "git_blob_sha": "13b8c07cafdbc8c0a4ec6dde9b1bb62fc69c716b",
+      "role": "workspace-manifest"
+    },
+    {
+      "path": "quality/dependency-policy.json",
+      "git_blob_sha": "c680a05c2d785f9eb080e16836b43cb12edeecf2",
+      "role": "dependency-policy"
+    }
+  ],
+  "task_routes": [
+    {
+      "path": "packages/core/src/document.ts",
+      "expected_capability_ids": [
+        "capability.document"
+      ]
+    },
+    {
+      "path": "packages/engine/src/editor.ts",
+      "expected_capability_ids": [
+        "capability.engine"
+      ]
+    },
+    {
+      "path": "packages/dom/src/selection.ts",
+      "expected_capability_ids": [
+        "capability.engine"
+      ]
+    },
+    {
+      "path": "packages/web-component/src/a-rich-text.ts",
+      "expected_capability_ids": [
+        "capability.engine"
+      ]
+    },
+    {
+      "path": "packages/ai-editor/src/index.ts",
+      "expected_capability_ids": [
+        "capability.ai"
+      ]
+    }
+  ],
+  "limitations": [
+    "Snapshot freshness is bound to the recorded commit; later main changes are not implied.",
+    "The representative graph does not enumerate every feature/editor package.",
+    "Dependency-policy execution, browser/device evidence and optional managed services are not verified by this snapshot."
+  ]
+}

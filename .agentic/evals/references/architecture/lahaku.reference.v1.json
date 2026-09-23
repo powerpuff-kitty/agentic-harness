@@ -1,0 +1,57 @@
+{
+  "format_version": 1,
+  "kind": "architecture-reference-snapshot",
+  "id": "reference.lahaku.2026-09-23",
+  "source": {
+    "repository": "powerpuff-kitty/lahaku",
+    "revision": "9c70004394f3420e85dfd959e930666d58873172",
+    "branch": "main",
+    "visibility": "public"
+  },
+  "reviewed_at": "2026-09-23",
+  "graph_path": ".agentic/evals/references/architecture/lahaku.graph.v1.json",
+  "evidence": [
+    {
+      "path": ".agentic/ARCHITECTURE.md",
+      "git_blob_sha": "165e98cd86195d469bf4ead3673670fa45cc8263",
+      "role": "architecture-truth"
+    },
+    {
+      "path": "package.json",
+      "git_blob_sha": "a6bb21f0b3dbde873913842881d8b71298b43e27",
+      "role": "workspace-manifest"
+    }
+  ],
+  "task_routes": [
+    {
+      "path": "packages/api/property-core/src/services/property.ts",
+      "expected_capability_ids": [
+        "capability.property-core"
+      ]
+    },
+    {
+      "path": "packages/front/sales/src/pages/ListingPage.vue",
+      "expected_capability_ids": [
+        "capability.property-core"
+      ]
+    },
+    {
+      "path": "packages/api/auth-api/src/index.ts",
+      "expected_capability_ids": [
+        "capability.auth-access"
+      ]
+    },
+    {
+      "path": "packages/api/gateway/src/index.ts",
+      "expected_capability_ids": [
+        "capability.auth-access",
+        "capability.property-core"
+      ]
+    }
+  ],
+  "limitations": [
+    "Snapshot freshness is bound to the recorded commit; later main changes are not implied.",
+    "Only public architecture/package evidence was reviewed and copied as metadata, not file contents.",
+    "This reference does not prove source imports, runtime deployment, or architecture-guardrail execution."
+  ]
+}

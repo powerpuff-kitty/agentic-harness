@@ -1,0 +1,63 @@
+{
+  "format_version": 1,
+  "kind": "architecture-reference-snapshot",
+  "id": "reference.loaftrail.2026-09-23",
+  "source": {
+    "repository": "powerpuff-kitty/loaftrail",
+    "revision": "b15cb37ff654a2fdd1705419b59d03e803c16d95",
+    "branch": "main",
+    "visibility": "public"
+  },
+  "reviewed_at": "2026-09-23",
+  "graph_path": ".agentic/evals/references/architecture/loaftrail.graph.v1.json",
+  "evidence": [
+    {
+      "path": ".agentic/ARCHITECTURE.md",
+      "git_blob_sha": "619b4c132ecb70e9781c2cbf107c44ee7b6d592e",
+      "role": "architecture-truth"
+    },
+    {
+      "path": "package.json",
+      "git_blob_sha": "a081f6b79a3709dc2dd8b769286840125f9bffa8",
+      "role": "workspace-manifest"
+    }
+  ],
+  "task_routes": [
+    {
+      "path": "packages/core/src/protocol.ts",
+      "expected_capability_ids": [
+        "capability.protocol"
+      ]
+    },
+    {
+      "path": "packages/issues/src/service.ts",
+      "expected_capability_ids": [
+        "capability.issues"
+      ]
+    },
+    {
+      "path": "packages/github/src/destination.ts",
+      "expected_capability_ids": [
+        "capability.issues"
+      ]
+    },
+    {
+      "path": "packages/browser/src/capture.ts",
+      "expected_capability_ids": [
+        "capability.browser"
+      ]
+    },
+    {
+      "path": "apps/dashboard/server/server.mjs",
+      "expected_capability_ids": [
+        "capability.feedback",
+        "capability.issues"
+      ]
+    }
+  ],
+  "limitations": [
+    "Snapshot freshness is bound to the recorded commit; later main changes are not implied.",
+    "Cargo currently has no workspace members, so future Rust/WASM implementation is not modeled as current.",
+    "This reference does not execute hosted/local deployment or downstream destination behavior."
+  ]
+}

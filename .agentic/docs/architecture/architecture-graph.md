@@ -102,6 +102,25 @@ The analyzer renders stable Mermaid from declared node IDs/names/kinds and typed
 
 Machine-readable outputs use `catalog/schema/architecture-derivatives.v1.schema.json` and `catalog/schema/architecture-drift.v1.schema.json`.
 
+## Revision-bound real-project references
+
+The reference set under `.agentic/evals/references/architecture/` validates the graph vocabulary against real public project structures without making those downstream repositories canonical Harness content.
+
+Each `architecture-reference.v1` manifest binds:
+
+- the public `owner/repository`;
+- an exact 40-character Git commit revision;
+- exact reviewed evidence paths and Git blob SHAs;
+- a local representative Architecture Graph fixture;
+- representative task-path routing expectations;
+- review date and explicit limitations.
+
+The initial set uses Lahaku as the primary capability-first marketplace reference, Loaftrail as a protocol-centered app/package/adapters reference, and A Rich Text as a browser-first package/library reference.
+
+These snapshots are **historical review evidence**. A later branch/revision does not silently update them. The local validator can prove manifest/graph/task-route coherence without network access, but it cannot authenticate that GitHub still serves the recorded blobs, establish source-import conformance, or claim deployed/runtime behavior.
+
+Reference graphs are representative rather than exhaustive. They preserve each project's own package shape and architecture language while mapping only enough roles to exercise the shared canonical semantics.
+
 ## Runtime boundary
 
 This repository owns the canonical schema and semantic meaning. Deterministic repository inspection, generated dependency checks and drift analysis belong in `agentic-harness-cli`. Reusable agent procedures belong in `agentic-harness-agents`.

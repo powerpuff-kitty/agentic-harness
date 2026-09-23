@@ -1,0 +1,143 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "powerpuff-kitty/lahaku",
+    "description": "Revision-bound representative architecture reference for powerpuff-kitty/lahaku."
+  },
+  "graph_state": "observed",
+  "nodes": [
+    {
+      "id": "capability.property-core",
+      "kind": "capability",
+      "name": "Property Core",
+      "lifecycle": "current",
+      "path": "packages/api/property-core",
+      "description": "Representative canonical property identity/domain authority.",
+      "metadata": {
+        "capability_key": "property-core"
+      }
+    },
+    {
+      "id": "capability.auth-access",
+      "kind": "capability",
+      "name": "Authentication and access",
+      "lifecycle": "current",
+      "path": "packages/api/auth-api",
+      "description": "Representative central authentication/access capability.",
+      "metadata": {
+        "capability_key": "auth-access"
+      }
+    },
+    {
+      "id": "contract.property",
+      "kind": "contract",
+      "name": "Property shared contract",
+      "lifecycle": "current",
+      "path": "packages/shared/core",
+      "description": "Representative shared domain contract boundary; not an exhaustive shared-core inventory."
+    },
+    {
+      "id": "app.gateway",
+      "kind": "app",
+      "name": "API gateway",
+      "lifecycle": "current",
+      "path": "packages/api/gateway",
+      "description": "Primary API composition surface."
+    },
+    {
+      "id": "surface.sales",
+      "kind": "surface",
+      "name": "Sales frontend",
+      "lifecycle": "current",
+      "path": "packages/front/sales",
+      "description": "Public sales/listing surface."
+    },
+    {
+      "id": "surface.rentals",
+      "kind": "surface",
+      "name": "Rentals frontend",
+      "lifecycle": "current",
+      "path": "packages/front/rentals",
+      "description": "Public rental/listing surface."
+    },
+    {
+      "id": "surface.customer",
+      "kind": "surface",
+      "name": "Customer frontend",
+      "lifecycle": "current",
+      "path": "packages/front/customer",
+      "description": "Customer/account surface."
+    },
+    {
+      "id": "adapter.property-client",
+      "kind": "adapter",
+      "name": "Property Core client",
+      "lifecycle": "current",
+      "path": "packages/api/property-core-client",
+      "description": "Client adapter into Property Core."
+    },
+    {
+      "id": "authority.postgres",
+      "kind": "authority",
+      "name": "PostgreSQL transactional authority",
+      "lifecycle": "current",
+      "path": null,
+      "description": "Architecture documentation names PostgreSQL as the main transactional system of record."
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.property-core",
+      "to": "contract.property",
+      "kind": "owns"
+    },
+    {
+      "from": "app.gateway",
+      "to": "capability.property-core",
+      "kind": "composes"
+    },
+    {
+      "from": "app.gateway",
+      "to": "capability.auth-access",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.property-core",
+      "to": "surface.sales",
+      "kind": "exposes"
+    },
+    {
+      "from": "capability.property-core",
+      "to": "surface.rentals",
+      "kind": "exposes"
+    },
+    {
+      "from": "capability.auth-access",
+      "to": "surface.customer",
+      "kind": "exposes"
+    },
+    {
+      "from": "adapter.property-client",
+      "to": "contract.property",
+      "kind": "implements"
+    },
+    {
+      "from": "authority.postgres",
+      "to": "capability.property-core",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "nodes_declared": 9,
+    "edges_declared": 8,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "This reference models representative boundaries only; Lahaku has additional front/back/API/worker/shared packages.",
+    "Package path existence was reviewed at the pinned revision, but this fixture does not execute Lahaku architecture guardrails.",
+    "Runtime/deployed Cloudflare/PostgreSQL/D1/KV/R2/Meilisearch behavior is not verified by this snapshot."
+  ]
+}

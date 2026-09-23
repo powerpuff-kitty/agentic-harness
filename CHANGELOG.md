@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added revision-bound real-project Architecture Graph references for Lahaku, Loaftrail and A Rich Text, with exact public Git revisions/evidence blob identities, representative graphs, route expectations, freshness limits and offline coherence validation.
+
 - Added Architecture Derivatives v1 and Architecture Drift v1 for graph-only guardrail plans, explicit unresolved paths, descriptive surface inventory, stable Mermaid diagrams, and deterministic observed/target graph differences without claiming source enforcement.
 
 - Added graph-only Architecture Analysis v1 with language-neutral task-to-capability routing, explicit ambiguity/unresolved coverage, review-required duplicate-capability candidates, stable Markdown summaries, and TypeScript/Rust/mixed-language conformance fixtures.
