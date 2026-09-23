@@ -89,6 +89,20 @@ The compatibility `work-action.v1` schema remains unchanged. New producers that 
 
 Authentication metadata records only the mode and credential source/subject reference; there is no raw credential field. The fixture at `fixtures/agent-connections.v2.json` covers local, hosted and BYO-API modes. Validation checks capability dependencies and uses WorkAction v2 permissions to derive eligibility deterministically. Connection readiness and tool readiness are observations, not proof that an external provider will remain available.
 
+## Reference coding-agent run
+
+The canonical reference scenario is the `wu:replay-demo` fixture set. It demonstrates one coherent coding-agent run rather than unrelated examples:
+
+- a failed parent Task and preserved first Attempt;
+- append-only replanning to a nested corrective retry Task;
+- explicit failing and passing test Evidence;
+- a produced patch Artifact with Run/Task/Attempt lineage;
+- deterministic replay to the final WorkUnit projection;
+- a WorkEvaluation on the same WorkUnit/Run, with security left explicitly `not_checked`;
+- the same WorkUnit/Run/Task/Attempt/Event identities mapped through the optional OpenTelemetry conformance fixture.
+
+The validator cross-checks the nesting, plan history, test evidence, patch producer lineage and Evaluation evidence references. No private chain-of-thought is part of the scenario.
+
 ## OpenTelemetry conformance
 
 `otel-export.v1` is an optional observability projection. WorkUnit, Run, Task, Attempt and WorkAction identities remain canonical Agent Work records; dropped, sampled, unavailable or malformed telemetry cannot complete, fail, approve or otherwise mutate them.
