@@ -1,0 +1,23 @@
+{
+  "format_version": 1,
+  "kind": "agent-work-otel-export",
+  "work_unit_id": "wu:replay-demo",
+  "status": "not_collected",
+  "semantic_conventions": {
+    "otel_semconv_version": "1.44.0",
+    "gen_ai_status": "development",
+    "custom_namespace": "agent.work"
+  },
+  "content_policy": {
+    "mode": "metadata_only",
+    "omitted_classes": [
+      "model_input",
+      "model_output",
+      "tool_payload",
+      "user_content",
+      "secret"
+    ],
+    "redaction_refs": []
+  },
+  "spans": []
+}

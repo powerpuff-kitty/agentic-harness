@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -32,6 +33,7 @@ SCHEMAS = {
     "work-reflection": WORK / "reflection.v1.schema.json",
     "reflection-policy": WORK / "reflection-policy.v1.schema.json",
     "reflection-trigger-decision": WORK / "reflection-trigger-decision.v1.schema.json",
+    "otel-export": WORK / "otel-export.v1.schema.json",
 }
 
 errors: list[str] = []
@@ -1485,6 +1487,40 @@ if isinstance(failed_reflection, dict) and isinstance(reflection_events, list):
         fail("reflection-correction-events: missing corrective attempt completion")
     if not any(event.get("type") == "test.passed" for event in reflection_events if isinstance(event, dict)):
         fail("reflection-correction-events: successful correction requires verification evidence")
+
+
+otel_validator = WORK / "conformance" / "validate_otel_export.py"
+otel_common = [
+    "--canonical-work-unit",
+    str(FIXTURES / "replay-expected-work-unit.v1.json"),
+    "--canonical-events",
+    str(FIXTURES / "replay-events.v1.json"),
+    "--canonical-redactions",
+    str(FIXTURES / "redactions.v1.json"),
+]
+for fixture_name, self_test in (
+    ("otel-export-collected.v1.json", True),
+    ("otel-export-not-collected.v1.json", False),
+):
+    command = [
+        sys.executable,
+        str(otel_validator),
+        str(FIXTURES / fixture_name),
+        *otel_common,
+    ]
+    if self_test:
+        command.append("--self-test")
+    result = subprocess.run(
+        command,
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        diagnostic = (result.stderr or result.stdout).strip()
+        fail(f"{fixture_name}: OpenTelemetry conformance failed: {diagnostic}")
+
 
 if errors:
     print("Agent Work Protocol validation failed:", file=sys.stderr)
