@@ -105,6 +105,12 @@ def validate_event_list(value, label: str) -> None:
 
 work_unit = load(FIXTURES / "replanned-work-unit.v1.json")
 work_unit_v2 = load(FIXTURES / "work-unit-v2.v2.json")
+coding_example_work_unit = load(FIXTURES / "coding-agent-example-work-unit.v2.json")
+coding_example_events = load(FIXTURES / "coding-agent-example-events.v1.json")
+coding_example_evidence = load(FIXTURES / "coding-agent-example-evidence.v1.json")
+coding_example_artifacts = load(FIXTURES / "coding-agent-example-artifacts.v1.json")
+coding_example_metrics = load(FIXTURES / "coding-agent-example-metrics.v1.json")
+coding_example_evaluations = load(FIXTURES / "coding-agent-example-evaluations.v2.json")
 work_progress = load(FIXTURES / "work-progress.v1.json")
 lifecycle = load(WORK / "lifecycle.v1.json")
 lifecycle_work_units = load(FIXTURES / "lifecycle-work-units.v1.json")
@@ -531,6 +537,241 @@ if isinstance(work_progress, dict):
     progress_validator = validators.get("work-progress")
     if progress_validator is not None and progress_validator.is_valid(percentage):
         fail("work-progress mutation: invented percentage was accepted")
+
+
+def _contains_private_reasoning_key(value) -> bool:
+    forbidden = {"chain_of_thought", "private_reasoning", "reasoning_trace", "scratchpad"}
+    if isinstance(value, dict):
+        return any(
+            str(key).lower() in forbidden or _contains_private_reasoning_key(item)
+            for key, item in value.items()
+        )
+    if isinstance(value, list):
+        return any(_contains_private_reasoning_key(item) for item in value)
+    return False
+
+
+def integrated_coding_example_errors(
+    work_unit,
+    events,
+    evidence_records,
+    artifact_records,
+    metric_records,
+    evaluation_records,
+) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(work_unit, dict):
+        return ["work unit fixture must be an object"]
+    if not all(isinstance(value, list) for value in (
+        events, evidence_records, artifact_records, metric_records, evaluation_records
+    )):
+        return ["events/evidence/artifacts/metrics/evaluations must be arrays"]
+
+    work_unit_id = work_unit.get("id")
+    runs = [run for run in work_unit.get("runs", []) if isinstance(run, dict)]
+    if len(runs) != 1:
+        problems.append("example must contain exactly one implementation Run")
+        return problems
+    run = runs[0]
+    run_id = run.get("id")
+
+    tasks = {
+        task.get("id"): task
+        for task in run.get("tasks", [])
+        if isinstance(task, dict) and isinstance(task.get("id"), str)
+    }
+    nested = [task for task in tasks.values() if task.get("parent_id") is not None]
+    if not nested:
+        problems.append("example must contain at least one nested Task")
+    for task in nested:
+        parent = task.get("parent_id")
+        if parent not in tasks:
+            problems.append(f"nested task {task.get('id')} references unknown parent {parent}")
+
+    revisions = [item for item in run.get("plan_revisions", []) if isinstance(item, dict)]
+    if len(revisions) < 2:
+        problems.append("example must contain a replan with at least two plan revisions")
+    elif revisions[0].get("task_ids") == revisions[-1].get("task_ids"):
+        problems.append("example replan must change the active task set")
+
+    if work_unit.get("state") != "completed" or run.get("state") != "completed":
+        problems.append("example must finish with completed WorkUnit and Run")
+    result = run.get("result", {})
+    if not isinstance(result, dict) or not result.get("revision"):
+        problems.append("completed example Run must retain a result revision")
+
+    event_types = [
+        event.get("type")
+        for event in events
+        if isinstance(event, dict)
+    ]
+    for required_type in ("plan.created", "plan.revised", "test.started", "test.passed", "artifact.created", "evaluation.completed"):
+        if required_type not in event_types:
+            problems.append(f"example is missing required event type {required_type}")
+
+    evidence_by_id = {
+        item.get("id"): item
+        for item in evidence_records
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    artifacts_by_id = {
+        item.get("id"): item
+        for item in artifact_records
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    metrics_by_id = {
+        item.get("id"): item
+        for item in metric_records
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    evaluations_by_id = {
+        item.get("id"): item
+        for item in evaluation_records
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+
+    passed_events = [
+        event for event in events
+        if isinstance(event, dict) and event.get("type") == "test.passed"
+    ]
+    for event in passed_events:
+        refs = event.get("evidence_refs", [])
+        verified_test_evidence = [
+            evidence_by_id.get(ref)
+            for ref in refs
+            if ref in evidence_by_id
+        ]
+        if not any(
+            isinstance(item, dict)
+            and item.get("status") == "verified"
+            and isinstance(item.get("source"), dict)
+            and item["source"].get("kind") == "test"
+            for item in verified_test_evidence
+        ):
+            problems.append("test.passed must reference verified test evidence")
+
+    for artifact_id, artifact in artifacts_by_id.items():
+        if artifact.get("work_unit_id") != work_unit_id:
+            problems.append(f"artifact {artifact_id} belongs to another WorkUnit")
+        produced_by = artifact.get("produced_by", {})
+        if isinstance(produced_by, dict):
+            if produced_by.get("run_id") != run_id:
+                problems.append(f"artifact {artifact_id} has wrong producing Run")
+            task_id = produced_by.get("task_id")
+            attempt_id = produced_by.get("attempt_id")
+            if task_id not in tasks:
+                problems.append(f"artifact {artifact_id} references unknown producing Task")
+            attempt_ids = {
+                attempt.get("id")
+                for attempt in run.get("attempts", [])
+                if isinstance(attempt, dict)
+            }
+            if attempt_id is not None and attempt_id not in attempt_ids:
+                problems.append(f"artifact {artifact_id} references unknown producing Attempt")
+
+    task_artifact_refs = {
+        ref
+        for task in tasks.values()
+        for ref in task.get("artifact_refs", [])
+    }
+    if not set(artifacts_by_id).issubset(task_artifact_refs):
+        problems.append("produced artifact is not retained on a Task")
+
+    for metric_id, metric in metrics_by_id.items():
+        evaluation_id = metric.get("evaluation_id")
+        if evaluation_id not in evaluations_by_id:
+            problems.append(f"metric {metric_id} references unknown Evaluation")
+        for evidence_ref in metric.get("evidence_refs", []):
+            if evidence_ref not in evidence_by_id:
+                problems.append(f"metric {metric_id} references unknown evidence {evidence_ref}")
+
+    for evaluation_id, evaluation_record in evaluations_by_id.items():
+        if evaluation_record.get("work_unit_id") != work_unit_id or evaluation_record.get("run_id") != run_id:
+            problems.append(f"evaluation {evaluation_id} targets the wrong WorkUnit/Run")
+        implementer = evaluation_record.get("implementer", {})
+        if not isinstance(implementer, dict) or implementer.get("run_id") != run_id:
+            problems.append(f"evaluation {evaluation_id} implementer identity does not match Run")
+        for metric_ref in evaluation_record.get("metric_refs", []):
+            if metric_ref not in metrics_by_id:
+                problems.append(f"evaluation {evaluation_id} references unknown metric {metric_ref}")
+
+    if _contains_private_reasoning_key({
+        "work_unit": work_unit,
+        "events": events,
+        "evidence": evidence_records,
+        "artifacts": artifact_records,
+        "metrics": metric_records,
+        "evaluations": evaluation_records,
+    }):
+        problems.append("example contains a private-reasoning field")
+
+    return problems
+
+
+if isinstance(coding_example_work_unit, dict):
+    validate("work-unit-v2", coding_example_work_unit, "coding-agent-example-work-unit")
+    for problem in work_unit_v2_errors(coding_example_work_unit):
+        fail(f"coding-agent-example:{problem}")
+
+if isinstance(coding_example_events, list):
+    validate_event_list(coding_example_events, "coding-agent-example-events")
+if isinstance(coding_example_evidence, list):
+    for index, item in enumerate(coding_example_evidence):
+        validate("work-evidence", item, f"coding-agent-example-evidence[{index}]")
+if isinstance(coding_example_artifacts, list):
+    for index, item in enumerate(coding_example_artifacts):
+        validate("work-artifact", item, f"coding-agent-example-artifacts[{index}]")
+if isinstance(coding_example_metrics, list):
+    for index, item in enumerate(coding_example_metrics):
+        validate("work-metric", item, f"coding-agent-example-metrics[{index}]")
+if isinstance(coding_example_evaluations, list):
+    for index, item in enumerate(coding_example_evaluations):
+        validate("work-evaluation-v2", item, f"coding-agent-example-evaluations[{index}]")
+
+for problem in integrated_coding_example_errors(
+    coding_example_work_unit,
+    coding_example_events,
+    coding_example_evidence,
+    coding_example_artifacts,
+    coding_example_metrics,
+    coding_example_evaluations,
+):
+    fail(f"coding-agent-example:{problem}")
+
+if isinstance(coding_example_events, list):
+    missing_test_evidence = copy.deepcopy(coding_example_events)
+    for event in missing_test_evidence:
+        if isinstance(event, dict) and event.get("type") == "test.passed":
+            event["evidence_refs"] = []
+    if not any(
+        "test.passed must reference verified test evidence" in item
+        for item in integrated_coding_example_errors(
+            coding_example_work_unit,
+            missing_test_evidence,
+            coding_example_evidence,
+            coding_example_artifacts,
+            coding_example_metrics,
+            coding_example_evaluations,
+        )
+    ):
+        fail("coding-agent-example mutation: test pass without evidence was not rejected")
+
+if isinstance(coding_example_evaluations, list):
+    broken_evaluation = copy.deepcopy(coding_example_evaluations)
+    if broken_evaluation:
+        broken_evaluation[0]["metric_refs"] = ["metric:missing"]
+    if not any(
+        "references unknown metric" in item
+        for item in integrated_coding_example_errors(
+            coding_example_work_unit,
+            coding_example_events,
+            coding_example_evidence,
+            coding_example_artifacts,
+            coding_example_metrics,
+            broken_evaluation,
+        )
+    ):
+        fail("coding-agent-example mutation: dangling evaluation metric was not rejected")
 
 
 if isinstance(evaluation, dict):
