@@ -14,7 +14,8 @@ It models execution as structured work rather than a chat transcript. Consumers 
 - evaluation.v1.schema.json — evidence-backed metrics, confidence signals and findings.
 - work-action.v1.schema.json — compatibility contract for execute/audit/reflect/fix/validate/reassess/custom actions and permissions.
 - work-action.v2.schema.json — preferred action contract with explicit approval state, parent/root lineage and result references for chained controls.
-- agent-connection.v1.schema.json — executable provider/model/auth/environment capabilities.
+- agent-connection.v1.schema.json — compatibility contract for basic executable provider/model/auth/environment capabilities.
+- agent-connection.v2.schema.json — preferred connection contract with explicit capability states, tool inventory, repository access, usage/rate-limit observations, session continuation and readiness evidence.
 - reflection.v1.schema.json — bounded post-attempt reflection with evidence, uncertainty, corrections and lineage.
 - reflection-policy.v1.schema.json — deterministic/provider-neutral policy for deciding when reflection is worth invoking.
 - reflection-trigger-decision.v1.schema.json — replayable result of applying a reflection policy to a trigger.
@@ -48,6 +49,12 @@ WorkEvent remains append-only. Optional `projection_delta` records deterministic
 `work-action.v2` keeps preset controls and free-form custom instructions on one primitive while making follow-up execution reconstructable. Each action records an explicit approval state, a parent/root lineage pair, and result references to produced runs, evaluations, artifacts or findings. Root actions use null parent/root references; descendants bind to the original root. Completed actions require at least one result reference. Read-only review intents cannot request write, commit or pull-request permissions.
 
 The compatibility `work-action.v1` schema remains unchanged. New producers that need audit → remediate → reassess history should emit v2. The chained fixture at `fixtures/action-lineage.v2.json` demonstrates that flow; deterministic validation rejects self-parenting, incorrect roots, write escalation on read-only reviews and completed actions with no result.
+
+## Agent connection capability matrix
+
+`agent-connection.v2` represents executable connections across local runners, vendor-hosted agents, Loaftrail/cloud runners, BYO API providers and custom environments without treating a model name as sufficient. Capability entries are explicit `supported`, `requires_approval`, `unsupported` or `unknown` states. Connected tools, repository-access scope, observed usage/rate limits, continuation support and readiness are separate evidence surfaces.
+
+Authentication metadata records only the mode and credential source/subject reference; there is no raw credential field. The fixture at `fixtures/agent-connections.v2.json` covers local, hosted and BYO-API modes. Validation checks capability dependencies and uses WorkAction v2 permissions to derive eligibility deterministically. Connection readiness and tool readiness are observations, not proof that an external provider will remain available.
 
 ## Reflection lifecycle
 

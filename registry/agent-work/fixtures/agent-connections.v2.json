@@ -1,0 +1,186 @@
+[
+  {
+    "format_version": 2,
+    "kind": "agent-connection",
+    "id": "agent:reviewer",
+    "provider": "local",
+    "agent": "coding-reviewer",
+    "model": null,
+    "auth": {
+      "mode": "local_provider",
+      "credential_source": "host_managed",
+      "subject_ref": null
+    },
+    "environment": {
+      "type": "local_runner",
+      "runtime": "host coding-agent runtime",
+      "region": null
+    },
+    "capabilities": {
+      "read_repo": "supported",
+      "write_repo": "unsupported",
+      "execute": "supported",
+      "commit": "unsupported",
+      "create_pr": "unsupported",
+      "stream_events": "supported",
+      "continue_session": "supported",
+      "approvals": "supported"
+    },
+    "connected_tools": [
+      {
+        "id": "tool:git",
+        "kind": "cli",
+        "readiness": "ready",
+        "capabilities": ["read-history", "diff"]
+      },
+      {
+        "id": "tool:test-runner",
+        "kind": "native",
+        "readiness": "ready",
+        "capabilities": ["execute-approved-checks"]
+      }
+    ],
+    "repository_access": {
+      "scope": "selected",
+      "repositories": [
+        { "repository": "example/project", "access": "read" }
+      ]
+    },
+    "usage": {
+      "status": "unknown",
+      "observed_at": null,
+      "limits": []
+    },
+    "session": {
+      "continuation": "supported",
+      "session_ref": "session:reviewer-demo",
+      "resumable_until": null
+    },
+    "readiness": {
+      "state": "ready",
+      "observed_at": "2026-09-23T05:00:00Z",
+      "reason": null
+    }
+  },
+  {
+    "format_version": 2,
+    "kind": "agent-connection",
+    "id": "agent:implementer",
+    "provider": "example-vendor",
+    "agent": "hosted-coding-agent",
+    "model": null,
+    "auth": {
+      "mode": "managed_oauth",
+      "credential_source": "cloud_managed",
+      "subject_ref": "account:example"
+    },
+    "environment": {
+      "type": "vendor_hosted",
+      "runtime": "managed coding environment",
+      "region": "provider-managed"
+    },
+    "capabilities": {
+      "read_repo": "supported",
+      "write_repo": "supported",
+      "execute": "supported",
+      "commit": "requires_approval",
+      "create_pr": "requires_approval",
+      "stream_events": "supported",
+      "continue_session": "supported",
+      "approvals": "supported"
+    },
+    "connected_tools": [
+      {
+        "id": "tool:repository",
+        "kind": "connector",
+        "readiness": "ready",
+        "capabilities": ["read", "write"]
+      }
+    ],
+    "repository_access": {
+      "scope": "selected",
+      "repositories": [
+        { "repository": "example/project", "access": "write" }
+      ]
+    },
+    "usage": {
+      "status": "available",
+      "observed_at": "2026-09-23T05:00:00Z",
+      "limits": [
+        {
+          "kind": "requests",
+          "limit": 1000,
+          "remaining": 800,
+          "unit": "requests",
+          "resets_at": "2026-09-24T00:00:00Z"
+        }
+      ]
+    },
+    "session": {
+      "continuation": "supported",
+      "session_ref": "session:implementer-demo",
+      "resumable_until": "2026-09-24T05:00:00Z"
+    },
+    "readiness": {
+      "state": "ready",
+      "observed_at": "2026-09-23T05:00:00Z",
+      "reason": null
+    }
+  },
+  {
+    "format_version": 2,
+    "kind": "agent-connection",
+    "id": "agent:api-advisor",
+    "provider": "custom-provider",
+    "agent": "semantic-advisor",
+    "model": "custom-model",
+    "auth": {
+      "mode": "api_key",
+      "credential_source": "environment",
+      "subject_ref": null
+    },
+    "environment": {
+      "type": "byo_api",
+      "runtime": "external API",
+      "region": null
+    },
+    "capabilities": {
+      "read_repo": "unsupported",
+      "write_repo": "unsupported",
+      "execute": "unsupported",
+      "commit": "unsupported",
+      "create_pr": "unsupported",
+      "stream_events": "unknown",
+      "continue_session": "unsupported",
+      "approvals": "unsupported"
+    },
+    "connected_tools": [],
+    "repository_access": {
+      "scope": "none",
+      "repositories": []
+    },
+    "usage": {
+      "status": "rate_limited",
+      "observed_at": "2026-09-23T05:00:00Z",
+      "limits": [
+        {
+          "kind": "requests",
+          "limit": 100,
+          "remaining": 0,
+          "unit": "requests",
+          "resets_at": "2026-09-23T06:00:00Z"
+        }
+      ]
+    },
+    "session": {
+      "continuation": "unsupported",
+      "session_ref": null,
+      "resumable_until": null
+    },
+    "readiness": {
+      "state": "rate_limited",
+      "observed_at": "2026-09-23T05:00:00Z",
+      "reason": "Provider reports no request capacity in the observed window."
+    }
+  }
+]
