@@ -1,0 +1,73 @@
+{
+  "format_version": 1,
+  "kind": "work-evaluation",
+  "id": "evaluation:replay-demo",
+  "work_unit_id": "wu:replay-demo",
+  "run_id": "run:replay",
+  "evaluator": {
+    "kind": "composite",
+    "connection_id": null,
+    "name": "agentic-harness/reference-run-evaluator",
+    "version": "1"
+  },
+  "status": "completed",
+  "created_at": "2026-09-21T20:42:44Z",
+  "dimensions": [
+    {
+      "id": "requirements",
+      "label": "Requirement coverage",
+      "status": "measured",
+      "score": 1,
+      "method": "Replay completed with exact projection match and passing retry verification evidence.",
+      "evidence_refs": [
+        "evidence:test-pass",
+        "evidence:failure-summary"
+      ],
+      "confidence": 1
+    },
+    {
+      "id": "validation",
+      "label": "Validation/test coverage",
+      "status": "measured",
+      "score": 1,
+      "method": "Failed and passing test evidence are both retained across the corrective retry.",
+      "evidence_refs": [
+        "evidence:test-failure",
+        "evidence:test-pass"
+      ],
+      "confidence": 1
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "status": "not_checked",
+      "score": null,
+      "method": null,
+      "evidence_refs": [],
+      "confidence": null
+    }
+  ],
+  "confidence": [
+    {
+      "kind": "completion",
+      "status": "measured",
+      "value": 1,
+      "method": "Canonical replay reached completed state and the retry test passed.",
+      "evidence_refs": [
+        "evidence:test-pass"
+      ]
+    },
+    {
+      "kind": "evidence_completeness",
+      "status": "judged",
+      "value": 0.8,
+      "method": "Implementation/retry/test/provenance evidence is present; security remains explicitly not checked.",
+      "evidence_refs": [
+        "evidence:test-failure",
+        "evidence:test-pass",
+        "evidence:failure-summary"
+      ]
+    }
+  ],
+  "findings": []
+}
