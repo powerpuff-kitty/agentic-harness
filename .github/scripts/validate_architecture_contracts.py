@@ -16,15 +16,23 @@ SCHEMA = json.loads((ROOT / "catalog/schema/architecture-graph.v1.schema.json").
 FIXTURE = json.loads((ROOT / ".agentic/evals/fixtures/architecture-graph.v1.json").read_text())
 FIXTURE_DIR = ROOT / ".agentic/evals/fixtures/architecture"
 ANALYSIS_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-analysis.v1.schema.json").read_text())
+DERIVATIVES_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-derivatives.v1.schema.json").read_text())
+DRIFT_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-drift.v1.schema.json").read_text())
 WEB_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.web-ts.v1.json").read_text())
 RUST_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.rust-workspace.v1.json").read_text())
 MIXED_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.mixed-stack.v1.json").read_text())
 DUPLICATE_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.duplicate-capability.v1.json").read_text())
+WEB_TARGET_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.web-ts-target.v1.json").read_text())
+WEB_MERMAID = (FIXTURE_DIR / "architecture-diagram.web-ts.mmd").read_text()
 WEB_SUMMARY = (FIXTURE_DIR / "architecture-summary.web-ts.md").read_text()
 Draft202012Validator.check_schema(SCHEMA)
 Draft202012Validator.check_schema(ANALYSIS_SCHEMA)
+Draft202012Validator.check_schema(DERIVATIVES_SCHEMA)
+Draft202012Validator.check_schema(DRIFT_SCHEMA)
 VALIDATOR = Draft202012Validator(SCHEMA)
 ANALYSIS_VALIDATOR = Draft202012Validator(ANALYSIS_SCHEMA)
+DERIVATIVES_VALIDATOR = Draft202012Validator(DERIVATIVES_SCHEMA)
+DRIFT_VALIDATOR = Draft202012Validator(DRIFT_SCHEMA)
 
 
 def semantic_errors(document: dict) -> list[str]:
@@ -269,6 +277,143 @@ class ArchitectureGraphContracts(unittest.TestCase):
             with self.subTest(path=path):
                 with self.assertRaises(graph_analysis.ArchitectureAnalysisError):
                     graph_analysis.resolve_task_context(WEB_FIXTURE, [path])
+
+
+    def test_guardrail_plan_derives_ready_path_prefixes_without_enforcement_claim(self):
+        output = graph_analysis.derive_graph_outputs(WEB_FIXTURE)
+        DERIVATIVES_VALIDATOR.validate(output)
+        plan = output["guardrail_plan"]
+        self.assertEqual(plan["ready_count"], 1)
+        self.assertEqual(plan["unresolved_count"], 0)
+        self.assertFalse(plan["enforcement_claim"])
+        entry = plan["entries"][0]
+        self.assertEqual(entry["constraint_id"], "boundary.web-no-catalog-adapter")
+        self.assertEqual(entry["effect"], "forbid")
+        self.assertEqual(entry["subject_path"], "apps/web")
+        self.assertEqual(entry["target_path"], "packages/catalog/src/adapters/api")
+        self.assertEqual(entry["plan_status"], "ready")
+        self.assertFalse(entry["enforcement_claim"])
+
+    def test_guardrail_missing_path_stays_unresolved(self):
+        graph = copy.deepcopy(WEB_FIXTURE)
+        graph["constraints"].append({
+            "id": "boundary.catalog-no-authority-import",
+            "kind": "forbidden-dependency",
+            "subject": "capability.catalog",
+            "target": "authority.catalog-store",
+            "status": "declared",
+            "mechanism": None,
+            "evidence_refs": [],
+            "description": "Synthetic missing-path guardrail case.",
+        })
+        plan = graph_analysis.derive_guardrail_plan(graph)
+        entry = next(
+            item for item in plan["entries"]
+            if item["constraint_id"] == "boundary.catalog-no-authority-import"
+        )
+        self.assertEqual(entry["plan_status"], "unresolved")
+        self.assertEqual(entry["unresolved_reasons"], ["target-path-missing"])
+        self.assertFalse(entry["enforcement_claim"])
+
+    def test_surface_inventory_does_not_treat_internal_capability_as_violation(self):
+        inventory = {
+            item["capability_id"]: item
+            for item in graph_analysis.surface_inventory(RUST_FIXTURE)
+        }
+        self.assertEqual(inventory["capability.orders"]["status"], "exposed")
+        self.assertEqual(
+            inventory["capability.orders"]["surface_ids"],
+            ["surface.orders-http"],
+        )
+        self.assertEqual(
+            inventory["capability.payments"],
+            {
+                "capability_id": "capability.payments",
+                "surface_ids": [],
+                "status": "internal_or_unexposed",
+            },
+        )
+
+    def test_mermaid_output_matches_committed_fixture_exactly(self):
+        generated = graph_analysis.render_mermaid(WEB_FIXTURE)
+        self.assertEqual(generated, WEB_MERMAID)
+        self.assertTrue(graph_analysis.check_mermaid(WEB_FIXTURE, WEB_MERMAID))
+        self.assertFalse(
+            graph_analysis.check_mermaid(
+                WEB_FIXTURE,
+                WEB_MERMAID.replace("Catalog<br/>capability", "Catalogue<br/>capability"),
+            )
+        )
+
+    def test_graph_drift_reports_structural_and_evidence_changes(self):
+        VALIDATOR.validate(WEB_TARGET_FIXTURE)
+        self.assertEqual(semantic_errors(WEB_TARGET_FIXTURE), [])
+        drift = graph_analysis.compare_graphs(WEB_FIXTURE, WEB_TARGET_FIXTURE)
+        DRIFT_VALIDATOR.validate(drift)
+
+        self.assertEqual(
+            drift["node_changes"]["added_ids"],
+            ["capability.recommendations", "surface.recommendations-ui"],
+        )
+        catalog_change = next(
+            item for item in drift["node_changes"]["changed"]
+            if item["id"] == "capability.catalog"
+        )
+        self.assertEqual(
+            catalog_change["fields"],
+            [{
+                "field": "path",
+                "before": "packages/catalog",
+                "after": "packages/catalog-core",
+            }],
+        )
+        self.assertEqual(
+            drift["edge_changes"]["added"],
+            [
+                "app.web|composes|capability.recommendations",
+                "capability.recommendations|depends-on|capability.catalog",
+                "capability.recommendations|exposes|surface.recommendations-ui",
+            ],
+        )
+        constraint_change = drift["constraint_changes"]["changed"][0]
+        self.assertEqual(constraint_change["id"], "boundary.web-no-catalog-adapter")
+        self.assertEqual(
+            [item["field"] for item in constraint_change["fields"]],
+            ["status", "mechanism", "evidence_refs"],
+        )
+        self.assertTrue(drift["coverage_changed"])
+        self.assertTrue(drift["not_checked_added"])
+        self.assertTrue(drift["not_checked_removed"])
+
+    def test_graph_drift_is_stable_under_input_reordering(self):
+        first = graph_analysis.compare_graphs(WEB_FIXTURE, WEB_TARGET_FIXTURE)
+        before = copy.deepcopy(WEB_FIXTURE)
+        after = copy.deepcopy(WEB_TARGET_FIXTURE)
+        before["nodes"].reverse()
+        before["edges"].reverse()
+        before["constraints"].reverse()
+        after["nodes"].reverse()
+        after["edges"].reverse()
+        after["constraints"].reverse()
+        second = graph_analysis.compare_graphs(before, after)
+        self.assertEqual(
+            graph_analysis.stable_json(first),
+            graph_analysis.stable_json(second),
+        )
+
+    def test_reverse_drift_reports_removals(self):
+        reverse = graph_analysis.compare_graphs(WEB_TARGET_FIXTURE, WEB_FIXTURE)
+        self.assertEqual(
+            reverse["node_changes"]["removed_ids"],
+            ["capability.recommendations", "surface.recommendations-ui"],
+        )
+        self.assertEqual(len(reverse["edge_changes"]["removed"]), 3)
+
+    def test_graph_drift_rejects_different_projects(self):
+        other = copy.deepcopy(WEB_TARGET_FIXTURE)
+        other["project"]["id"] = "fixture.other-project"
+        with self.assertRaises(graph_analysis.ArchitectureAnalysisError):
+            graph_analysis.compare_graphs(WEB_FIXTURE, other)
 
 
 
