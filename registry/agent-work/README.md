@@ -22,6 +22,7 @@ It models execution as structured work rather than a chat transcript. Consumers 
 - work-action.v2.schema.json — preferred action contract with explicit approval state, parent/root lineage and result references for chained controls.
 - agent-connection.v1.schema.json — compatibility contract for basic executable provider/model/auth/environment capabilities.
 - agent-connection.v2.schema.json — preferred connection contract with explicit capability states, tool inventory, repository access, usage/rate-limit observations, session continuation and readiness evidence.
+- otel-export.v1.schema.json — optional metadata-only OpenTelemetry projection with exact Agent Work correlation; telemetry never becomes canonical work state.
 - reflection.v1.schema.json — bounded post-attempt reflection with evidence, uncertainty, corrections and lineage.
 - reflection-policy.v1.schema.json — deterministic/provider-neutral policy for deciding when reflection is worth invoking.
 - reflection-trigger-decision.v1.schema.json — replayable result of applying a reflection policy to a trigger.
@@ -88,6 +89,16 @@ The compatibility `work-action.v1` schema remains unchanged. New producers that 
 
 Authentication metadata records only the mode and credential source/subject reference; there is no raw credential field. The fixture at `fixtures/agent-connections.v2.json` covers local, hosted and BYO-API modes. Validation checks capability dependencies and uses WorkAction v2 permissions to derive eligibility deterministically. Connection readiness and tool readiness are observations, not proof that an external provider will remain available.
 
+## OpenTelemetry conformance
+
+`otel-export.v1` is an optional observability projection. WorkUnit, Run, Task, Attempt and WorkAction identities remain canonical Agent Work records; dropped, sampled, unavailable or malformed telemetry cannot complete, fail, approve or otherwise mutate them.
+
+The mapping baseline is OpenTelemetry semantic conventions 1.44.0. GenAI and agent conventions are still Development, so `agent.work.*` correlation attributes remain stable even if `gen_ai.*` evolves. Standard GenAI operation names are used only when they actually match the observed operation; ordinary Agent Work entities are not relabeled as GenAI agent spans merely because an AI agent produced them.
+
+The collected fixture maps every canonical WorkUnit/Run/Task/Attempt and every replay WorkEvent, preserves provider/model/version plus input/output identities, records token/cost observations when supplied, and keeps model/tool content out of the metadata-only export. The `not_collected` fixture demonstrates that missing telemetry is valid and independent from canonical completion.
+
+Run the conformance validator with the canonical fixtures as documented in [otel-mapping.md](otel-mapping.md). CI also executes its adversarial self-tests for duplicate/missing entities, event/state drift, sensitive content, invalid token usage and dangling trace links.
+
 ## Reflection lifecycle
 
     attempt
@@ -120,4 +131,4 @@ Run:
 
     python3 .github/scripts/validate_agent_work_protocol.py
 
-The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including WorkUnit v2 Run identity, Task parent/dependency cycles, deterministic latest-plan progress, lifecycle/retry rules, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
+The validators check the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including WorkUnit v2 Run identity, Task parent/dependency cycles, deterministic latest-plan progress, lifecycle/retry rules, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, OpenTelemetry entity/event correlation, metadata-only telemetry safety, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
