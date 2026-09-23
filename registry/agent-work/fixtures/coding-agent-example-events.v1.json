@@ -1,0 +1,402 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:1",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": null,
+    "sequence": 1,
+    "occurred_at": "2026-09-23T05:40:01Z",
+    "type": "work_unit.started",
+    "subject": {
+      "kind": "work-unit",
+      "id": "wu:example-coding-agent"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "work-unit",
+        "id": "wu:example-coding-agent"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:2",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 2,
+    "occurred_at": "2026-09-23T05:40:02Z",
+    "type": "run.started",
+    "subject": {
+      "kind": "run",
+      "id": "run:example-coding-agent"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "run",
+        "id": "run:example-coding-agent"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:3",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 3,
+    "occurred_at": "2026-09-23T05:40:03Z",
+    "type": "plan.created",
+    "subject": {
+      "kind": "plan",
+      "id": "plan:example:1"
+    },
+    "summary": "Initial plan.",
+    "evidence_refs": [],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:4",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 4,
+    "occurred_at": "2026-09-23T05:40:10Z",
+    "type": "task.started",
+    "subject": {
+      "kind": "task",
+      "id": "task:inspect"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:inspect"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:5",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 5,
+    "occurred_at": "2026-09-23T05:40:30Z",
+    "type": "task.completed",
+    "subject": {
+      "kind": "task",
+      "id": "task:inspect"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:inspect"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:6",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 6,
+    "occurred_at": "2026-09-23T05:40:31Z",
+    "type": "task.started",
+    "subject": {
+      "kind": "task",
+      "id": "task:implement"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:implement"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:7",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 7,
+    "occurred_at": "2026-09-23T05:40:55Z",
+    "type": "artifact.created",
+    "subject": {
+      "kind": "artifact",
+      "id": "artifact:example:patch"
+    },
+    "summary": "Focused patch produced.",
+    "evidence_refs": [],
+    "artifact_refs": [
+      "artifact:example:patch"
+    ]
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:8",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 8,
+    "occurred_at": "2026-09-23T05:41:00Z",
+    "type": "task.completed",
+    "subject": {
+      "kind": "task",
+      "id": "task:implement"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:implement"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:9",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 9,
+    "occurred_at": "2026-09-23T05:41:10Z",
+    "type": "plan.revised",
+    "subject": {
+      "kind": "plan",
+      "id": "plan:example:2"
+    },
+    "summary": "Added explicit verification task.",
+    "evidence_refs": [],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:10",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 10,
+    "occurred_at": "2026-09-23T05:41:20Z",
+    "type": "task.started",
+    "subject": {
+      "kind": "task",
+      "id": "task:test"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:test"
+      },
+      "previous_state": "queued",
+      "next_state": "running",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:11",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 11,
+    "occurred_at": "2026-09-23T05:41:21Z",
+    "type": "test.started",
+    "subject": {
+      "kind": "test",
+      "id": "test:example:focused"
+    },
+    "summary": "Focused test started.",
+    "evidence_refs": [],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:12",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 12,
+    "occurred_at": "2026-09-23T05:41:44Z",
+    "type": "test.passed",
+    "subject": {
+      "kind": "test",
+      "id": "test:example:focused"
+    },
+    "summary": "Focused test passed.",
+    "evidence_refs": [
+      "evidence:example:test-pass"
+    ],
+    "artifact_refs": []
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:13",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 13,
+    "occurred_at": "2026-09-23T05:41:45Z",
+    "type": "task.completed",
+    "subject": {
+      "kind": "task",
+      "id": "task:test"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "task",
+        "id": "task:test"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:14",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 14,
+    "occurred_at": "2026-09-23T05:41:50Z",
+    "type": "evaluation.completed",
+    "subject": {
+      "kind": "evaluation",
+      "id": "evaluation:example"
+    },
+    "summary": "Independent deterministic evaluation completed.",
+    "evidence_refs": [
+      "evidence:example:test-pass"
+    ],
+    "artifact_refs": [
+      "artifact:example:patch"
+    ]
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:15",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": "run:example-coding-agent",
+    "sequence": 15,
+    "occurred_at": "2026-09-23T05:41:55Z",
+    "type": "run.completed",
+    "subject": {
+      "kind": "run",
+      "id": "run:example-coding-agent"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "run",
+        "id": "run:example-coding-agent"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  },
+  {
+    "format_version": 1,
+    "kind": "work-event",
+    "id": "event:example:16",
+    "work_unit_id": "wu:example-coding-agent",
+    "run_id": null,
+    "sequence": 16,
+    "occurred_at": "2026-09-23T05:41:56Z",
+    "type": "work_unit.completed",
+    "subject": {
+      "kind": "work-unit",
+      "id": "wu:example-coding-agent"
+    },
+    "summary": null,
+    "evidence_refs": [],
+    "artifact_refs": [],
+    "projection_delta": {
+      "operation": "state_transition",
+      "entity": {
+        "kind": "work-unit",
+        "id": "wu:example-coding-agent"
+      },
+      "previous_state": "running",
+      "next_state": "completed",
+      "snapshot_ref": null,
+      "value_ref": null,
+      "plan_revision": null
+    }
+  }
+]
