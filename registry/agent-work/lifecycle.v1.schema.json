@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/lifecycle.v1.schema.json",
+  "title": "Agent Work Lifecycle v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "states",
+    "terminal_states",
+    "retry_requires_new_attempt",
+    "entity_transitions"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "agent-work-lifecycle" },
+    "states": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 10,
+      "items": { "$ref": "#/$defs/state" }
+    },
+    "terminal_states": {
+      "type": "array",
+      "uniqueItems": true,
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/state" }
+    },
+    "retry_requires_new_attempt": { "type": "boolean", "const": true },
+    "entity_transitions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work-unit", "run", "task", "attempt"],
+      "properties": {
+        "work-unit": { "$ref": "#/$defs/transition_map" },
+        "run": { "$ref": "#/$defs/transition_map" },
+        "task": { "$ref": "#/$defs/transition_map" },
+        "attempt": { "$ref": "#/$defs/transition_map" }
+      }
+    }
+  },
+  "$defs": {
+    "state": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "queued",
+        "running",
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ]
+    },
+    "state_list": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/state" }
+    },
+    "transition_map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposed",
+        "queued",
+        "running",
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "properties": {
+        "proposed": { "$ref": "#/$defs/state_list" },
+        "queued": { "$ref": "#/$defs/state_list" },
+        "running": { "$ref": "#/$defs/state_list" },
+        "validating": { "$ref": "#/$defs/state_list" },
+        "completed": { "$ref": "#/$defs/state_list" },
+        "blocked": { "$ref": "#/$defs/state_list" },
+        "waiting_for_user": { "$ref": "#/$defs/state_list" },
+        "waiting_for_approval": { "$ref": "#/$defs/state_list" },
+        "failed": { "$ref": "#/$defs/state_list" },
+        "cancelled": { "$ref": "#/$defs/state_list" }
+      }
+    }
+  }
+}
