@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-- Added an optional metadata-only Agent Work OpenTelemetry export contract, canonical-to-OTel mapping, full replay-correlation fixtures, no-telemetry coverage, and a reusable adapter conformance validator with negative mutation tests.
+- Added optional Agent Work OpenTelemetry conformance: metadata-only export schema, canonical WorkUnit/Run/Task/Attempt/event correlation, current Development GenAI operation mapping, sensitive-content boundaries, collected/not-collected fixtures, and deterministic adversarial validation.
+
+- Added compatibility-safe WorkUnit v2 Run input/session identity and deterministic WorkProgress v1 latest-plan Task-state projections, completing the remaining observable-work identity/progress scope without changing WorkUnit v1 or lifecycle v1.
 
 - Added a canonical Agent Work lifecycle transition table, replay enforcement, terminal/retry invariants, and success/blocked/failure/retry fixtures; replanning remains append-only.
 
