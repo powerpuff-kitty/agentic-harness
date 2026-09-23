@@ -1,0 +1,209 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:baseline:requirements",
+    "evaluation_id": "evaluation:baseline",
+    "dimension": "requirement_coverage",
+    "label": "Verified acceptance-criteria coverage",
+    "status": "measured",
+    "method": {
+      "kind": "deterministic_check",
+      "description": "Count acceptance criteria with current evidence marked verified.",
+      "version": "1"
+    },
+    "input_refs": ["evidence:acceptance-index"],
+    "evidence_refs": ["evidence:acceptance-index"],
+    "measurement": {
+      "value": 4,
+      "unit": "criteria",
+      "normalized_score": 0.8,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:20:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:baseline:security",
+    "evaluation_id": "evaluation:baseline",
+    "dimension": "security",
+    "label": "Security verification",
+    "status": "not_checked",
+    "method": {
+      "kind": "other",
+      "description": null,
+      "version": null
+    },
+    "input_refs": [],
+    "evidence_refs": [],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": null,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:20:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:baseline:evidence-completeness",
+    "evaluation_id": "evaluation:baseline",
+    "dimension": "evidence_completeness",
+    "label": "Evaluator evidence completeness",
+    "status": "judged",
+    "method": {
+      "kind": "evaluator_judgment",
+      "description": "Review required evidence classes and record unresolved coverage separately.",
+      "version": "1"
+    },
+    "input_refs": ["evidence:acceptance-index", "evidence:coverage-map"],
+    "evidence_refs": ["evidence:coverage-map"],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": 0.7,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:20:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:baseline:completion-confidence",
+    "evaluation_id": "evaluation:baseline",
+    "dimension": "completion_confidence",
+    "label": "Evaluator completion confidence",
+    "status": "judged",
+    "method": {
+      "kind": "evaluator_judgment",
+      "description": "Estimate completion from current verified criteria while retaining not-checked security scope.",
+      "version": "1"
+    },
+    "input_refs": ["metric:baseline:requirements", "metric:baseline:security"],
+    "evidence_refs": ["evidence:acceptance-index"],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": 0.6,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:20:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:baseline:self-assessment",
+    "evaluation_id": "evaluation:baseline",
+    "dimension": "agent_self_assessment",
+    "label": "Implementer self-assessment",
+    "status": "judged",
+    "method": {
+      "kind": "agent_self_assessment",
+      "description": "Implementer-reported confidence retained as a separate signal, not evaluator truth.",
+      "version": "1"
+    },
+    "input_refs": ["evidence:implementer-summary"],
+    "evidence_refs": ["evidence:implementer-summary"],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": 0.9,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:19:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:peer:architecture",
+    "evaluation_id": "evaluation:peer",
+    "dimension": "architecture_compliance",
+    "label": "Architecture review",
+    "status": "judged",
+    "method": {
+      "kind": "evaluator_judgment",
+      "description": "Compare the changed dependency edge with the accepted architecture boundary.",
+      "version": "1"
+    },
+    "input_refs": ["evidence:architecture-rule", "evidence:changed-edge"],
+    "evidence_refs": ["evidence:architecture-rule", "evidence:changed-edge"],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": 0.75,
+      "grade": "needs-remediation"
+    },
+    "created_at": "2026-09-23T05:21:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:peer:evaluator-confidence",
+    "evaluation_id": "evaluation:peer",
+    "dimension": "evaluator_confidence",
+    "label": "Peer evaluator confidence",
+    "status": "judged",
+    "method": {
+      "kind": "evaluator_judgment",
+      "description": "Confidence in the architecture finding based on the two cited current sources.",
+      "version": "1"
+    },
+    "input_refs": ["evidence:architecture-rule", "evidence:changed-edge"],
+    "evidence_refs": ["evidence:architecture-rule", "evidence:changed-edge"],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": 0.8,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:21:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:reassess:requirements",
+    "evaluation_id": "evaluation:reassess",
+    "dimension": "requirement_coverage",
+    "label": "Post-fix acceptance-criteria coverage",
+    "status": "measured",
+    "method": {
+      "kind": "deterministic_check",
+      "description": "Count acceptance criteria with current post-fix verification evidence.",
+      "version": "1"
+    },
+    "input_refs": ["evidence:post-fix-acceptance-index"],
+    "evidence_refs": ["evidence:post-fix-acceptance-index"],
+    "measurement": {
+      "value": 5,
+      "unit": "criteria",
+      "normalized_score": 1.0,
+      "grade": "pass"
+    },
+    "created_at": "2026-09-23T05:30:00Z"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-metric",
+    "id": "metric:reassess:completion-confidence",
+    "evaluation_id": "evaluation:reassess",
+    "dimension": "completion_confidence",
+    "label": "Post-fix evaluator completion confidence",
+    "status": "judged",
+    "method": {
+      "kind": "evaluator_judgment",
+      "description": "Assess completion from post-fix acceptance and architecture evidence.",
+      "version": "1"
+    },
+    "input_refs": ["metric:reassess:requirements", "evidence:post-fix-architecture"],
+    "evidence_refs": ["evidence:post-fix-acceptance-index", "evidence:post-fix-architecture"],
+    "measurement": {
+      "value": null,
+      "unit": null,
+      "normalized_score": 0.9,
+      "grade": null
+    },
+    "created_at": "2026-09-23T05:30:00Z"
+  }
+]
