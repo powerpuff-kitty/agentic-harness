@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/powerpuff-kitty/agentic-harness/catalog/schema/architecture-analysis.v1.schema.json",
+  "title": "Agentic Harness Architecture Analysis v1",
+  "description": "Deterministic analysis of an already-declared Architecture Graph. It does not prove repository conformance, duplicate behavior, or enforcement.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version","kind","project_id","graph_state","task_context","duplicate_capability_candidates","summary","not_checked"],
+  "properties": {
+    "format_version": { "const": 1 },
+    "kind": { "const": "architecture-analysis" },
+    "project_id": { "$ref": "#/$defs/id" },
+    "graph_state": { "enum": ["observed", "target", "migration"] },
+    "task_context": { "$ref": "#/$defs/task_context" },
+    "duplicate_capability_candidates": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/duplicate_candidate" },
+      "maxItems": 4096
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sha256", "bytes"],
+      "properties": {
+        "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "not_checked": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/text" },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[A-Za-z0-9_.:/+-]+$"
+    },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))[^\\u0000-\\u001f\\u007f-\\u009f]+$"
+    },
+    "capability_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id","name","owner_path","matched_paths","contract_ids","surface_ids"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "$ref": "#/$defs/text" },
+        "owner_path": { "oneOf": [{ "$ref": "#/$defs/path" }, { "type": "null" }] },
+        "matched_paths": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "contract_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "surface_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "ambiguous_path": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "capability_ids"],
+      "properties": {
+        "path": { "$ref": "#/$defs/path" },
+        "capability_ids": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } }
+      }
+    },
+    "task_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paths","capabilities","ambiguous_paths","unresolved_paths","matched_node_ids","complete"],
+      "properties": {
+        "paths": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/path" } },
+        "capabilities": { "type": "array", "items": { "$ref": "#/$defs/capability_context" } },
+        "ambiguous_paths": { "type": "array", "items": { "$ref": "#/$defs/ambiguous_path" } },
+        "unresolved_paths": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "matched_node_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "complete": { "type": "boolean" }
+      }
+    },
+    "duplicate_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["identity","identity_source","capability_ids","paths","surface_ids","status","reason"],
+      "properties": {
+        "identity": { "$ref": "#/$defs/text" },
+        "identity_source": { "enum": ["metadata.capability_key", "normalized-name"] },
+        "capability_ids": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "paths": { "type": "array", "minItems": 2, "uniqueItems": true, "items": { "$ref": "#/$defs/path" } },
+        "surface_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "status": { "const": "review_required" },
+        "reason": { "$ref": "#/$defs/text" }
+      }
+    }
+  }
+}

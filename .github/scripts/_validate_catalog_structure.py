@@ -230,7 +230,7 @@ for profile in sorted(profiles):
         if policy not in policies:
             fail(f"profile {profile} references unknown policy: {policy}")
 
-required_schemas = {"manifest.schema.json", "lock.schema.json", "variant.schema.json", "adr-index.schema.json", "migration-report.schema.json", "codebase-audit.schema.json", "profile.schema.json", "architecture-graph.v1.schema.json"}
+required_schemas = {"manifest.schema.json", "lock.schema.json", "variant.schema.json", "adr-index.schema.json", "migration-report.schema.json", "codebase-audit.schema.json", "profile.schema.json", "architecture-graph.v1.schema.json", "architecture-analysis.v1.schema.json"}
 for name in required_schemas:
     if not (schema_root / name).is_file():
         fail(f"missing schema: catalog/schema/{name}")

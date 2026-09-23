@@ -9,11 +9,22 @@ import unittest
 
 from jsonschema import Draft202012Validator
 
+import architecture_graph as graph_analysis
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = json.loads((ROOT / "catalog/schema/architecture-graph.v1.schema.json").read_text())
 FIXTURE = json.loads((ROOT / ".agentic/evals/fixtures/architecture-graph.v1.json").read_text())
+FIXTURE_DIR = ROOT / ".agentic/evals/fixtures/architecture"
+ANALYSIS_SCHEMA = json.loads((ROOT / "catalog/schema/architecture-analysis.v1.schema.json").read_text())
+WEB_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.web-ts.v1.json").read_text())
+RUST_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.rust-workspace.v1.json").read_text())
+MIXED_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.mixed-stack.v1.json").read_text())
+DUPLICATE_FIXTURE = json.loads((FIXTURE_DIR / "architecture-graph.duplicate-capability.v1.json").read_text())
+WEB_SUMMARY = (FIXTURE_DIR / "architecture-summary.web-ts.md").read_text()
 Draft202012Validator.check_schema(SCHEMA)
+Draft202012Validator.check_schema(ANALYSIS_SCHEMA)
 VALIDATOR = Draft202012Validator(SCHEMA)
+ANALYSIS_VALIDATOR = Draft202012Validator(ANALYSIS_SCHEMA)
 
 
 def semantic_errors(document: dict) -> list[str]:
@@ -143,6 +154,122 @@ class ArchitectureGraphContracts(unittest.TestCase):
             "coverage.nodes_declared must equal the number of nodes",
             semantic_errors(bad),
         )
+
+    def test_three_structurally_different_graphs_validate(self):
+        for name, fixture in (
+            ("web-ts", WEB_FIXTURE),
+            ("rust-workspace", RUST_FIXTURE),
+            ("mixed-stack", MIXED_FIXTURE),
+        ):
+            with self.subTest(name=name):
+                VALIDATOR.validate(fixture)
+                self.assertEqual(semantic_errors(fixture), [])
+
+    def test_web_task_paths_resolve_to_capability_context(self):
+        result = graph_analysis.resolve_task_context(
+            WEB_FIXTURE,
+            [
+                "apps/web/src/features/catalog/Grid.vue",
+                "packages/search/src/query.ts",
+            ],
+        )
+        self.assertTrue(result["complete"])
+        self.assertEqual(result["ambiguous_paths"], [])
+        self.assertEqual(result["unresolved_paths"], [])
+        by_id = {item["id"]: item for item in result["capabilities"]}
+        self.assertEqual(set(by_id), {"capability.catalog", "capability.search"})
+        self.assertEqual(by_id["capability.catalog"]["owner_path"], "packages/catalog")
+        self.assertEqual(by_id["capability.catalog"]["contract_ids"], ["contract.catalog"])
+        self.assertEqual(by_id["capability.catalog"]["surface_ids"], ["surface.catalog-ui"])
+
+    def test_rust_adapter_routes_through_contract_to_capability_owner(self):
+        result = graph_analysis.resolve_task_context(
+            RUST_FIXTURE,
+            ["crates/postgres/orders/repository.rs"],
+        )
+        self.assertTrue(result["complete"])
+        self.assertEqual(
+            [item["id"] for item in result["capabilities"]],
+            ["capability.orders"],
+        )
+        self.assertEqual(
+            result["capabilities"][0]["owner_path"],
+            "crates/orders",
+        )
+
+    def test_mixed_language_engine_and_provider_route_without_special_cases(self):
+        result = graph_analysis.resolve_task_context(
+            MIXED_FIXTURE,
+            [
+                "engines/vector/src/lib.rs",
+                "infra/kafka/client/consumer.py",
+            ],
+        )
+        self.assertTrue(result["complete"])
+        self.assertEqual(
+            {item["id"] for item in result["capabilities"]},
+            {"capability.index", "capability.ingest"},
+        )
+
+    def test_ambiguous_and_unresolved_paths_remain_explicit(self):
+        result = graph_analysis.resolve_task_context(
+            WEB_FIXTURE,
+            ["apps/web/src/main.ts", "docs/unknown.md"],
+        )
+        self.assertFalse(result["complete"])
+        self.assertEqual(result["unresolved_paths"], ["docs/unknown.md"])
+        self.assertEqual(
+            result["ambiguous_paths"],
+            [{
+                "path": "apps/web/src/main.ts",
+                "capability_ids": ["capability.catalog", "capability.search"],
+            }],
+        )
+
+    def test_duplicate_capability_is_review_candidate_not_violation(self):
+        candidates = graph_analysis.duplicate_capability_candidates(DUPLICATE_FIXTURE)
+        self.assertEqual(len(candidates), 1)
+        candidate = candidates[0]
+        self.assertEqual(candidate["identity"], "listing")
+        self.assertEqual(candidate["identity_source"], "metadata.capability_key")
+        self.assertEqual(candidate["status"], "review_required")
+        self.assertIn("not proof", candidate["reason"])
+        self.assertEqual(
+            candidate["capability_ids"],
+            ["capability.listing.api", "capability.listing.web"],
+        )
+
+    def test_analysis_output_is_schema_valid_and_deterministic(self):
+        paths = ["apps/web/src/features/catalog/Grid.vue"]
+        first = graph_analysis.analyze(WEB_FIXTURE, paths)
+        ANALYSIS_VALIDATOR.validate(first)
+
+        reordered = copy.deepcopy(WEB_FIXTURE)
+        reordered["nodes"] = list(reversed(reordered["nodes"]))
+        reordered["edges"] = list(reversed(reordered["edges"]))
+        second = graph_analysis.analyze(reordered, paths)
+        self.assertEqual(
+            graph_analysis.stable_json(first),
+            graph_analysis.stable_json(second),
+        )
+
+    def test_generated_summary_matches_committed_fixture_exactly(self):
+        generated = graph_analysis.render_markdown(WEB_FIXTURE)
+        self.assertEqual(generated, WEB_SUMMARY)
+        self.assertTrue(graph_analysis.check_markdown(WEB_FIXTURE, WEB_SUMMARY))
+        self.assertFalse(
+            graph_analysis.check_markdown(
+                WEB_FIXTURE,
+                WEB_SUMMARY.replace("surface.catalog-ui", "surface.catalog-screen"),
+            )
+        )
+
+    def test_task_paths_must_be_relative_posix_paths(self):
+        for path in ("/absolute/file.ts", "../escape.ts", r"src\windows.ts"):
+            with self.subTest(path=path):
+                with self.assertRaises(graph_analysis.ArchitectureAnalysisError):
+                    graph_analysis.resolve_task_context(WEB_FIXTURE, [path])
+
 
 
 if __name__ == "__main__":
