@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/otel-export.v1.schema.json",
+  "title": "Agent Work OpenTelemetry Export v1",
+  "description": "A conformance envelope for projecting canonical Agent Work entities/events into OpenTelemetry-compatible telemetry. Telemetry is derived and optional; it is never canonical work state.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "work_unit_id",
+    "status",
+    "semantic_conventions",
+    "content_policy",
+    "spans"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "agent-work-otel-export" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "status": { "type": "string", "enum": ["collected", "partial", "not_collected"] },
+    "semantic_conventions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["otel_semconv_version", "gen_ai_status", "custom_namespace"],
+      "properties": {
+        "otel_semconv_version": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "gen_ai_status": {
+          "type": "string",
+          "enum": ["development", "stable", "not_used"]
+        },
+        "custom_namespace": { "type": "string", "const": "agent.work" }
+      }
+    },
+    "content_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "omitted_classes", "redaction_refs"],
+      "properties": {
+        "mode": { "type": "string", "const": "metadata_only" },
+        "omitted_classes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": ["model_input", "model_output", "tool_payload", "user_content", "secret"]
+          }
+        },
+        "redaction_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/id" }
+        }
+      }
+    },
+    "spans": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": { "$ref": "#/$defs/span" }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "status": { "const": "not_collected" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": { "spans": { "maxItems": 0 } }
+      }
+    },
+    {
+      "if": {
+        "properties": { "status": { "const": "collected" } },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": { "spans": { "minItems": 1 } }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "trace_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{32}$"
+    },
+    "span_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{16}$"
+    },
+    "attribute_value": {
+      "oneOf": [
+        { "type": "string", "maxLength": 10000 },
+        { "type": "number" },
+        { "type": "boolean" },
+        {
+          "type": "array",
+          "maxItems": 1000,
+          "items": {
+            "oneOf": [
+              { "type": "string", "maxLength": 10000 },
+              { "type": "number" },
+              { "type": "boolean" }
+            ]
+          }
+        }
+      ]
+    },
+    "attributes": {
+      "type": "object",
+      "propertyNames": { "type": "string", "minLength": 1, "maxLength": 300 },
+      "additionalProperties": { "$ref": "#/$defs/attribute_value" }
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "id"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "work-unit",
+            "run",
+            "task",
+            "attempt",
+            "action",
+            "evaluation",
+            "reflection",
+            "model",
+            "tool",
+            "other"
+          ]
+        },
+        "id": { "$ref": "#/$defs/id" }
+      }
+    },
+    "link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["trace_id", "span_id", "relationship", "attributes"],
+      "properties": {
+        "trace_id": { "$ref": "#/$defs/trace_id" },
+        "span_id": { "$ref": "#/$defs/span_id" },
+        "relationship": {
+          "type": "string",
+          "enum": ["parent_action", "reassessment", "retry", "reflection", "causal", "other"]
+        },
+        "attributes": { "$ref": "#/$defs/attributes" }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "occurred_at", "canonical_event_id", "attributes"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "canonical_event_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "attributes": { "$ref": "#/$defs/attributes" }
+      }
+    },
+    "span": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trace_id",
+        "span_id",
+        "parent_span_id",
+        "name",
+        "span_kind",
+        "entity",
+        "started_at",
+        "ended_at",
+        "status",
+        "attributes",
+        "links",
+        "events"
+      ],
+      "properties": {
+        "trace_id": { "$ref": "#/$defs/trace_id" },
+        "span_id": { "$ref": "#/$defs/span_id" },
+        "parent_span_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/span_id" },
+            { "type": "null" }
+          ]
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "span_kind": {
+          "type": "string",
+          "enum": ["internal", "client", "server", "producer", "consumer"]
+        },
+        "entity": { "$ref": "#/$defs/entity" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "ended_at": { "type": "string", "format": "date-time" },
+        "status": { "type": "string", "enum": ["unset", "ok", "error"] },
+        "attributes": { "$ref": "#/$defs/attributes" },
+        "links": {
+          "type": "array",
+          "maxItems": 1000,
+          "items": { "$ref": "#/$defs/link" }
+        },
+        "events": {
+          "type": "array",
+          "maxItems": 100000,
+          "items": { "$ref": "#/$defs/event" }
+        }
+      }
+    }
+  }
+}
