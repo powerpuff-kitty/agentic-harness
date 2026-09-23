@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/work-progress.v1.schema.json",
+  "title": "Agent Work Progress v1",
+  "description": "Deterministic progress projection derived from the current Run's latest plan and Task states. No estimated percentage is stored.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "work_unit_id",
+    "run_id",
+    "plan_revision",
+    "basis",
+    "active_task_count",
+    "state_counts"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "const": "work-progress"
+    },
+    "work_unit_id": {
+      "$ref": "#/$defs/id"
+    },
+    "run_id": {
+      "$ref": "#/$defs/id"
+    },
+    "plan_revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "basis": {
+      "type": "string",
+      "const": "latest-plan-task-state-counts"
+    },
+    "active_task_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "state_counts": {
+      "$ref": "#/$defs/state_counts"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "state_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "proposed",
+        "queued",
+        "running",
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "properties": {
+        "proposed": {
+          "$ref": "#/$defs/count"
+        },
+        "queued": {
+          "$ref": "#/$defs/count"
+        },
+        "running": {
+          "$ref": "#/$defs/count"
+        },
+        "validating": {
+          "$ref": "#/$defs/count"
+        },
+        "completed": {
+          "$ref": "#/$defs/count"
+        },
+        "blocked": {
+          "$ref": "#/$defs/count"
+        },
+        "waiting_for_user": {
+          "$ref": "#/$defs/count"
+        },
+        "waiting_for_approval": {
+          "$ref": "#/$defs/count"
+        },
+        "failed": {
+          "$ref": "#/$defs/count"
+        },
+        "cancelled": {
+          "$ref": "#/$defs/count"
+        }
+      }
+    }
+  }
+}
