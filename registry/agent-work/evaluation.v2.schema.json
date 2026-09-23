@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/evaluation.v2.schema.json",
+  "title": "Agent Work Evaluation v2",
+  "description": "Normalized evaluation envelope linking independent metrics/findings and immutable reassessment lineage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "work_unit_id",
+    "run_id",
+    "implementer",
+    "evaluator",
+    "status",
+    "created_at",
+    "lineage",
+    "metric_refs",
+    "confidence_metric_refs",
+    "finding_refs"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 2 },
+    "kind": { "type": "string", "const": "work-evaluation" },
+    "id": { "$ref": "#/$defs/id" },
+    "work_unit_id": { "$ref": "#/$defs/id" },
+    "run_id": { "$ref": "#/$defs/id" },
+    "implementer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "connection_id"],
+      "properties": {
+        "run_id": { "$ref": "#/$defs/id" },
+        "connection_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "evaluator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "connection_id", "name", "version"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["deterministic", "agent", "human", "composite"] },
+        "connection_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "version": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "status": { "type": "string", "enum": ["completed", "partial", "failed"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prior_evaluation_id", "reassessment_action_id"],
+      "properties": {
+        "prior_evaluation_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        },
+        "reassessment_action_id": {
+          "oneOf": [
+            { "$ref": "#/$defs/id" },
+            { "type": "null" }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "prior_evaluation_id": { "type": "null" } },
+            "required": ["prior_evaluation_id"]
+          },
+          "then": {
+            "properties": { "reassessment_action_id": { "type": "null" } }
+          }
+        },
+        {
+          "if": {
+            "properties": { "prior_evaluation_id": { "$ref": "#/$defs/id" } },
+            "required": ["prior_evaluation_id"]
+          },
+          "then": {
+            "properties": { "reassessment_action_id": { "$ref": "#/$defs/id" } }
+          }
+        }
+      ]
+    },
+    "metric_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "confidence_metric_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 100,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "finding_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": { "$ref": "#/$defs/id" }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    }
+  }
+}
