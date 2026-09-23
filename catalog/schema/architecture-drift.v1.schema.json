@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/powerpuff-kitty/agentic-harness/catalog/schema/architecture-drift.v1.schema.json",
+  "title": "Agentic Harness Architecture Drift v1",
+  "description": "Deterministic graph-to-graph difference report. It compares declared graph data only and does not inspect repository source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version","kind","project_id","before_state","after_state","node_changes","edge_changes","constraint_changes","coverage_changed","coverage_before","coverage_after","not_checked_added","not_checked_removed"],
+  "properties": {
+    "format_version": { "const": 1 },
+    "kind": { "const": "architecture-drift" },
+    "project_id": { "$ref": "#/$defs/id" },
+    "before_state": { "enum": ["observed","target","migration"] },
+    "after_state": { "enum": ["observed","target","migration"] },
+    "node_changes": { "$ref": "#/$defs/entity_changes" },
+    "edge_changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added","removed"],
+      "properties": {
+        "added": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+        "removed": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } }
+      }
+    },
+    "constraint_changes": { "$ref": "#/$defs/entity_changes" },
+    "coverage_changed": { "type": "boolean" },
+    "coverage_before": { "type": "object" },
+    "coverage_after": { "type": "object" },
+    "not_checked_added": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+    "not_checked_removed": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } }
+  },
+  "$defs": {
+    "id": { "type": "string", "minLength": 1, "maxLength": 160, "pattern": "^[A-Za-z0-9_.:/+-]+$" },
+    "text": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "field_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field","before","after"],
+      "properties": {
+        "field": { "$ref": "#/$defs/text" },
+        "before": {},
+        "after": {}
+      }
+    },
+    "changed_entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id","fields"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "fields": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/field_change" } }
+      }
+    },
+    "entity_changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added_ids","removed_ids","changed"],
+      "properties": {
+        "added_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "removed_ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/id" } },
+        "changed": { "type": "array", "items": { "$ref": "#/$defs/changed_entity" } }
+      }
+    }
+  }
+}
