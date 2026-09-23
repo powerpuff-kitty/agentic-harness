@@ -1,0 +1,68 @@
+[
+  {
+    "format_version": 2,
+    "kind": "work-action",
+    "id": "action:audit-1",
+    "target": { "kind": "run", "id": "run:implementation-1" },
+    "intent": "audit",
+    "prompt": "Audit the implementation against the ticket acceptance criteria.",
+    "agent_connection_id": "agent:reviewer",
+    "permissions": { "read": true, "write": false, "execute": true, "commit": false, "create_pr": false },
+    "finding_refs": [],
+    "evidence_refs": ["evidence:implementation-1"],
+    "continuation": "linked_run",
+    "status": "completed",
+    "approval": { "required": false, "status": "not_required", "approval_ref": null },
+    "lineage": { "parent_action_id": null, "root_action_id": null },
+    "result": {
+      "run_refs": ["run:audit-1"],
+      "evaluation_refs": ["evaluation:audit-1"],
+      "artifact_refs": [],
+      "finding_refs": ["finding:architecture-1"]
+    }
+  },
+  {
+    "format_version": 2,
+    "kind": "work-action",
+    "id": "action:fix-1",
+    "target": { "kind": "finding", "id": "finding:architecture-1" },
+    "intent": "remediate",
+    "prompt": "Fix the evidence-backed architecture finding without widening scope.",
+    "agent_connection_id": "agent:implementer",
+    "permissions": { "read": true, "write": true, "execute": true, "commit": false, "create_pr": false },
+    "finding_refs": ["finding:architecture-1"],
+    "evidence_refs": ["evidence:architecture-1"],
+    "continuation": "linked_run",
+    "status": "completed",
+    "approval": { "required": true, "status": "granted", "approval_ref": "approval:fix-1" },
+    "lineage": { "parent_action_id": "action:audit-1", "root_action_id": "action:audit-1" },
+    "result": {
+      "run_refs": ["run:fix-1"],
+      "evaluation_refs": [],
+      "artifact_refs": ["artifact:patch-1"],
+      "finding_refs": []
+    }
+  },
+  {
+    "format_version": 2,
+    "kind": "work-action",
+    "id": "action:reassess-1",
+    "target": { "kind": "run", "id": "run:fix-1" },
+    "intent": "reassess",
+    "prompt": "Reassess the corrected implementation against the original finding and acceptance criteria.",
+    "agent_connection_id": "agent:reviewer",
+    "permissions": { "read": true, "write": false, "execute": true, "commit": false, "create_pr": false },
+    "finding_refs": ["finding:architecture-1"],
+    "evidence_refs": ["evidence:architecture-1"],
+    "continuation": "linked_run",
+    "status": "completed",
+    "approval": { "required": false, "status": "not_required", "approval_ref": null },
+    "lineage": { "parent_action_id": "action:fix-1", "root_action_id": "action:audit-1" },
+    "result": {
+      "run_refs": ["run:reassess-1"],
+      "evaluation_refs": ["evaluation:reassess-1"],
+      "artifact_refs": [],
+      "finding_refs": []
+    }
+  }
+]
