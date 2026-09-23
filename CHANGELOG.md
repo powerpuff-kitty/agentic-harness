@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added graph-only Architecture Analysis v1 with language-neutral task-to-capability routing, explicit ambiguity/unresolved coverage, review-required duplicate-capability candidates, stable Markdown summaries, and TypeScript/Rust/mixed-language conformance fixtures.
+
 - Added a coherent Agent Work reference coding run tying nested tasks, replanning, failed/passing test evidence, patch artifact provenance and Evaluation to the same WorkUnit/Run with deterministic cross-record validation.
 
 - Added optional Agent Work OpenTelemetry conformance: metadata-only export schema, canonical WorkUnit/Run/Task/Attempt/event correlation, current Development GenAI operation mapping, sensitive-content boundaries, collected/not-collected fixtures, and deterministic adversarial validation.
