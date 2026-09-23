@@ -1,0 +1,17 @@
+flowchart LR
+  n_adapter_catalog_api["Catalog API adapter<br/>adapter"]
+  n_app_web["Web application<br/>app"]
+  n_authority_catalog_store["Catalog source of truth<br/>authority"]
+  n_capability_catalog["Catalog<br/>capability"]
+  n_capability_search["Search<br/>capability"]
+  n_contract_catalog["Catalog contract<br/>contract"]
+  n_surface_catalog_ui["Catalog UI<br/>surface"]
+  n_surface_search_ui["Search UI<br/>surface"]
+  n_adapter_catalog_api -->|implements| n_contract_catalog
+  n_app_web -->|composes| n_capability_catalog
+  n_app_web -->|composes| n_capability_search
+  n_authority_catalog_store -->|authoritative-for| n_capability_catalog
+  n_capability_catalog -->|exposes| n_surface_catalog_ui
+  n_capability_catalog -->|owns| n_contract_catalog
+  n_capability_search -->|depends-on| n_capability_catalog
+  n_capability_search -->|exposes| n_surface_search_ui
