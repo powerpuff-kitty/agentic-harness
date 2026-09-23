@@ -1,0 +1,128 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "fixture.mixed-stack",
+    "description": "Synthetic fixture.mixed-stack architecture fixture."
+  },
+  "graph_state": "migration",
+  "nodes": [
+    {
+      "id": "capability.ingest",
+      "kind": "capability",
+      "name": "Ingest",
+      "lifecycle": "current",
+      "path": "services/ingest",
+      "metadata": {
+        "capability_key": "ingest",
+        "language": "python"
+      }
+    },
+    {
+      "id": "capability.index",
+      "kind": "capability",
+      "name": "Index",
+      "lifecycle": "current",
+      "path": "engines/indexer",
+      "metadata": {
+        "capability_key": "index",
+        "language": "rust"
+      }
+    },
+    {
+      "id": "contract.events",
+      "kind": "contract",
+      "name": "Event contract",
+      "lifecycle": "current",
+      "path": "contracts/events"
+    },
+    {
+      "id": "app.orchestrator",
+      "kind": "app",
+      "name": "Orchestrator",
+      "lifecycle": "current",
+      "path": "apps/orchestrator"
+    },
+    {
+      "id": "surface.search-api",
+      "kind": "surface",
+      "name": "Search API",
+      "lifecycle": "current",
+      "path": "apps/api/routes/search"
+    },
+    {
+      "id": "provider.kafka",
+      "kind": "provider",
+      "name": "Kafka provider",
+      "lifecycle": "current",
+      "path": "infra/kafka/client"
+    },
+    {
+      "id": "engine.vector",
+      "kind": "engine",
+      "name": "Vector engine",
+      "lifecycle": "current",
+      "path": "engines/vector"
+    },
+    {
+      "id": "authority.dataset",
+      "kind": "authority",
+      "name": "Dataset authority",
+      "lifecycle": "current",
+      "path": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.index",
+      "to": "capability.ingest",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.ingest",
+      "to": "contract.events",
+      "kind": "owns"
+    },
+    {
+      "from": "provider.kafka",
+      "to": "contract.events",
+      "kind": "implements"
+    },
+    {
+      "from": "app.orchestrator",
+      "to": "capability.ingest",
+      "kind": "composes"
+    },
+    {
+      "from": "app.orchestrator",
+      "to": "capability.index",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.index",
+      "to": "surface.search-api",
+      "kind": "exposes"
+    },
+    {
+      "from": "engine.vector",
+      "to": "capability.index",
+      "kind": "adapts"
+    },
+    {
+      "from": "authority.dataset",
+      "to": "capability.ingest",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [],
+  "coverage": {
+    "nodes_declared": 8,
+    "edges_declared": 8,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "Repository paths are declared fixture data and were not inspected against a checkout.",
+    "The migration graph does not prove Python/Rust contract compatibility."
+  ]
+}
