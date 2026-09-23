@@ -22,6 +22,7 @@ SCHEMAS = {
     "work-action": WORK / "work-action.v1.schema.json",
     "work-action-v2": WORK / "work-action.v2.schema.json",
     "agent-connection": WORK / "agent-connection.v1.schema.json",
+    "agent-connection-v2": WORK / "agent-connection.v2.schema.json",
     "work-reflection": WORK / "reflection.v1.schema.json",
     "reflection-policy": WORK / "reflection-policy.v1.schema.json",
     "reflection-trigger-decision": WORK / "reflection-trigger-decision.v1.schema.json",
@@ -99,6 +100,7 @@ evaluation = load(FIXTURES / "evaluation.v1.json")
 action = load(FIXTURES / "action.v1.json")
 action_lineage = load(FIXTURES / "action-lineage.v2.json")
 connection = load(FIXTURES / "agent-connection.v1.json")
+connections_v2 = load(FIXTURES / "agent-connections.v2.json")
 events = load(FIXTURES / "events.v1.json")
 evidence_records = load(FIXTURES / "evidence.v1.json")
 artifacts = load(FIXTURES / "artifacts.v1.json")
@@ -336,6 +338,199 @@ if isinstance(action_lineage, list):
     missing_result[-1]["result"] = None
     if not any("not of type 'object'" in item for item in action_v2_semantic_errors(missing_result)):
         fail("action-lineage mutation: completed action without result was not rejected")
+
+
+def connection_v2_semantic_errors(value) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(value, list):
+        return ["expected an array of AgentConnection v2 records"]
+
+    validator = validators.get("agent-connection-v2")
+    by_id: dict[str, dict] = {}
+    capability_for_permission = {
+        "read": "read_repo",
+        "write": "write_repo",
+        "execute": "execute",
+        "commit": "commit",
+        "create_pr": "create_pr",
+    }
+
+    for index, candidate in enumerate(value):
+        if validator is not None:
+            for error in sorted(validator.iter_errors(candidate), key=lambda item: list(item.path)):
+                location = ".".join(str(part) for part in error.path) or "<root>"
+                problems.append(f"[{index}].{location}: {error.message}")
+        if not isinstance(candidate, dict):
+            continue
+
+        connection_id = candidate.get("id")
+        if not isinstance(connection_id, str):
+            continue
+        if connection_id in by_id:
+            problems.append(f"duplicate connection id {connection_id}")
+        by_id[connection_id] = candidate
+
+        capabilities = candidate.get("capabilities", {})
+        if not isinstance(capabilities, dict):
+            continue
+        if capabilities.get("commit") == "supported" and capabilities.get("write_repo") != "supported":
+            problems.append(f"{connection_id}: commit support requires write_repo support")
+        if capabilities.get("create_pr") == "supported" and capabilities.get("commit") != "supported":
+            problems.append(f"{connection_id}: create_pr support requires commit support")
+
+        repositories = candidate.get("repositories", [])
+        if isinstance(repositories, list):
+            seen_repositories: set[str] = set()
+            for access in repositories:
+                if not isinstance(access, dict):
+                    continue
+                repository = access.get("repository")
+                if isinstance(repository, str):
+                    if repository in seen_repositories:
+                        problems.append(f"{connection_id}: duplicate repository access {repository}")
+                    seen_repositories.add(repository)
+                permissions = access.get("permissions", {})
+                if isinstance(permissions, dict):
+                    for permission, capability in capability_for_permission.items():
+                        if permissions.get(permission) is True and capabilities.get(capability) != "supported":
+                            problems.append(
+                                f"{connection_id}: repository {repository} grants {permission} without {capability} support"
+                            )
+
+        tools = candidate.get("tools", [])
+        if isinstance(tools, list):
+            tool_ids: set[str] = set()
+            for tool in tools:
+                if not isinstance(tool, dict):
+                    continue
+                tool_id = tool.get("id")
+                if isinstance(tool_id, str):
+                    if tool_id in tool_ids:
+                        problems.append(f"{connection_id}: duplicate tool id {tool_id}")
+                    tool_ids.add(tool_id)
+            if tools and capabilities.get("tool_calls") != "supported":
+                problems.append(f"{connection_id}: connected tools require tool_calls support")
+
+        readiness = candidate.get("readiness", {})
+        if isinstance(readiness, dict) and readiness.get("status") == "ready":
+            if readiness.get("checked_at") is None or not readiness.get("evidence_refs"):
+                problems.append(f"{connection_id}: ready status requires checked_at and evidence")
+
+        usage = candidate.get("usage", {})
+        if isinstance(usage, dict) and usage.get("status") == "observed":
+            if usage.get("captured_at") is None:
+                problems.append(f"{connection_id}: observed usage requires captured_at")
+            if all(usage.get(field) is None for field in ("input_tokens", "output_tokens", "cost")):
+                problems.append(f"{connection_id}: observed usage requires at least one measured value")
+
+        limits = candidate.get("rate_limits", {})
+        if isinstance(limits, dict) and limits.get("status") == "observed":
+            if limits.get("captured_at") is None:
+                problems.append(f"{connection_id}: observed rate limits require captured_at")
+            if all(limits.get(field) is None for field in ("limit", "remaining", "reset_at")):
+                problems.append(f"{connection_id}: observed rate limits require at least one measured value")
+            limit = limits.get("limit")
+            remaining = limits.get("remaining")
+            if isinstance(limit, int) and isinstance(remaining, int) and remaining > limit:
+                problems.append(f"{connection_id}: remaining rate limit exceeds limit")
+
+        continuation = candidate.get("continuation", {})
+        if isinstance(continuation, dict):
+            support = continuation.get("support")
+            capability = capabilities.get("continue_session")
+            if support == "supported" and capability != "supported":
+                problems.append(f"{connection_id}: continuation support requires continue_session support")
+            if support == "unsupported" and capability == "supported":
+                problems.append(f"{connection_id}: continuation contract contradicts continue_session support")
+
+        auth = candidate.get("auth", {})
+        if isinstance(auth, dict) and auth.get("mode") == "api_key_ref" and auth.get("credential_ref") is None:
+            problems.append(f"{connection_id}: api_key_ref auth requires an opaque credential reference")
+
+    return problems
+
+
+def action_connection_eligibility_errors(actions, connections) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(actions, list) or not isinstance(connections, list):
+        return problems
+
+    by_id = {
+        item.get("id"): item
+        for item in connections
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    capability_for_permission = {
+        "read": "read_repo",
+        "write": "write_repo",
+        "execute": "execute",
+        "commit": "commit",
+        "create_pr": "create_pr",
+    }
+
+    for action in actions:
+        if not isinstance(action, dict):
+            continue
+        action_id = action.get("id")
+        connection_id = action.get("agent_connection_id")
+        connection = by_id.get(connection_id)
+        if not isinstance(connection, dict):
+            problems.append(f"{action_id}: unknown agent connection {connection_id}")
+            continue
+
+        readiness = connection.get("readiness", {})
+        if not isinstance(readiness, dict) or readiness.get("status") != "ready":
+            problems.append(f"{action_id}: agent connection {connection_id} is not ready")
+
+        capabilities = connection.get("capabilities", {})
+        permissions = action.get("permissions", {})
+        if isinstance(capabilities, dict) and isinstance(permissions, dict):
+            for permission, capability in capability_for_permission.items():
+                if permissions.get(permission) is True and capabilities.get(capability) != "supported":
+                    problems.append(
+                        f"{action_id}: requested {permission} permission is not supported by {connection_id}"
+                    )
+
+        approval = action.get("approval", {})
+        if isinstance(approval, dict) and approval.get("required") is True:
+            if not isinstance(capabilities, dict) or capabilities.get("approvals") != "supported":
+                problems.append(f"{action_id}: approval-gated action requires approvals capability")
+
+        if action.get("continuation") == "same_session":
+            continuation = connection.get("continuation", {})
+            if not isinstance(continuation, dict) or "same_session" not in continuation.get("modes", []):
+                problems.append(f"{action_id}: same_session continuation is not supported by {connection_id}")
+
+    return problems
+
+
+if isinstance(connections_v2, list):
+    for problem in connection_v2_semantic_errors(connections_v2):
+        fail(f"agent-connections-v2:{problem}")
+
+    if isinstance(action_lineage, list):
+        for problem in action_connection_eligibility_errors(action_lineage, connections_v2):
+            fail(f"action-eligibility:{problem}")
+
+        unavailable = copy.deepcopy(connections_v2)
+        unavailable[0]["readiness"]["status"] = "unavailable"
+        if not any("is not ready" in item for item in action_connection_eligibility_errors(action_lineage, unavailable)):
+            fail("agent-connections-v2 mutation: unavailable connection remained action-eligible")
+
+        underpowered = copy.deepcopy(connections_v2)
+        underpowered[1]["capabilities"]["write_repo"] = "unsupported"
+        if not any("requested write permission" in item for item in action_connection_eligibility_errors(action_lineage, underpowered)):
+            fail("agent-connections-v2 mutation: unsupported write capability remained action-eligible")
+
+    over_scoped = copy.deepcopy(connections_v2)
+    over_scoped[0]["repositories"][0]["permissions"]["write"] = True
+    if not any("grants write without write_repo support" in item for item in connection_v2_semantic_errors(over_scoped)):
+        fail("agent-connections-v2 mutation: repository permission exceeded capability support")
+
+    false_ready = copy.deepcopy(connections_v2)
+    false_ready[0]["readiness"]["evidence_refs"] = []
+    if not any("ready status requires checked_at and evidence" in item for item in connection_v2_semantic_errors(false_ready)):
+        fail("agent-connections-v2 mutation: unsupported ready claim was not rejected")
 
 
 if isinstance(connection, dict):
