@@ -14,6 +14,7 @@ FIXTURES = WORK / "fixtures"
 
 SCHEMAS = {
     "work-unit": WORK / "work-unit.v1.schema.json",
+    "work-lifecycle": WORK / "lifecycle.v1.schema.json",
     "work-event": WORK / "work-event.v1.schema.json",
     "work-evidence": WORK / "evidence.v1.schema.json",
     "work-artifact": WORK / "artifact.v1.schema.json",
@@ -99,6 +100,8 @@ def validate_event_list(value, label: str) -> None:
 
 
 work_unit = load(FIXTURES / "replanned-work-unit.v1.json")
+lifecycle = load(WORK / "lifecycle.v1.json")
+lifecycle_work_units = load(FIXTURES / "lifecycle-work-units.v1.json")
 evaluation = load(FIXTURES / "evaluation.v1.json")
 evaluations_v2 = load(FIXTURES / "evaluations.v2.json")
 metrics_v1 = load(FIXTURES / "metrics.v1.json")
@@ -127,6 +130,77 @@ reflection_policy = load(FIXTURES / "reflection-policy.v1.json")
 reflection_decision = load(FIXTURES / "reflection-trigger-skip.v1.json")
 reflection_events = load(FIXTURES / "reflection-correction-events.v1.json")
 corrected_work_unit = load(FIXTURES / "reflection-corrected-work-unit.v1.json")
+
+EXPECTED_WORK_STATES = {
+    "proposed", "queued", "running", "validating", "completed",
+    "blocked", "waiting_for_user", "waiting_for_approval", "failed", "cancelled",
+}
+lifecycle_transitions: dict[str, dict[str, set[str]]] = {}
+
+if isinstance(lifecycle, dict):
+    validate("work-lifecycle", lifecycle, "lifecycle")
+    states = lifecycle.get("states", [])
+    terminal_states_declared = set(lifecycle.get("terminal_states", []))
+    if set(states) != EXPECTED_WORK_STATES:
+        fail("lifecycle: states must exactly match the WorkUnit v1 state domain")
+    if terminal_states_declared != {"completed", "failed", "cancelled"}:
+        fail("lifecycle: terminal states must be completed, failed and cancelled")
+
+    raw_transitions = lifecycle.get("entity_transitions", {})
+    if isinstance(raw_transitions, dict):
+        for entity_kind in ("work-unit", "run", "task", "attempt"):
+            mapping = raw_transitions.get(entity_kind, {})
+            if not isinstance(mapping, dict):
+                fail(f"lifecycle: missing transition map for {entity_kind}")
+                continue
+            if set(mapping) != EXPECTED_WORK_STATES:
+                fail(f"lifecycle: {entity_kind} transition map must cover every state")
+                continue
+
+            normalized: dict[str, set[str]] = {}
+            for previous_state, next_states in mapping.items():
+                if not isinstance(next_states, list):
+                    fail(f"lifecycle: {entity_kind}:{previous_state} transitions must be an array")
+                    continue
+                normalized[previous_state] = set(next_states)
+                if previous_state in terminal_states_declared and next_states:
+                    fail(f"lifecycle: terminal {entity_kind} state {previous_state} cannot transition")
+                if previous_state in next_states:
+                    fail(f"lifecycle: {entity_kind}:{previous_state} cannot self-transition")
+                unknown = set(next_states) - EXPECTED_WORK_STATES
+                if unknown:
+                    fail(f"lifecycle: {entity_kind}:{previous_state} has unknown targets {sorted(unknown)}")
+            lifecycle_transitions[entity_kind] = normalized
+
+
+def transition_allowed(entity_kind: str, previous_state: str, next_state: str) -> bool:
+    return next_state in lifecycle_transitions.get(entity_kind, {}).get(previous_state, set())
+
+
+if lifecycle_transitions:
+    if transition_allowed("task", "completed", "running"):
+        fail("lifecycle: completed task must be terminal")
+    if transition_allowed("attempt", "failed", "running"):
+        fail("lifecycle: failed attempt must not be resurrected; create a new attempt")
+    if not transition_allowed("task", "running", "completed"):
+        fail("lifecycle: running task must be able to complete")
+
+
+if isinstance(lifecycle_work_units, list):
+    expected_scenarios = {
+        "wu:lifecycle:success": "completed",
+        "wu:lifecycle:blocked": "blocked",
+        "wu:lifecycle:failed": "failed",
+        "wu:lifecycle:retry": "running",
+    }
+    observed_scenarios: dict[str, str] = {}
+    for index, scenario in enumerate(lifecycle_work_units):
+        validate("work-unit", scenario, f"lifecycle-work-units[{index}]")
+        if isinstance(scenario, dict) and isinstance(scenario.get("id"), str):
+            observed_scenarios[scenario["id"]] = scenario.get("state")
+    if observed_scenarios != expected_scenarios:
+        fail("lifecycle-work-units: fixtures must cover success, blocked, failed and retry states")
+
 
 if isinstance(work_unit, dict):
     validate("work-unit", work_unit, "replanned-work-unit")
@@ -202,6 +276,77 @@ if isinstance(work_unit, dict):
             if key in attempts_seen:
                 fail(f"{run.get('id')}: duplicate task attempt {key}")
             attempts_seen.add(key)
+
+def attempt_invariant_errors(value, label: str) -> list[str]:
+    problems: list[str] = []
+    if not isinstance(value, dict):
+        return problems
+    terminal = {"completed", "failed", "cancelled"}
+
+    for run in value.get("runs", []):
+        if not isinstance(run, dict):
+            continue
+        by_task: dict[str, list[dict]] = {}
+        for attempt in run.get("attempts", []):
+            if not isinstance(attempt, dict) or not isinstance(attempt.get("task_id"), str):
+                continue
+            by_task.setdefault(attempt["task_id"], []).append(attempt)
+
+            state = attempt.get("state")
+            completed_at = attempt.get("completed_at")
+            if state in terminal and completed_at is None:
+                problems.append(f"{label}:{attempt.get('id')}: terminal attempt requires completed_at")
+            if state not in terminal and completed_at is not None:
+                problems.append(f"{label}:{attempt.get('id')}: nonterminal attempt cannot have completed_at")
+
+        for task_id, attempts in by_task.items():
+            ordered = sorted(attempts, key=lambda item: item.get("ordinal", 0))
+            ordinals = [item.get("ordinal") for item in ordered]
+            if ordinals != list(range(1, len(ordered) + 1)):
+                problems.append(f"{label}:{task_id}: attempt ordinals must be contiguous from 1")
+                continue
+            for previous in ordered[:-1]:
+                if previous.get("state") not in {"failed", "cancelled"}:
+                    problems.append(
+                        f"{label}:{task_id}: retry requires prior failed/cancelled attempt, "
+                        f"found {previous.get('state')}"
+                    )
+
+    return problems
+
+
+for label, candidate in [
+    ("replanned-work-unit", work_unit),
+    ("reflection-corrected-work-unit", corrected_work_unit),
+]:
+    for problem in attempt_invariant_errors(candidate, label):
+        fail(problem)
+
+if isinstance(lifecycle_work_units, list):
+    for index, scenario in enumerate(lifecycle_work_units):
+        for problem in attempt_invariant_errors(scenario, f"lifecycle-work-units[{index}]"):
+            fail(problem)
+
+    retry_fixture = next(
+        (
+            item for item in lifecycle_work_units
+            if isinstance(item, dict) and item.get("id") == "wu:lifecycle:retry"
+        ),
+        None,
+    )
+    if isinstance(retry_fixture, dict):
+        bad_ordinal = copy.deepcopy(retry_fixture)
+        bad_ordinal["runs"][0]["attempts"][1]["ordinal"] = 3
+        if not any("attempt ordinals must be contiguous" in item
+                   for item in attempt_invariant_errors(bad_ordinal, "retry-mutation")):
+            fail("lifecycle mutation: noncontiguous retry ordinal was not rejected")
+
+        resurrected = copy.deepcopy(retry_fixture)
+        resurrected["runs"][0]["attempts"][0]["state"] = "completed"
+        if not any("retry requires prior failed/cancelled attempt" in item
+                   for item in attempt_invariant_errors(resurrected, "retry-mutation")):
+            fail("lifecycle mutation: retry after completed attempt was not rejected")
+
 
 if isinstance(evaluation, dict):
     validate("work-evaluation", evaluation, "evaluation")
@@ -971,7 +1116,15 @@ if isinstance(replay_seed, dict) and isinstance(replay_expected, dict) and isins
                     f"state {delta.get('previous_state')}, found {target.get('state')}"
                 )
                 continue
-            target["state"] = delta.get("next_state")
+            previous_state = delta.get("previous_state")
+            next_state = delta.get("next_state")
+            if not transition_allowed(entity_kind, previous_state, next_state):
+                fail(
+                    f"replay-events[{index}]: invalid {entity_kind} lifecycle transition "
+                    f"{previous_state} -> {next_state}"
+                )
+                continue
+            target["state"] = next_state
             if entity_kind == "attempt" and delta.get("next_state") in terminal_states:
                 target["completed_at"] = event.get("occurred_at")
 

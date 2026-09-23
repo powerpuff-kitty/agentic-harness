@@ -1,0 +1,230 @@
+{
+  "format_version": 1,
+  "kind": "agent-work-lifecycle",
+  "states": [
+    "proposed",
+    "queued",
+    "running",
+    "validating",
+    "completed",
+    "blocked",
+    "waiting_for_user",
+    "waiting_for_approval",
+    "failed",
+    "cancelled"
+  ],
+  "terminal_states": [
+    "completed",
+    "failed",
+    "cancelled"
+  ],
+  "retry_requires_new_attempt": true,
+  "entity_transitions": {
+    "work-unit": {
+      "proposed": [
+        "queued",
+        "running",
+        "cancelled"
+      ],
+      "queued": [
+        "running",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "cancelled"
+      ],
+      "running": [
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "validating": [
+        "running",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "completed": [],
+      "blocked": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_user": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_approval": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "failed": [],
+      "cancelled": []
+    },
+    "run": {
+      "proposed": [
+        "queued",
+        "running",
+        "cancelled"
+      ],
+      "queued": [
+        "running",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "cancelled"
+      ],
+      "running": [
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "validating": [
+        "running",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "completed": [],
+      "blocked": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_user": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_approval": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "failed": [],
+      "cancelled": []
+    },
+    "task": {
+      "proposed": [
+        "queued",
+        "running",
+        "cancelled"
+      ],
+      "queued": [
+        "running",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "cancelled"
+      ],
+      "running": [
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "validating": [
+        "running",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "completed": [],
+      "blocked": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_user": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_approval": [
+        "queued",
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "failed": [],
+      "cancelled": []
+    },
+    "attempt": {
+      "proposed": [
+        "queued",
+        "running",
+        "cancelled"
+      ],
+      "queued": [
+        "running",
+        "cancelled"
+      ],
+      "running": [
+        "validating",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "validating": [
+        "running",
+        "completed",
+        "blocked",
+        "waiting_for_user",
+        "waiting_for_approval",
+        "failed",
+        "cancelled"
+      ],
+      "completed": [],
+      "blocked": [
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_user": [
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "waiting_for_approval": [
+        "running",
+        "failed",
+        "cancelled"
+      ],
+      "failed": [],
+      "cancelled": []
+    }
+  }
+}

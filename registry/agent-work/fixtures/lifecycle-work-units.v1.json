@@ -1,0 +1,173 @@
+[
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:success",
+    "source": { "kind": "issue", "reference": "fixture:lifecycle-success" },
+    "objective": "Demonstrate a successful lifecycle.",
+    "acceptance_criteria": [{ "id": "ac:success", "text": "The task completes." }],
+    "permissions": { "read": true, "write": true, "execute": true, "commit": false, "create_pr": false },
+    "state": "completed",
+    "created_at": "2026-09-23T05:40:00Z",
+    "runs": [{
+      "id": "run:lifecycle:success",
+      "role": "implementer",
+      "agent_connection_id": "agent:implementer",
+      "state": "completed",
+      "plan_revisions": [{
+        "revision": 1,
+        "created_at": "2026-09-23T05:40:01Z",
+        "task_ids": ["task:lifecycle:success"],
+        "change_summary": "Initial plan."
+      }],
+      "tasks": [{
+        "id": "task:lifecycle:success",
+        "parent_id": null,
+        "title": "Complete the fixture task",
+        "depends_on": [],
+        "state": "completed",
+        "evidence_refs": ["evidence:lifecycle:success"],
+        "artifact_refs": []
+      }],
+      "attempts": [{
+        "id": "attempt:lifecycle:success:1",
+        "task_id": "task:lifecycle:success",
+        "ordinal": 1,
+        "state": "completed",
+        "started_at": "2026-09-23T05:40:02Z",
+        "completed_at": "2026-09-23T05:40:03Z"
+      }],
+      "result": { "revision": "fixture-success", "branch": null, "pull_request": null }
+    }],
+    "current_run_id": "run:lifecycle:success"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:blocked",
+    "source": { "kind": "issue", "reference": "fixture:lifecycle-blocked" },
+    "objective": "Demonstrate blocked work without pretending completion.",
+    "acceptance_criteria": [{ "id": "ac:blocked", "text": "The dependency becomes available." }],
+    "permissions": { "read": true, "write": false, "execute": false, "commit": false, "create_pr": false },
+    "state": "blocked",
+    "created_at": "2026-09-23T05:41:00Z",
+    "runs": [{
+      "id": "run:lifecycle:blocked",
+      "role": "implementer",
+      "agent_connection_id": "agent:implementer",
+      "state": "blocked",
+      "plan_revisions": [{
+        "revision": 1,
+        "created_at": "2026-09-23T05:41:01Z",
+        "task_ids": ["task:lifecycle:blocked"],
+        "change_summary": "Initial plan."
+      }],
+      "tasks": [{
+        "id": "task:lifecycle:blocked",
+        "parent_id": null,
+        "title": "Wait for unavailable dependency",
+        "depends_on": [],
+        "state": "blocked",
+        "evidence_refs": ["evidence:lifecycle:dependency-unavailable"],
+        "artifact_refs": []
+      }],
+      "attempts": [],
+      "result": { "revision": null, "branch": null, "pull_request": null }
+    }],
+    "current_run_id": "run:lifecycle:blocked"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:failed",
+    "source": { "kind": "issue", "reference": "fixture:lifecycle-failed" },
+    "objective": "Demonstrate terminal failed work.",
+    "acceptance_criteria": [{ "id": "ac:failed", "text": "The check passes." }],
+    "permissions": { "read": true, "write": false, "execute": true, "commit": false, "create_pr": false },
+    "state": "failed",
+    "created_at": "2026-09-23T05:42:00Z",
+    "runs": [{
+      "id": "run:lifecycle:failed",
+      "role": "validator",
+      "agent_connection_id": "agent:reviewer",
+      "state": "failed",
+      "plan_revisions": [{
+        "revision": 1,
+        "created_at": "2026-09-23T05:42:01Z",
+        "task_ids": ["task:lifecycle:failed"],
+        "change_summary": "Initial plan."
+      }],
+      "tasks": [{
+        "id": "task:lifecycle:failed",
+        "parent_id": null,
+        "title": "Run failing validation",
+        "depends_on": [],
+        "state": "failed",
+        "evidence_refs": ["evidence:lifecycle:failure"],
+        "artifact_refs": []
+      }],
+      "attempts": [{
+        "id": "attempt:lifecycle:failed:1",
+        "task_id": "task:lifecycle:failed",
+        "ordinal": 1,
+        "state": "failed",
+        "started_at": "2026-09-23T05:42:02Z",
+        "completed_at": "2026-09-23T05:42:03Z"
+      }],
+      "result": { "revision": null, "branch": null, "pull_request": null }
+    }],
+    "current_run_id": "run:lifecycle:failed"
+  },
+  {
+    "format_version": 1,
+    "kind": "work-unit",
+    "id": "wu:lifecycle:retry",
+    "source": { "kind": "issue", "reference": "fixture:lifecycle-retry" },
+    "objective": "Demonstrate retry as a new attempt.",
+    "acceptance_criteria": [{ "id": "ac:retry", "text": "A retry follows the failed attempt." }],
+    "permissions": { "read": true, "write": true, "execute": true, "commit": false, "create_pr": false },
+    "state": "running",
+    "created_at": "2026-09-23T05:43:00Z",
+    "runs": [{
+      "id": "run:lifecycle:retry",
+      "role": "implementer",
+      "agent_connection_id": "agent:implementer",
+      "state": "running",
+      "plan_revisions": [{
+        "revision": 1,
+        "created_at": "2026-09-23T05:43:01Z",
+        "task_ids": ["task:lifecycle:retry"],
+        "change_summary": "Initial plan."
+      }],
+      "tasks": [{
+        "id": "task:lifecycle:retry",
+        "parent_id": null,
+        "title": "Retry the failed operation",
+        "depends_on": [],
+        "state": "running",
+        "evidence_refs": ["evidence:lifecycle:first-failure"],
+        "artifact_refs": []
+      }],
+      "attempts": [
+        {
+          "id": "attempt:lifecycle:retry:1",
+          "task_id": "task:lifecycle:retry",
+          "ordinal": 1,
+          "state": "failed",
+          "started_at": "2026-09-23T05:43:02Z",
+          "completed_at": "2026-09-23T05:43:03Z"
+        },
+        {
+          "id": "attempt:lifecycle:retry:2",
+          "task_id": "task:lifecycle:retry",
+          "ordinal": 2,
+          "state": "running",
+          "started_at": "2026-09-23T05:43:04Z",
+          "completed_at": null
+        }
+      ],
+      "result": { "revision": null, "branch": "fixture/retry", "pull_request": null }
+    }],
+    "current_run_id": "run:lifecycle:retry"
+  }
+]

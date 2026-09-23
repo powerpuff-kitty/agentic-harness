@@ -6,7 +6,8 @@ It models execution as structured work rather than a chat transcript. Consumers 
 
 ## V1 contracts
 
-- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt lifecycle.
+- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt structure.
+- lifecycle.v1.schema.json + lifecycle.v1.json — canonical state domain and allowed WorkUnit/Run/Task/Attempt transitions; retries create new attempts.
 - work-event.v1.schema.json — append-only execution event envelope with optional replay deltas.
 - evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
 - artifact.v1.schema.json — content-addressed produced artifacts linked to their producing run/task/attempt.
@@ -36,6 +37,14 @@ It models execution as structured work rather than a chat transcript. Consumers 
 | Context | Task-specific compiled view shown to a model | Ephemeral projection | It is the model input |
 
 Reflection is not memory. A reflection may emit only memory candidate references; promotion, consolidation, supersession and remote-storage policy belong to the Project Memory subsystem. Reflection is also not hidden reasoning capture: it stores concise inspectable conclusions, uncertainty, evidence and proposed corrective actions.
+
+## Work lifecycle and retries
+
+`lifecycle.v1.json` is the canonical state-transition table for WorkUnit, Run, Task and Attempt. Completed, failed and cancelled entities are terminal. Blocked/waiting entities may resume or terminate according to the table; a simple running WorkUnit/Run/Task may complete directly without inventing a validation phase.
+
+A failed or cancelled Attempt is never resurrected. Retrying the same Task creates the next contiguous Attempt ordinal; retrying after a completed Attempt is invalid. Terminal attempts require `completed_at`, while nonterminal attempts must not carry one. Plan changes append a new monotonically increasing plan revision and keep earlier revisions intact.
+
+`fixtures/lifecycle-work-units.v1.json` covers successful, blocked, failed and retried work. `replanned-work-unit.v1.json` covers append-only replanning. Replay state transitions are checked against the same lifecycle table before the projection is mutated.
 
 ## Evidence, artifacts and replay
 
