@@ -1,0 +1,354 @@
+{
+  "format_version": 1,
+  "kind": "agent-work-lifecycle",
+  "id": "agent-work-lifecycle:v1",
+  "states": [
+    "proposed",
+    "queued",
+    "running",
+    "validating",
+    "completed",
+    "blocked",
+    "waiting_for_user",
+    "waiting_for_approval",
+    "failed",
+    "cancelled"
+  ],
+  "entities": {
+    "work-unit": {
+      "initial_states": [
+        "proposed",
+        "queued"
+      ],
+      "terminal_states": [
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "from": "proposed",
+          "to": [
+            "queued",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "queued",
+          "to": [
+            "running",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "running",
+          "to": [
+            "validating",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "validating",
+          "to": [
+            "running",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "blocked",
+          "to": [
+            "queued",
+            "running",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "waiting_for_user",
+          "to": [
+            "queued",
+            "running",
+            "blocked",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "waiting_for_approval",
+          "to": [
+            "queued",
+            "running",
+            "blocked",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "failed",
+          "to": [
+            "queued",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "completed",
+          "to": [
+            "queued"
+          ]
+        },
+        {
+          "from": "cancelled",
+          "to": []
+        }
+      ]
+    },
+    "run": {
+      "initial_states": [
+        "proposed",
+        "queued"
+      ],
+      "terminal_states": [
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "from": "proposed",
+          "to": [
+            "queued",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "queued",
+          "to": [
+            "running",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "running",
+          "to": [
+            "validating",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "validating",
+          "to": [
+            "running",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "blocked",
+          "to": [
+            "queued",
+            "running",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "waiting_for_user",
+          "to": [
+            "queued",
+            "running",
+            "blocked",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "waiting_for_approval",
+          "to": [
+            "queued",
+            "running",
+            "blocked",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "failed",
+          "to": []
+        },
+        {
+          "from": "completed",
+          "to": []
+        },
+        {
+          "from": "cancelled",
+          "to": []
+        }
+      ]
+    },
+    "task": {
+      "initial_states": [
+        "proposed",
+        "queued"
+      ],
+      "terminal_states": [
+        "completed",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "from": "proposed",
+          "to": [
+            "queued",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "queued",
+          "to": [
+            "running",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "running",
+          "to": [
+            "validating",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "validating",
+          "to": [
+            "running",
+            "blocked",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "blocked",
+          "to": [
+            "queued",
+            "running",
+            "waiting_for_user",
+            "waiting_for_approval",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "waiting_for_user",
+          "to": [
+            "queued",
+            "running",
+            "blocked",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "waiting_for_approval",
+          "to": [
+            "queued",
+            "running",
+            "blocked",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "failed",
+          "to": [
+            "queued",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "completed",
+          "to": []
+        },
+        {
+          "from": "cancelled",
+          "to": []
+        }
+      ]
+    },
+    "attempt": {
+      "initial_states": [
+        "queued",
+        "running"
+      ],
+      "terminal_states": [
+        "completed",
+        "failed",
+        "cancelled"
+      ],
+      "transitions": [
+        {
+          "from": "queued",
+          "to": [
+            "running",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "running",
+          "to": [
+            "completed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "from": "completed",
+          "to": []
+        },
+        {
+          "from": "failed",
+          "to": []
+        },
+        {
+          "from": "cancelled",
+          "to": []
+        }
+      ]
+    }
+  },
+  "progress": {
+    "basis": "latest-plan-task-state-counts",
+    "active_plan_only": true,
+    "persist_percentage": false
+  }
+}
