@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added a canonical Agent Work lifecycle transition table, replay enforcement, terminal/retry invariants, and success/blocked/failure/retry fixtures; replanning remains append-only.
+
 - Added normalized Agent Work Metric and Finding contracts plus Evaluation v2 with evidence-backed scoring, explicit remediation eligibility, independent evaluator identity, and immutable reassessment lineage; Evaluation v1 remains compatible.
 
 - Added AgentConnection v2 with explicit capability states, connected-tool inventory, repository access, usage/rate-limit observations, session continuation, readiness evidence, and WorkAction eligibility validation while retaining v1 compatibility.
