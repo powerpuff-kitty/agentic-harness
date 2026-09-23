@@ -14,6 +14,8 @@ FIXTURES = WORK / "fixtures"
 
 SCHEMAS = {
     "work-unit": WORK / "work-unit.v1.schema.json",
+    "work-unit-v2": WORK / "work-unit.v2.schema.json",
+    "work-lifecycle": WORK / "lifecycle.v1.schema.json",
     "work-event": WORK / "work-event.v1.schema.json",
     "work-evidence": WORK / "evidence.v1.schema.json",
     "work-artifact": WORK / "artifact.v1.schema.json",
@@ -67,6 +69,64 @@ def validate(kind: str, value, label: str) -> None:
         fail(f"{label}:{location}: {error.message}")
 
 
+LIFECYCLE = load(WORK / "lifecycle.v1.json")
+TRANSITIONS: dict[str, dict[str, set[str]]] = {}
+TERMINAL_STATES: dict[str, set[str]] = {}
+ALL_STATES = {
+    "proposed", "queued", "running", "validating", "completed",
+    "blocked", "waiting_for_user", "waiting_for_approval", "failed", "cancelled",
+}
+
+if isinstance(LIFECYCLE, dict):
+    validate("work-lifecycle", LIFECYCLE, "lifecycle")
+    if set(LIFECYCLE.get("states", [])) != ALL_STATES:
+        fail("lifecycle: states must exactly match the WorkUnit state vocabulary")
+
+    entities = LIFECYCLE.get("entities", {})
+    for entity_kind in ("work-unit", "run", "task", "attempt"):
+        policy = entities.get(entity_kind, {}) if isinstance(entities, dict) else {}
+        rows = policy.get("transitions", []) if isinstance(policy, dict) else []
+        terminal = set(policy.get("terminal_states", [])) if isinstance(policy, dict) else set()
+        initial = set(policy.get("initial_states", [])) if isinstance(policy, dict) else set()
+
+        if not initial:
+            fail(f"lifecycle:{entity_kind}: initial states must not be empty")
+        if not terminal:
+            fail(f"lifecycle:{entity_kind}: terminal states must not be empty")
+        if not initial.issubset(ALL_STATES) or not terminal.issubset(ALL_STATES):
+            fail(f"lifecycle:{entity_kind}: unknown initial/terminal state")
+
+        table: dict[str, set[str]] = {}
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            source = row.get("from")
+            targets = row.get("to", [])
+            if source in table:
+                fail(f"lifecycle:{entity_kind}: duplicate transition row for {source}")
+                continue
+            if source not in ALL_STATES:
+                fail(f"lifecycle:{entity_kind}: unknown transition source {source}")
+                continue
+            target_set = set(targets) if isinstance(targets, list) else set()
+            if not target_set.issubset(ALL_STATES):
+                fail(f"lifecycle:{entity_kind}: transition from {source} references unknown state")
+            table[source] = target_set
+
+        for terminal_state in terminal:
+            if table.get(terminal_state, set()):
+                fail(f"lifecycle:{entity_kind}: terminal state {terminal_state} has outgoing transitions")
+
+        TRANSITIONS[entity_kind] = table
+        TERMINAL_STATES[entity_kind] = terminal
+
+
+def transition_allowed(entity_kind: str | None, previous: str | None, next_state: str | None) -> bool:
+    if not isinstance(entity_kind, str) or not isinstance(previous, str) or not isinstance(next_state, str):
+        return False
+    return next_state in TRANSITIONS.get(entity_kind, {}).get(previous, set())
+
+
 def validate_event_list(value, label: str) -> None:
     if not isinstance(value, list):
         fail(f"{label}: expected an array of work events")
@@ -97,8 +157,21 @@ def validate_event_list(value, label: str) -> None:
         elif event.get("work_unit_id") != work_unit_id:
             fail(f"{label}[{index}]: fixture mixes work units")
 
+        delta = event.get("projection_delta")
+        if isinstance(delta, dict) and delta.get("operation") == "state_transition":
+            entity = delta.get("entity", {})
+            entity_kind = entity.get("kind") if isinstance(entity, dict) else None
+            previous = delta.get("previous_state")
+            next_state = delta.get("next_state")
+            if not transition_allowed(entity_kind, previous, next_state):
+                fail(
+                    f"{label}[{index}]: lifecycle forbids "
+                    f"{entity_kind} {previous} -> {next_state}"
+                )
+
 
 work_unit = load(FIXTURES / "replanned-work-unit.v1.json")
+lifecycle_work_units = load(FIXTURES / "lifecycle-work-units.v2.json")
 evaluation = load(FIXTURES / "evaluation.v1.json")
 evaluations_v2 = load(FIXTURES / "evaluations.v2.json")
 metrics_v1 = load(FIXTURES / "metrics.v1.json")
@@ -202,6 +275,211 @@ if isinstance(work_unit, dict):
             if key in attempts_seen:
                 fail(f"{run.get('id')}: duplicate task attempt {key}")
             attempts_seen.add(key)
+
+def work_unit_v2_semantic_errors(value: dict) -> list[str]:
+    problems: list[str] = []
+    validator = validators.get("work-unit-v2")
+    if validator is not None:
+        for error in sorted(validator.iter_errors(value), key=lambda item: list(item.path)):
+            location = ".".join(str(part) for part in error.path) or "<root>"
+            problems.append(f"{location}: {error.message}")
+
+    if not isinstance(value, dict):
+        return problems
+
+    runs = value.get("runs", [])
+    run_ids = [run.get("id") for run in runs if isinstance(run, dict)]
+    if len(run_ids) != len(set(run_ids)):
+        problems.append("run ids must be unique")
+    if value.get("current_run_id") is not None and value.get("current_run_id") not in set(run_ids):
+        problems.append("current_run_id must reference an existing run")
+
+    for run in runs:
+        if not isinstance(run, dict):
+            continue
+        run_id = run.get("id")
+        tasks = run.get("tasks", [])
+        task_ids = [task.get("id") for task in tasks if isinstance(task, dict)]
+        known = set(task_ids)
+        if len(task_ids) != len(known):
+            problems.append(f"{run_id}: task ids must be unique")
+
+        dependencies: dict[str, list[str]] = {}
+        parents: dict[str, str | None] = {}
+        for task in tasks:
+            if not isinstance(task, dict) or not isinstance(task.get("id"), str):
+                continue
+            task_id = task["id"]
+            parent = task.get("parent_id")
+            parents[task_id] = parent if isinstance(parent, str) else None
+            if parent is not None and parent not in known:
+                problems.append(f"{run_id}: {task_id} references missing parent {parent}")
+            if parent == task_id:
+                problems.append(f"{run_id}: {task_id} cannot parent itself")
+
+            deps = task.get("depends_on", [])
+            dependencies[task_id] = list(deps) if isinstance(deps, list) else []
+            for dependency in dependencies[task_id]:
+                if dependency not in known:
+                    problems.append(f"{run_id}: {task_id} references missing dependency {dependency}")
+                if dependency == task_id:
+                    problems.append(f"{run_id}: {task_id} cannot depend on itself")
+
+        def cycle_errors(graph: dict[str, list[str]], label: str) -> None:
+            visiting: set[str] = set()
+            visited: set[str] = set()
+
+            def visit(node_id: str) -> None:
+                if node_id in visited:
+                    return
+                if node_id in visiting:
+                    problems.append(f"{run_id}: {label} graph contains a cycle at {node_id}")
+                    return
+                visiting.add(node_id)
+                for target in graph.get(node_id, []):
+                    if target in graph:
+                        visit(target)
+                visiting.remove(node_id)
+                visited.add(node_id)
+
+            for node_id in graph:
+                visit(node_id)
+
+        cycle_errors(dependencies, "task dependency")
+        parent_graph = {
+            task_id: [parent] if isinstance(parent, str) and parent in known else []
+            for task_id, parent in parents.items()
+        }
+        cycle_errors(parent_graph, "task parent")
+
+        revisions = run.get("plan_revisions", [])
+        numbers = [item.get("revision") for item in revisions if isinstance(item, dict)]
+        expected_numbers = list(range(1, len(numbers) + 1))
+        if numbers != expected_numbers:
+            problems.append(f"{run_id}: plan revisions must be contiguous append-only revisions starting at 1")
+        for revision in revisions:
+            if not isinstance(revision, dict):
+                continue
+            for task_id in revision.get("task_ids", []):
+                if task_id not in known:
+                    problems.append(f"{run_id}: plan revision references unknown task {task_id}")
+
+        attempts_by_task: dict[str, list[dict]] = {}
+        attempt_ids: set[str] = set()
+        for attempt in run.get("attempts", []):
+            if not isinstance(attempt, dict):
+                continue
+            attempt_id = attempt.get("id")
+            if isinstance(attempt_id, str):
+                if attempt_id in attempt_ids:
+                    problems.append(f"{run_id}: duplicate attempt id {attempt_id}")
+                attempt_ids.add(attempt_id)
+
+            task_id = attempt.get("task_id")
+            if task_id not in known:
+                problems.append(f"{run_id}: attempt references unknown task {task_id}")
+                continue
+            attempts_by_task.setdefault(task_id, []).append(attempt)
+
+            state = attempt.get("state")
+            started_at = attempt.get("started_at")
+            completed_at = attempt.get("completed_at")
+            if state == "queued" and (started_at is not None or completed_at is not None):
+                problems.append(f"{run_id}: queued attempt {attempt_id} cannot have timestamps")
+            if state == "running" and (started_at is None or completed_at is not None):
+                problems.append(f"{run_id}: running attempt {attempt_id} requires started_at and no completed_at")
+            if state in {"completed", "failed", "cancelled"} and (started_at is None or completed_at is None):
+                problems.append(f"{run_id}: terminal attempt {attempt_id} requires start and completion timestamps")
+
+        for task_id, attempts in attempts_by_task.items():
+            ordinals = [item.get("ordinal") for item in attempts]
+            expected = list(range(1, len(attempts) + 1))
+            if ordinals != expected:
+                problems.append(f"{run_id}: attempts for {task_id} must use contiguous ordinals starting at 1")
+
+    return problems
+
+
+if isinstance(lifecycle_work_units, list):
+    expected_cases = {
+        "wu:lifecycle:successful",
+        "wu:lifecycle:blocked",
+        "wu:lifecycle:failed",
+        "wu:lifecycle:retried",
+        "wu:lifecycle:replanned",
+    }
+    observed_cases = {
+        item.get("id")
+        for item in lifecycle_work_units
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+    if observed_cases != expected_cases:
+        fail(
+            "lifecycle-work-units: expected success/blocked/failed/retried/replanned cases; "
+            f"observed={sorted(observed_cases)}"
+        )
+
+    for index, candidate in enumerate(lifecycle_work_units):
+        if not isinstance(candidate, dict):
+            fail(f"lifecycle-work-units[{index}]: expected object")
+            continue
+        for problem in work_unit_v2_semantic_errors(candidate):
+            fail(f"lifecycle-work-units[{index}]: {problem}")
+
+    by_id = {
+        item.get("id"): item
+        for item in lifecycle_work_units
+        if isinstance(item, dict) and isinstance(item.get("id"), str)
+    }
+
+    retried = by_id.get("wu:lifecycle:retried", {})
+    retry_attempts = [
+        attempt
+        for run in retried.get("runs", [])
+        if isinstance(run, dict)
+        for attempt in run.get("attempts", [])
+        if isinstance(attempt, dict)
+    ]
+    if [item.get("state") for item in retry_attempts] != ["failed", "completed"]:
+        fail("lifecycle-work-units: retried case must preserve failed then completed attempts")
+    if [item.get("ordinal") for item in retry_attempts] != [1, 2]:
+        fail("lifecycle-work-units: retried case must use contiguous attempt ordinals")
+
+    replanned = by_id.get("wu:lifecycle:replanned", {})
+    replan_runs = [run for run in replanned.get("runs", []) if isinstance(run, dict)]
+    if not replan_runs or len(replan_runs[0].get("plan_revisions", [])) < 2:
+        fail("lifecycle-work-units: replanned case requires at least two plan revisions")
+    elif replan_runs[0]["plan_revisions"][0].get("task_ids") == replan_runs[0]["plan_revisions"][-1].get("task_ids"):
+        fail("lifecycle-work-units: replanned case must change the active task set")
+
+    bad_revision = copy.deepcopy(lifecycle_work_units[0])
+    bad_revision["runs"][0]["plan_revisions"][0]["revision"] = 2
+    if not any("plan revisions must be contiguous" in item for item in work_unit_v2_semantic_errors(bad_revision)):
+        fail("lifecycle mutation: noncontiguous plan revision was not rejected")
+
+    bad_parent = copy.deepcopy(lifecycle_work_units[0])
+    tasks = bad_parent["runs"][0]["tasks"]
+    if len(tasks) >= 2:
+        tasks[0]["parent_id"] = tasks[1]["id"]
+        tasks[1]["parent_id"] = tasks[0]["id"]
+        if not any("task parent graph contains a cycle" in item for item in work_unit_v2_semantic_errors(bad_parent)):
+            fail("lifecycle mutation: parent cycle was not rejected")
+
+    bad_ordinal = copy.deepcopy(by_id["wu:lifecycle:retried"])
+    bad_ordinal["runs"][0]["attempts"][1]["ordinal"] = 3
+    if not any("contiguous ordinals" in item for item in work_unit_v2_semantic_errors(bad_ordinal)):
+        fail("lifecycle mutation: noncontiguous retry ordinal was not rejected")
+
+if TRANSITIONS:
+    if transition_allowed("attempt", "failed", "running"):
+        fail("lifecycle-policy: failed Attempt must be terminal; retry requires a new Attempt")
+    if transition_allowed("run", "failed", "queued"):
+        fail("lifecycle-policy: failed Run must be terminal; retry requires a new Run")
+    if transition_allowed("task", "completed", "running"):
+        fail("lifecycle-policy: completed Task must not restart in place")
+    if not transition_allowed("task", "failed", "queued"):
+        fail("lifecycle-policy: failed Task should support explicit recovery through queued state")
+
 
 if isinstance(evaluation, dict):
     validate("work-evaluation", evaluation, "evaluation")
@@ -961,6 +1239,12 @@ if isinstance(replay_seed, dict) and isinstance(replay_expected, dict) and isins
         entity_id = entity.get("id") if isinstance(entity, dict) else None
 
         if operation == "state_transition":
+            if not transition_allowed(entity_kind, delta.get("previous_state"), delta.get("next_state")):
+                fail(
+                    f"replay-events[{index}]: lifecycle forbids "
+                    f"{entity_kind} {delta.get('previous_state')} -> {delta.get('next_state')}"
+                )
+                continue
             target = _entity_for_delta(projection, entity_kind, entity_id)
             if target is None:
                 fail(f"replay-events[{index}]: transition target {entity_kind}:{entity_id} is missing")
