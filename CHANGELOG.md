@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added AgentConnection v2 with explicit capability support, repository/tool access, credential references, readiness evidence, usage/rate-limit observations, continuation modes, and deterministic WorkAction eligibility checks while retaining v1 compatibility.
+
 - Added WorkAction v2 with approval state, parent/root lineage, produced-result references, and chained audit/remediate/reassess validation while retaining v1 compatibility.
 
 - Added Architecture Graph v1, a language-neutral capability/contract/provider/adapter model with semantic dependency validation and explicit declaration/check/enforcement states.
