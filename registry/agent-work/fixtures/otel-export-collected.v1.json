@@ -390,7 +390,7 @@
       "trace_id": "11111111111111111111111111111111",
       "span_id": "0000000000000007",
       "parent_span_id": "0000000000000006",
-      "name": "gen_ai.chat",
+      "name": "chat synthetic-example-model",
       "span_kind": "client",
       "entity": {
         "kind": "model",
@@ -419,7 +419,8 @@
         "gen_ai.usage.output_tokens": 30,
         "agent.work.cost.amount": 0.001,
         "agent.work.cost.currency": "USD",
-        "agent.work.cost.source": "fixture-observation"
+        "agent.work.cost.source": "fixture-observation",
+        "gen_ai.operation.name": "chat"
       },
       "links": [],
       "events": []
@@ -428,7 +429,7 @@
       "trace_id": "11111111111111111111111111111111",
       "span_id": "0000000000000008",
       "parent_span_id": "0000000000000006",
-      "name": "agent.work.tool",
+      "name": "execute_tool test-runner",
       "span_kind": "internal",
       "entity": {
         "kind": "tool",
@@ -447,7 +448,9 @@
         "agent.work.attempt.id": "attempt:retry:1",
         "agent.work.tool.name": "test-runner",
         "agent.work.input.identity": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-        "agent.work.output.identity": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        "agent.work.output.identity": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "gen_ai.operation.name": "execute_tool",
+        "gen_ai.tool.name": "test-runner"
       },
       "links": [],
       "events": []
