@@ -1,0 +1,138 @@
+{
+  "format_version": 1,
+  "kind": "architecture-graph",
+  "project": {
+    "id": "fixture.web-ts",
+    "description": "Synthetic fixture.web-ts architecture fixture."
+  },
+  "graph_state": "observed",
+  "nodes": [
+    {
+      "id": "capability.catalog",
+      "kind": "capability",
+      "name": "Catalog",
+      "lifecycle": "current",
+      "path": "packages/catalog",
+      "metadata": {
+        "capability_key": "catalog",
+        "language": "typescript"
+      }
+    },
+    {
+      "id": "capability.search",
+      "kind": "capability",
+      "name": "Search",
+      "lifecycle": "current",
+      "path": "packages/search",
+      "metadata": {
+        "capability_key": "search",
+        "language": "typescript"
+      }
+    },
+    {
+      "id": "contract.catalog",
+      "kind": "contract",
+      "name": "Catalog contract",
+      "lifecycle": "current",
+      "path": "packages/contracts/catalog"
+    },
+    {
+      "id": "app.web",
+      "kind": "app",
+      "name": "Web application",
+      "lifecycle": "current",
+      "path": "apps/web"
+    },
+    {
+      "id": "surface.catalog-ui",
+      "kind": "surface",
+      "name": "Catalog UI",
+      "lifecycle": "current",
+      "path": "apps/web/src/features/catalog"
+    },
+    {
+      "id": "surface.search-ui",
+      "kind": "surface",
+      "name": "Search UI",
+      "lifecycle": "current",
+      "path": "apps/web/src/features/search"
+    },
+    {
+      "id": "adapter.catalog-api",
+      "kind": "adapter",
+      "name": "Catalog API adapter",
+      "lifecycle": "current",
+      "path": "packages/catalog/src/adapters/api"
+    },
+    {
+      "id": "authority.catalog-store",
+      "kind": "authority",
+      "name": "Catalog source of truth",
+      "lifecycle": "current",
+      "path": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "capability.search",
+      "to": "capability.catalog",
+      "kind": "depends-on"
+    },
+    {
+      "from": "capability.catalog",
+      "to": "contract.catalog",
+      "kind": "owns"
+    },
+    {
+      "from": "app.web",
+      "to": "capability.catalog",
+      "kind": "composes"
+    },
+    {
+      "from": "app.web",
+      "to": "capability.search",
+      "kind": "composes"
+    },
+    {
+      "from": "capability.catalog",
+      "to": "surface.catalog-ui",
+      "kind": "exposes"
+    },
+    {
+      "from": "capability.search",
+      "to": "surface.search-ui",
+      "kind": "exposes"
+    },
+    {
+      "from": "adapter.catalog-api",
+      "to": "contract.catalog",
+      "kind": "implements"
+    },
+    {
+      "from": "authority.catalog-store",
+      "to": "capability.catalog",
+      "kind": "authoritative-for"
+    }
+  ],
+  "constraints": [
+    {
+      "id": "boundary.web-no-catalog-adapter",
+      "kind": "forbidden-dependency",
+      "subject": "app.web",
+      "target": "adapter.catalog-api",
+      "status": "declared",
+      "mechanism": null,
+      "evidence_refs": [],
+      "description": "The web composition root reaches catalog behavior through declared capability contracts."
+    }
+  ],
+  "coverage": {
+    "nodes_declared": 8,
+    "edges_declared": 8,
+    "paths_checked": 0,
+    "complete": false
+  },
+  "not_checked": [
+    "Repository paths are declared fixture data and were not inspected against a checkout."
+  ]
+}
