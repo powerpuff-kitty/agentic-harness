@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/finding.v1.schema.json",
+  "title": "Agent Work Finding v1",
+  "description": "Evidence-backed evaluation finding with explicit remediation eligibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "evaluation_id",
+    "severity",
+    "category",
+    "message",
+    "target",
+    "evidence_refs",
+    "status",
+    "remediation",
+    "prior_finding_id",
+    "created_at"
+  ],
+  "properties": {
+    "format_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "kind": {
+      "type": "string",
+      "const": "work-finding"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "evaluation_id": {
+      "$ref": "#/$defs/id"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "info",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 300
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 10000
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "reference"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "work-unit",
+            "run",
+            "task",
+            "file",
+            "artifact",
+            "requirement",
+            "other"
+          ]
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": {
+        "$ref": "#/$defs/id"
+      },
+      "minItems": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "resolved",
+        "accepted",
+        "blocked",
+        "dismissed"
+      ]
+    },
+    "remediation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "eligible",
+        "action_intents",
+        "guidance"
+      ],
+      "properties": {
+        "eligible": {
+          "type": "boolean"
+        },
+        "action_intents": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "remediate",
+              "reassess",
+              "validate",
+              "review"
+            ]
+          }
+        },
+        "guidance": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 10000
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "eligible": {
+                "const": false
+              }
+            },
+            "required": [
+              "eligible"
+            ]
+          },
+          "then": {
+            "properties": {
+              "action_intents": {
+                "maxItems": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "prior_finding_id": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/id"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    }
+  }
+}

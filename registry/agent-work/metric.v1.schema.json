@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agentic-harness.dev/schemas/agent-work/metric.v1.schema.json",
+  "title": "Agent Work Metric v1",
+  "description": "Evidence-backed measurement or judgment attached to one Agent Work evaluation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "kind",
+    "id",
+    "evaluation_id",
+    "dimension",
+    "label",
+    "status",
+    "method",
+    "input_refs",
+    "evidence_refs",
+    "measurement",
+    "created_at"
+  ],
+  "properties": {
+    "format_version": { "type": "integer", "const": 1 },
+    "kind": { "type": "string", "const": "work-metric" },
+    "id": { "$ref": "#/$defs/id" },
+    "evaluation_id": { "$ref": "#/$defs/id" },
+    "dimension": {
+      "type": "string",
+      "enum": [
+        "requirement_coverage",
+        "functional_correctness",
+        "validation_coverage",
+        "code_quality",
+        "architecture_compliance",
+        "maintainability",
+        "security",
+        "performance",
+        "accessibility",
+        "documentation",
+        "regression_risk",
+        "evidence_completeness",
+        "evaluator_confidence",
+        "completion_confidence",
+        "agent_self_assessment",
+        "custom"
+      ]
+    },
+    "label": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "status": {
+      "type": "string",
+      "enum": ["measured", "judged", "unknown", "not_checked", "blocked", "not_applicable"]
+    },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "description", "version"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["deterministic_check", "evaluator_judgment", "agent_self_assessment", "composite", "other"]
+        },
+        "description": { "type": ["string", "null"], "maxLength": 5000 },
+        "version": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "input_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 5000,
+      "items": { "$ref": "#/$defs/id" }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "normalized_score", "grade"],
+      "properties": {
+        "value": {
+          "type": ["number", "string", "boolean", "null"]
+        },
+        "unit": { "type": ["string", "null"], "maxLength": 100 },
+        "normalized_score": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "grade": { "type": ["string", "null"], "maxLength": 200 }
+      }
+    },
+    "created_at": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["unknown", "not_checked", "blocked", "not_applicable"] }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "measurement": {
+            "properties": {
+              "value": { "type": "null" },
+              "unit": { "type": "null" },
+              "normalized_score": { "type": "null" },
+              "grade": { "type": "null" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "dimension": { "const": "agent_self_assessment" }
+        },
+        "required": ["dimension"]
+      },
+      "then": {
+        "properties": {
+          "method": {
+            "properties": {
+              "kind": { "const": "agent_self_assessment" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}$"
+    }
+  }
+}

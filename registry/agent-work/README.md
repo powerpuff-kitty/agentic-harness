@@ -11,7 +11,10 @@ It models execution as structured work rather than a chat transcript. Consumers 
 - evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
 - artifact.v1.schema.json — content-addressed produced artifacts linked to their producing run/task/attempt.
 - redaction.v1.schema.json — explicit redaction records so sensitive payload removal remains auditable.
-- evaluation.v1.schema.json — evidence-backed metrics, confidence signals and findings.
+- evaluation.v1.schema.json — compatibility envelope with embedded dimensions, confidence signals and findings.
+- metric.v1.schema.json — normalized evidence-backed deterministic measurements, evaluator judgments and explicitly separate agent self-assessment.
+- finding.v1.schema.json — normalized evidence-backed findings with status, target and remediation eligibility.
+- evaluation.v2.schema.json — preferred evaluation envelope with implementer/evaluator identity, metric/finding references and immutable reassessment lineage.
 - work-action.v1.schema.json — compatibility contract for execute/audit/reflect/fix/validate/reassess/custom actions and permissions.
 - work-action.v2.schema.json — preferred action contract with explicit approval state, parent/root lineage and result references for chained controls.
 - agent-connection.v1.schema.json — compatibility contract for basic executable provider/model/auth/environment capabilities.
@@ -43,6 +46,14 @@ Artifacts are content-addressed outputs with producer lineage. Small structured 
 Sensitive content is never silently deleted. A redacted payload carries a `redaction_ref` to a WorkRedaction record identifying the affected evidence/artifact, fields, reason, policy/actor and optional redacted digest. A redaction record must not contain the removed secret itself.
 
 WorkEvent remains append-only. Optional `projection_delta` records deterministic state transitions, entity creation snapshots, plan revisions and evidence/artifact links. Replaying a seed WorkUnit plus ordered events and referenced structured snapshots must rebuild the same current WorkUnit projection. Replay data captures observable state changes, not private chain-of-thought.
+
+## Evaluation, metrics and reassessment
+
+The normalized evaluation contracts separate what was measured from who judged it. `metric.v1` records method kind, method description/version, exact input references, evidence references and measurement values. Unknown, not-checked, blocked and not-applicable metrics cannot carry a score, grade or value. Agent self-assessment is a distinct metric dimension/method and is never relabeled as evaluator confidence.
+
+`finding.v1` requires evidence and makes remediation eligibility explicit. `evaluation.v2` links metrics/findings without embedding mutable copies, preserves both implementer and evaluator identities, and records reassessment as a new evaluation pointing to its prior evaluation and triggering WorkAction. Earlier evaluations remain unchanged.
+
+The fixtures `metrics.v1.json`, `findings.v1.json` and `evaluations.v2.json` demonstrate two independent evaluators on the same implementation plus a post-fix reassessment. Validation rejects scored not-checked metrics, measurements without evidence, evaluator/implementer identity collapse, self/cyclic reassessment and remediation actions on ineligible findings.
 
 ## Action lineage and results
 
