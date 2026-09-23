@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Added an optional metadata-only Agent Work OpenTelemetry export contract, canonical-to-OTel mapping, full replay-correlation fixtures, no-telemetry coverage, and a reusable adapter conformance validator with negative mutation tests.
+
 - Added a canonical Agent Work lifecycle transition table, replay enforcement, terminal/retry invariants, and success/blocked/failure/retry fixtures; replanning remains append-only.
 
 - Added normalized Agent Work Metric and Finding contracts plus Evaluation v2 with evidence-backed scoring, explicit remediation eligibility, independent evaluator identity, and immutable reassessment lineage; Evaluation v1 remains compatible.
