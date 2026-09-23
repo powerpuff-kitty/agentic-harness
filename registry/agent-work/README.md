@@ -4,9 +4,11 @@ Agent Work is the provider-neutral, versioned contract for observable AI work.
 
 It models execution as structured work rather than a chat transcript. Consumers can render plans, tasks, attempts, evidence, artifacts, evaluations, reflections and follow-up actions without requiring or storing private chain-of-thought.
 
-## V1 contracts
+## Versioned contracts
 
-- work-unit.v1.schema.json — WorkUnit, Run, Plan revision, Task and Attempt structure.
+- work-unit.v1.schema.json — compatibility WorkUnit, Run, Plan revision, Task and Attempt structure.
+- work-unit.v2.schema.json — preferred WorkUnit contract with opaque session correlation and immutable Run input identity separate from output revision.
+- work-progress.v1.schema.json — deterministic latest-plan Task-state projection for progress UIs; no estimated percentage field.
 - lifecycle.v1.schema.json + lifecycle.v1.json — canonical state domain and allowed WorkUnit/Run/Task/Attempt transitions; retries create new attempts.
 - work-event.v1.schema.json — append-only execution event envelope with optional replay deltas.
 - evidence.v1.schema.json — captured facts, derived results and explicit unavailable evidence with provenance.
@@ -20,10 +22,10 @@ It models execution as structured work rather than a chat transcript. Consumers 
 - work-action.v2.schema.json — preferred action contract with explicit approval state, parent/root lineage and result references for chained controls.
 - agent-connection.v1.schema.json — compatibility contract for basic executable provider/model/auth/environment capabilities.
 - agent-connection.v2.schema.json — preferred connection contract with explicit capability states, tool inventory, repository access, usage/rate-limit observations, session continuation and readiness evidence.
+- otel-export.v1.schema.json — optional metadata-only OpenTelemetry projection with exact Agent Work correlation; telemetry never becomes canonical work state.
 - reflection.v1.schema.json — bounded post-attempt reflection with evidence, uncertainty, corrections and lineage.
 - reflection-policy.v1.schema.json — deterministic/provider-neutral policy for deciding when reflection is worth invoking.
 - reflection-trigger-decision.v1.schema.json — replayable result of applying a reflection policy to a trigger.
-- otel-export.v1.schema.json — optional metadata-only OpenTelemetry projection with explicit semantic-convention versioning and canonical correlation IDs.
 
 ## Concept boundaries
 
@@ -38,6 +40,16 @@ It models execution as structured work rather than a chat transcript. Consumers 
 | Context | Task-specific compiled view shown to a model | Ephemeral projection | It is the model input |
 
 Reflection is not memory. A reflection may emit only memory candidate references; promotion, consolidation, supersession and remote-storage policy belong to the Project Memory subsystem. Reflection is also not hidden reasoning capture: it stores concise inspectable conclusions, uncertainty, evidence and proposed corrective actions.
+
+## Run identity and deterministic progress
+
+WorkUnit v2 is additive; WorkUnit v1 remains valid. Each v2 Run keeps `agent_connection_id` as the executable connection reference, adds nullable `session_ref` for opaque provider-session correlation, and requires an immutable `input_revision` made of a source revision plus context fingerprint. The Run `result.revision` remains a separate output identity, so consumers do not conflate what was executed with what was produced.
+
+The protocol does not serialize provider-private session state or credentials. A session reference is correlation metadata only, and a context fingerprint is identity evidence rather than proof that every relevant source was included.
+
+`work-progress.v1` is derived from the current Run's **latest plan revision**. Historical Tasks removed from the active plan remain in WorkUnit history but do not inflate current progress counts. The projection records active Task count plus exact counts for every lifecycle state and deliberately has no percentage field. This makes progress reproducible from canonical WorkUnit state instead of a model estimate.
+
+The fixture pair `work-unit-v2.v2.json` and `work-progress.v1.json` proves the derivation: a completed inspection Task remains historical after replanning, while only the active implementation and verification Tasks contribute to current progress.
 
 ## Work lifecycle and retries
 
@@ -77,13 +89,15 @@ The compatibility `work-action.v1` schema remains unchanged. New producers that 
 
 Authentication metadata records only the mode and credential source/subject reference; there is no raw credential field. The fixture at `fixtures/agent-connections.v2.json` covers local, hosted and BYO-API modes. Validation checks capability dependencies and uses WorkAction v2 permissions to derive eligibility deterministically. Connection readiness and tool readiness are observations, not proof that an external provider will remain available.
 
-## OpenTelemetry projection and adapter conformance
+## OpenTelemetry conformance
 
-OpenTelemetry is an optional derived projection, never canonical Agent Work state. The mapping in [otel-mapping.md](./otel-mapping.md) uses duration-bearing WorkUnit/Run/Task/Attempt/Action operations as spans and point-in-time WorkEvents as span events. Non-parent causal relationships such as retries or reassessments use links. Agent Work correlation lives under the `agent.work.*` namespace; observed GenAI attributes may be added only with an explicit semantic-convention version/status.
+`otel-export.v1` is an optional observability projection. WorkUnit, Run, Task, Attempt and WorkAction identities remain canonical Agent Work records; dropped, sampled, unavailable or malformed telemetry cannot complete, fail, approve or otherwise mutate them.
 
-The v1 export contract is metadata-only: model inputs/outputs, user content, tool payloads and secrets are omitted. Provider/model/tool labels, content identities, usage/cost observations and canonical redaction references may be retained when actually observed. `status: not_collected` with no spans is valid and does not affect WorkUnit validity.
+The mapping baseline is OpenTelemetry semantic conventions 1.44.0. GenAI and agent conventions are still Development, so `agent.work.*` correlation attributes remain stable even if `gen_ai.*` evolves. Standard GenAI operation names are used only when they actually match the observed operation; ordinary Agent Work entities are not relabeled as GenAI agent spans merely because an AI agent produced them.
 
-The reusable `conformance/validate_otel_export.py` command checks schema validity, parent-span structure/cycles, canonical entity containment, exact WorkEvent timestamp/type/state correlation, full event coverage for collected fixtures, redaction references and sensitive telemetry keys. Its negative self-tests mutate correlation, state, event coverage and content handling so adapter regressions fail deterministically.
+The collected fixture maps every canonical WorkUnit/Run/Task/Attempt and every replay WorkEvent, preserves provider/model/version plus input/output identities, records token/cost observations when supplied, and keeps model/tool content out of the metadata-only export. The `not_collected` fixture demonstrates that missing telemetry is valid and independent from canonical completion.
+
+Run the conformance validator with the canonical fixtures as documented in [otel-mapping.md](otel-mapping.md). CI also executes its adversarial self-tests for duplicate/missing entities, event/state drift, sensitive content, invalid token usage and dangling trace links.
 
 ## Reflection lifecycle
 
@@ -117,4 +131,4 @@ Run:
 
     python3 .github/scripts/validate_agent_work_protocol.py
 
-The validator checks the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including DAG cycles, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, score/evidence semantics, reflection abstention rules, deterministic trigger ordering, correction lineage, and OpenTelemetry adapter conformance. The collected OTel fixture runs deterministic negative self-tests; the no-telemetry fixture proves observability remains optional.
+The validators check the JSON Schemas and representative fixtures plus protocol invariants that JSON Schema alone cannot express, including WorkUnit v2 Run identity, Task parent/dependency cycles, deterministic latest-plan progress, lifecycle/retry rules, references, monotonic event sequence, evidence/artifact/redaction provenance, deterministic WorkUnit replay, OpenTelemetry entity/event correlation, metadata-only telemetry safety, score/evidence semantics, reflection abstention rules, deterministic trigger ordering and correction lineage.
