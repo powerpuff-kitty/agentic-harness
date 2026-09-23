@@ -12,7 +12,8 @@ It models execution as structured work rather than a chat transcript. Consumers 
 - artifact.v1.schema.json — content-addressed produced artifacts linked to their producing run/task/attempt.
 - redaction.v1.schema.json — explicit redaction records so sensitive payload removal remains auditable.
 - evaluation.v1.schema.json — evidence-backed metrics, confidence signals and findings.
-- work-action.v1.schema.json — execute/audit/reflect/fix/validate/reassess/custom actions and permissions.
+- work-action.v1.schema.json — compatibility contract for execute/audit/reflect/fix/validate/reassess/custom actions and permissions.
+- work-action.v2.schema.json — preferred action contract with explicit approval state, parent/root lineage and result references for chained controls.
 - agent-connection.v1.schema.json — executable provider/model/auth/environment capabilities.
 - reflection.v1.schema.json — bounded post-attempt reflection with evidence, uncertainty, corrections and lineage.
 - reflection-policy.v1.schema.json — deterministic/provider-neutral policy for deciding when reflection is worth invoking.
@@ -41,6 +42,12 @@ Artifacts are content-addressed outputs with producer lineage. Small structured 
 Sensitive content is never silently deleted. A redacted payload carries a `redaction_ref` to a WorkRedaction record identifying the affected evidence/artifact, fields, reason, policy/actor and optional redacted digest. A redaction record must not contain the removed secret itself.
 
 WorkEvent remains append-only. Optional `projection_delta` records deterministic state transitions, entity creation snapshots, plan revisions and evidence/artifact links. Replaying a seed WorkUnit plus ordered events and referenced structured snapshots must rebuild the same current WorkUnit projection. Replay data captures observable state changes, not private chain-of-thought.
+
+## Action lineage and results
+
+`work-action.v2` keeps preset controls and free-form custom instructions on one primitive while making follow-up execution reconstructable. Each action records an explicit approval state, a parent/root lineage pair, and result references to produced runs, evaluations, artifacts or findings. Root actions use null parent/root references; descendants bind to the original root. Completed actions require at least one result reference. Read-only review intents cannot request write, commit or pull-request permissions.
+
+The compatibility `work-action.v1` schema remains unchanged. New producers that need audit → remediate → reassess history should emit v2. The chained fixture at `fixtures/action-lineage.v2.json` demonstrates that flow; deterministic validation rejects self-parenting, incorrect roots, write escalation on read-only reviews and completed actions with no result.
 
 ## Reflection lifecycle
 
