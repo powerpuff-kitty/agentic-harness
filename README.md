@@ -79,6 +79,8 @@ The current CLI does not implement filesystem `ah migrate --apply`, `ah doctor`,
 
 ## What is supported
 
+The [revision-bound capability status](.agentic/docs/project/capability-status.md) separates reviewed source, consumer compatibility and release inclusion. It is a historical snapshot, not a live readiness verdict.
+
 The [CLI command/compatibility contract](https://github.com/powerpuff-kitty/agentic-harness-cli/blob/main/docs/cli-contracts.md) is authoritative for the version you install.
 
 | Surface | Boundary |
@@ -103,7 +105,7 @@ Permission declarations express intended policy. They do not by themselves confi
 
 ## Contributions and roadmap
 
-Read [`CONTRIBUTING.md`](CONTRIBUTING.md), the relevant current truth and ADRs. The [audit-remediation roadmap](.agentic/plans/audit-remediation-2026-09-12.md) prioritizes truthful onboarding, native integration and executed verification before more catalog breadth.
+Read [`CONTRIBUTING.md`](CONTRIBUTING.md), the relevant current truth and ADRs. The [audit-remediation roadmap](.agentic/plans/audit-realignment-2026-10-11.md) prioritizes truthful onboarding, native integration and executed verification before more catalog breadth.
 
 All public source and collaboration metadata must follow the [public-surface policy](.agentic/docs/project/public-surface.md).
 

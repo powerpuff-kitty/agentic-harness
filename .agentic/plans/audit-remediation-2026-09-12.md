@@ -1,5 +1,7 @@
 # Audit remediation: public trust and one complete adoption path
 
+> Historical plan. Current delivery order: [October 11 realignment](audit-realignment-2026-10-11.md). The original scope below is retained for context, not current completion status.
+
 Date: 2026-09-12. Status: implementation started; not a release-readiness claim.
 
 ## Goal and scope

@@ -7,6 +7,8 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 
+import strict_json
+
 ROOT = Path(__file__).resolve().parents[2]
 MAX_BYTES = 131_072
 
@@ -22,9 +24,18 @@ class EvaluationError(ValueError):
     pass
 
 def _size(value):
-    raw = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
-    if len(raw) > MAX_BYTES:
-        raise EvaluationError("record-size-limit-exceeded")
+    try:
+        strict_json.dumps(value, max_bytes=MAX_BYTES)
+    except strict_json.StrictJSONError as error:
+        raise EvaluationError("record-" + str(error)) from None
+
+
+def decode(raw):
+    """Decode supplied JSON; callers must retain bytes to detect duplicate keys."""
+    try:
+        return strict_json.loads(raw, max_bytes=MAX_BYTES)
+    except strict_json.StrictJSONError as error:
+        raise EvaluationError("record-" + str(error)) from None
 
 def _missing_required(value, treatment):
     required = set(value["required_evidence"])
