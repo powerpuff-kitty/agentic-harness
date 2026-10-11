@@ -57,5 +57,6 @@ for script in ['validate_check_contracts.py', 'validate_execution_contracts.py',
                'test_context_checkpoint.py', 'test_checkpoint_refresh.py', 'test_decision_binding.py',
                'test_ordinal_binding.py', 'test_rule_ir.py', 'test_rule_sources.py', 'test_rule_context.py',
                'test_context_memory.py', 'test_token_economics.py', 'test_decision_run.py',
-               'test_strict_json.py', 'test_token_economics_strict.py', 'test_capability_status.py']:
+               'test_strict_json.py', 'test_token_economics_strict.py', 'test_capability_status.py',
+               'test_evidence_conformance.py']:
     subprocess.run([sys.executable, str(root / '.github/scripts' / script)], check=True)
