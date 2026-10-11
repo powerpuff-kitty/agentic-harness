@@ -1,0 +1,203 @@
+{
+  "format_version": 1,
+  "scope": "reviewed-source-snapshot",
+  "reviewed_at": "2026-10-11",
+  "sources": {
+    "canonical": {
+      "repository": "powerpuff-kitty/agentic-harness",
+      "revision": "db7ed265511695a356c950af49028abae48df192"
+    },
+    "cli": {
+      "repository": "powerpuff-kitty/agentic-harness-cli",
+      "revision": "ba1e1325f35f9526ee374b0a85a9e20ef6be83d8"
+    }
+  },
+  "consumer_pins": [
+    {
+      "consumer": "cli",
+      "upstream": "canonical",
+      "revision": "2a9a459af0d6cf19ae764ea2b860f4588aaac653",
+      "evidence_path": "upstream.lock.json"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "architecture.graph",
+      "name": "Architecture graph reference analysis",
+      "owner": "canonical",
+      "implementation": "reference-only",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "canonical",
+          "path": ".agentic/docs/architecture/architecture-graph.md"
+        }
+      ],
+      "limitation": "Routing, guardrail plans, graph-document drift and reference snapshots operate on supplied declarations. Source-import conformance and runtime enforcement are separate.",
+      "issues": [
+        176,
+        198
+      ]
+    },
+    {
+      "id": "context.selection",
+      "name": "Task context and Rule IR",
+      "owner": "canonical",
+      "implementation": "reference-only",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "canonical",
+          "path": ".agentic/docs/architecture/context-compiler.md"
+        },
+        {
+          "source": "canonical",
+          "path": ".agentic/docs/architecture/rule-ir.md"
+        }
+      ],
+      "limitation": "Mandatory context and exact source binding are represented. Complete source discovery, host delivery and total task efficiency remain separate evidence requirements.",
+      "issues": [
+        114,
+        116,
+        171
+      ]
+    },
+    {
+      "id": "context.economics",
+      "name": "Token-efficiency evidence inspection",
+      "owner": "canonical",
+      "implementation": "reference-only",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "canonical",
+          "path": ".github/scripts/token_economics.py"
+        },
+        {
+          "source": "canonical",
+          "path": ".agentic/docs/architecture/token-economics.md"
+        }
+      ],
+      "limitation": "The reviewed September source has a numeric-input integrity defect tracked by #196. Contract tests do not establish model-token savings or authenticated billing.",
+      "issues": [
+        114,
+        196,
+        198
+      ]
+    },
+    {
+      "id": "decision.records",
+      "name": "DecisionRun and replay evidence",
+      "owner": "canonical",
+      "implementation": "reference-only",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "canonical",
+          "path": ".agentic/docs/architecture/decision-run.md"
+        }
+      ],
+      "limitation": "Identity, timing and reducer checks inspect supplied records. This reference module is not a provider scheduler, persistent cache or consequential-action executor.",
+      "issues": [
+        105,
+        109,
+        110
+      ]
+    },
+    {
+      "id": "decision.jev",
+      "name": "Opt-in Jev transport in CLI source",
+      "owner": "cli",
+      "implementation": "implemented",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "cli",
+          "path": "README.md"
+        },
+        {
+          "source": "cli",
+          "path": "docs/cli-contracts.md"
+        }
+      ],
+      "limitation": "Explicit hosted evaluation is documented in the README and present in inspected source. The older command table needs reconciliation. No live provider trial or project calibration was performed for this snapshot.",
+      "issues": [
+        105,
+        197,
+        198
+      ]
+    },
+    {
+      "id": "quality.contracts",
+      "name": "Quality contracts and debt ratchets",
+      "owner": "canonical",
+      "implementation": "reference-only",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "canonical",
+          "path": "registry/quality/README.md"
+        }
+      ],
+      "limitation": "Profiles, findings and baseline semantics exist. Complete executed project-native checks, changed-code ratcheting and supported consumer delivery need their own evidence.",
+      "issues": [
+        102,
+        104
+      ]
+    },
+    {
+      "id": "design.preservation",
+      "name": "Static design-preservation workflow",
+      "owner": "cli",
+      "implementation": "partial",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "cli",
+          "path": "docs/cli-contracts.md"
+        }
+      ],
+      "limitation": "Static analysis, review-required identity and prompt compilation have documented coverage limits. Rendered appearance, complete accessibility and actual identity adherence are not certified here.",
+      "issues": [
+        38,
+        62,
+        66
+      ]
+    },
+    {
+      "id": "adoption.workflow",
+      "name": "Scoped adoption and completion evidence",
+      "owner": "canonical",
+      "implementation": "partial",
+      "verification": "source-reviewed",
+      "consumer_compatibility": "not-checked",
+      "release_inclusion": "not-checked",
+      "evidence": [
+        {
+          "source": "canonical",
+          "path": ".agentic/docs/testing/2026-09-18-merge-readiness.md"
+        }
+      ],
+      "limitation": "A historical assisted-session and candidate review exists. Automatic host loading, repeated comparative outcomes and current release readiness are not established by that review.",
+      "issues": [
+        87,
+        197,
+        198
+      ]
+    }
+  ]
+}
