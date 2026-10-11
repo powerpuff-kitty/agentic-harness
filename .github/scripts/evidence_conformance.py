@@ -13,6 +13,7 @@ import strict_json
 ROOT = Path(__file__).resolve().parents[2]
 CORPUS = "catalog/conformance/evidence-v1.json"
 SCHEMA = "catalog/schema/codebase-audit.v2.schema.json"
+SCHEMA_GIT_BLOB = "d85f59542b77adf74f04b37c8c31b836771c7c7d"
 
 
 class ConformanceError(ValueError):
@@ -58,6 +59,9 @@ def validate_corpus(raw: bytes, schema_bytes: bytes) -> tuple[dict, Draft202012V
             and value["limits"]["max_input_bytes"] == 4096, "invalid-limits")
     fields(value["schema"], "path git_blob_sha sha256")
     require(value["schema"]["path"] == SCHEMA, "unsupported-schema-path")
+    # The accepted schema is independently pinned; rehashing an arbitrary schema
+    # cannot enable remote $ref resolution or silently change these test semantics.
+    require(value["schema"]["git_blob_sha"] == SCHEMA_GIT_BLOB, "unsupported-schema-identity")
     require(type(schema_bytes) is bytes and len(schema_bytes) <= strict_json.MAX_BYTES, "invalid-schema-bytes")
     header = b"blob " + str(len(schema_bytes)).encode() + b"\0"
     require(hashlib.sha1(header + schema_bytes).hexdigest() == value["schema"]["git_blob_sha"]
@@ -114,6 +118,7 @@ def inspect(raw: bytes, schema_bytes: bytes) -> dict:
 
 
 def read_local(relative: str) -> bytes:
+    require(relative in (CORPUS, SCHEMA), "unsupported-local-path")
     path = ROOT
     for part in relative.split("/"):
         path /= part

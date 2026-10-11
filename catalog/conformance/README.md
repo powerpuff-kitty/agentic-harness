@@ -15,11 +15,12 @@ python3 .github/scripts/evidence_conformance.py
 python3 .github/scripts/test_evidence_conformance.py
 ```
 
-The first command reads the fixed local corpus and schema, emits a result with
-exact corpus/schema identities, and exits 0 for a matching corpus, 1 for a mismatch
-or 2 for malformed local input. A trusted quiescent checkout is assumed. It never
-follows evidence references or executes fixture text. The 16 mutation tests verify
-identity drift, malformed metadata, unsupported scopes, and deliberately wrong
+The first command reads the fixed local corpus and independently pinned schema,
+emits a result with exact corpus/schema identities, and exits 0 for a matching
+corpus, 1 for a mismatch or 2 for malformed local input. A trusted quiescent checkout
+is assumed. It never follows evidence references or executes fixture text. The 18
+mutation tests verify identity drift, malformed metadata, unsupported scopes,
+arbitrary-schema substitution, local-read restrictions and deliberately wrong
 expectations. The existing machine-contract entrypoint runs this test suite.
 
 ## Consumer synchronization

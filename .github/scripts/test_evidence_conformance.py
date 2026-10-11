@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Mutation tests for shared-case integrity and truthful scope reporting."""
 import copy
+import hashlib
 import json
 import unittest
 from unittest.mock import patch
@@ -48,6 +49,20 @@ class EvidenceConformanceTests(unittest.TestCase):
     def test_schema_drift_is_not_consumer_conformance(self):
         with self.assertRaisesRegex(conformance.ConformanceError, "schema-digest-mismatch"):
             conformance.inspect(self.raw, self.schema + b" ")
+
+    def test_rehashed_arbitrary_schema_cannot_trigger_reference_resolution(self):
+        schema = b'{"$ref":"https://example.invalid/must-not-fetch"}'
+        header = b"blob " + str(len(schema)).encode() + b"\0"
+        self.value["schema"]["git_blob_sha"] = hashlib.sha1(header + schema).hexdigest()
+        self.value["schema"]["sha256"] = hashlib.sha256(schema).hexdigest()
+        with patch.object(conformance, "Draft202012Validator", side_effect=AssertionError("no schema evaluation")):
+            with self.assertRaisesRegex(conformance.ConformanceError, "unsupported-schema-identity"):
+                conformance.inspect(strict_json.dumps(self.value), schema)
+
+    def test_local_reader_cannot_follow_a_caller_supplied_path(self):
+        for path in ("../private.json", "/etc/passwd", "other.json"):
+            with self.assertRaisesRegex(conformance.ConformanceError, "unsupported-local-path"):
+                conformance.read_local(path)
 
     def test_schema_path_cannot_select_another_file(self):
         for path in ("../schema.json", "https://example.invalid/schema.json", "other.json"):
