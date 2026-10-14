@@ -6,7 +6,7 @@
 agentic-harness
 canonical project contract + catalog + schemas + registries
         ↓ pinned source
-skills
+ai-skills
 self-contained skills with local references, helpers and assets
         ↓ pinned source
 agentic-harness-cli
@@ -15,7 +15,9 @@ native composition, analysis, validation and explicit artifact gates
 self-contained target repository / versioned project artifacts
 ```
 
-The canonical repository owns project contracts. The skills repository owns procedures. The CLI owns deterministic mechanics. No downstream layer may silently redefine upstream contracts or accepted target-project truth.
+The canonical repository owns project contracts. The ai-skills repository owns procedures. The separate ai-agents repository owns
+portable role profiles and team workflows; its exports do not supply a runtime or
+automatically install skills. The CLI owns deterministic mechanics. No downstream layer may silently redefine upstream contracts or accepted target-project truth.
 
 Public documentation and diagrams enumerate approved public repositories only; see [public-surface policy](docs/project/public-surface.md).
 

@@ -87,7 +87,7 @@ The [CLI command/compatibility contract](https://github.com/powerpuff-kitty/agen
 | Audit and explicit artifact gates | Reports measured/unknown evidence and evaluates requested policy; a no-threshold gate is not verified application completion. |
 | Architecture and design analysis | Experimental, deterministic source analysis with explicit coverage limits. |
 | Design preservation and compilation | Review-required candidate identity and task-specific context; observations do not become approved intent automatically. |
-| Agent procedures and adapters | See the agents repository's actual distribution and compatibility guidance; host delivery/enforcement must be verified separately. |
+| Agent procedures and adapters | See the ai-skills and ai-agents distribution and compatibility guidance; host delivery/enforcement must be verified separately. |
 
 Permission declarations express intended policy. They do not by themselves configure a host sandbox, block tools or establish that an agent obeyed a rule. Agent hosting/orchestration is outside this project's scope.
 
@@ -96,7 +96,8 @@ Permission declarations express intended policy. They do not by themselves confi
 | Public repository | Owns |
 | --- | --- |
 | `agentic-harness` | Project contracts, context templates, packs, policies, profiles, presets and schemas |
-| [`skills`](https://github.com/powerpuff-kitty/skills) | Self-contained skills with local references, helpers and assets |
+| [`ai-skills`](https://github.com/powerpuff-kitty/ai-skills) | Self-contained skills with local references, helpers and assets |
+| [`ai-agents`](https://github.com/powerpuff-kitty/ai-agents) | Portable specialist profiles, team workflows and profile adapters |
 | [`agentic-harness-cli`](https://github.com/powerpuff-kitty/agentic-harness-cli) | Deterministic composition, analysis, artifact validation and explicit checks |
 
 `.agentic/` is project-owned truth. `.agents/` holds reusable procedures. Skills may guide work but cannot silently redefine accepted architecture or policy.

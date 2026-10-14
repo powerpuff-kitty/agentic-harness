@@ -9,7 +9,7 @@ This is a real, self-hosting Agentic Harness installation. The repository demons
 | `manifest.yaml` | Project type, maturity, context paths, installed modules, skills, and permissions | Starting any task | Project configuration changes |
 | `lock.json` | Resolved source revisions and installed content | Reproducing or upgrading the harness | Source or module pins change |
 | `PRODUCT.md` | Product purpose, users, scope, non-goals, and success criteria | Changing product behavior or scope | Accepted product truth changes |
-| `ARCHITECTURE.md` | Current three-repository architecture and target-project contract | Changing boundaries, source ownership, or composition | Accepted architecture changes |
+| `ARCHITECTURE.md` | Current public repository architecture and target-project contract | Changing boundaries, source ownership, or composition | Accepted architecture changes |
 | `SECURITY.md` | Supply-chain, instruction, permission, release, and data-safety model | Touching sources, automation, permissions, or releases | Security assumptions or controls change |
 | `DESIGN.md` | Documentation UX, naming, discoverability, and design-system principles | Changing the public structure or documentation experience | Accepted design direction changes |
 | `REFERENCE.md` | Evidence and provenance used by decisions | Researching or reviewing a choice | Evidence changes or expires |
@@ -52,4 +52,4 @@ Lower layers may guide work but cannot silently redefine higher layers.
 
 ## Repository source layout
 
-Reusable authoring material is under `../catalog/`. The sibling `skills` repository owns procedures; `agentic-harness-cli` owns deterministic application and enforcement.
+Reusable authoring material is under `../catalog/`. The sibling `ai-skills` repository owns procedures; `agentic-harness-cli` owns deterministic application and enforcement.

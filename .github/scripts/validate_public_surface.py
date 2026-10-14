@@ -15,7 +15,8 @@ from pathlib import Path
 from urllib.parse import unquote
 
 PUBLIC_REPOSITORIES = frozenset({
-    "agentic-harness", "skills", "agentic-harness-cli",
+    "agentic-harness", "ai-skills", "ai-agents", "agentic-harness-cli",
+    "skills", "agents",  # Historical repository names.
     "agentic-harness-agents",  # Legacy name retained in historical provenance.
 })
 REPOSITORY_NAME = re.compile(

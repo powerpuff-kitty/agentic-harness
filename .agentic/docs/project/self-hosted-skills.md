@@ -60,7 +60,7 @@ See `docs/architecture/context-checkpoints.md` for the canonical contract bounda
 
 ## Provenance and read-only verification
 
-Authoring remains in `skills`. Imported paths normally map to
+Authoring remains in `ai-skills`. Imported paths normally map to
 `skills/<skill>/<file>` at the locked revision; MIT notices map to its root LICENSE.
 The retained older lifecycle references have explicit shared-source mappings in the
 verifier. They are preserved assets, not mandatory initial reads. Updating a source
@@ -98,7 +98,7 @@ implied by this repository-local delivery.
 
 ## Source layout after the collection cleanup
 
-Current `skills` source contains `<name>/` directories directly at its root, plus
+Current `ai-skills` source contains `<name>/` directories directly at its root, plus
 `README.md` and `INSTALL.md` entrypoints. Each skill owns
 its `LICENSE` and any needed references, helpers, assets or tests; there is no root
 plugin or collection manifest. The reviewed self-hosted installation above remains

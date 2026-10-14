@@ -10,11 +10,12 @@ Developers and teams using coding agents on new or existing repositories; platfo
 
 ## Public product boundary
 
-Agentic Harness comprises three public responsibilities:
+Agentic Harness comprises 4 public responsibilities:
 
 1. `agentic-harness`: project-context contracts, materialized context templates, packs, policies, profiles, presets, schemas and registries.
-2. `skills`: reusable procedures and host-integration guidance, distributed separately from project truth.
-3. `agentic-harness-cli`: the Rust `ah` implementation for deterministic composition, validation, audit/artifact gates and experimental architecture/design inspection.
+2. `ai-skills`: reusable procedures and host-integration guidance, distributed separately from project truth.
+3. `ai-agents`: portable specialist profiles and team workflows with separate host adapters; no agent runtime.
+4. `agentic-harness-cli`: the Rust `ah` implementation for deterministic composition, validation, audit/artifact gates and experimental architecture/design inspection.
 
 Public documentation describes approved public capabilities only. Follow [public-surface policy](docs/project/public-surface.md) for source, issues, PRs, diagrams and generated artifacts.
 
