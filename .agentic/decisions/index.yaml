@@ -56,3 +56,7 @@ decisions:
     title: Keep the skills source limited to skill folders
     status: accepted
     file: ADR-014-skill-folders-only.md
+  - id: ADR-015
+    title: Expose independent skills at the source root
+    status: accepted
+    file: ADR-015-root-skill-layout-and-installation.md

@@ -98,7 +98,8 @@ implied by this repository-local delivery.
 
 ## Source layout after the collection cleanup
 
-Current `skills` source contains only `skills/<name>/` directories. Each skill owns
+Current `skills` source contains `<name>/` directories directly at its root, plus
+`README.md` and `INSTALL.md` entrypoints. Each skill owns
 its `LICENSE` and any needed references, helpers, assets or tests; there is no root
 plugin or collection manifest. The reviewed self-hosted installation above remains
 pinned to its recorded pre-cleanup revision and byte inventory. It is not silently
