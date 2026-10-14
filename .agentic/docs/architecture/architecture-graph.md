@@ -123,6 +123,6 @@ Reference graphs are representative rather than exhaustive. They preserve each p
 
 ## Runtime boundary
 
-This repository owns the canonical schema and semantic meaning. Deterministic repository inspection, generated dependency checks and drift analysis belong in `agentic-harness-cli`. Reusable agent procedures belong in `agentic-harness-agents`.
+This repository owns the canonical schema and semantic meaning. Deterministic repository inspection, generated dependency checks and drift analysis belong in `agentic-harness-cli`. Reusable agent procedures belong in `skills`.
 
 The synthetic fixture at `.agentic/evals/fixtures/architecture-graph.v1.json` validates the public contract without identifying a downstream project.

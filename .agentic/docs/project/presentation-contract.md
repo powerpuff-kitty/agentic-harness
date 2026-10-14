@@ -12,7 +12,7 @@ A consumer can map the extension into its own versioned page document, preservin
 project IDs, source revisions, hashes and explicit public-asset approvals.
 
 Canonical source roles remain separate: this repository owns the contract;
-agentic-harness-agents owns reusable procedures; agentic-harness-cli owns installation
+skills owns reusable procedures; agentic-harness-cli owns installation
 and deterministic import/diff behavior. Source pins and migration tests in those
 repositories require separately reviewed adoption. A copied pack must not be
 presented as an already supported CLI command. No downstream pin is changed here.

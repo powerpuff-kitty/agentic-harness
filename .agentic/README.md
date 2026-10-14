@@ -52,4 +52,4 @@ Lower layers may guide work but cannot silently redefine higher layers.
 
 ## Repository source layout
 
-Reusable authoring material is under `../catalog/`. The sibling `agentic-harness-agents` repository owns procedures; `agentic-harness-cli` owns deterministic application and enforcement.
+Reusable authoring material is under `../catalog/`. The sibling `skills` repository owns procedures; `agentic-harness-cli` owns deterministic application and enforcement.

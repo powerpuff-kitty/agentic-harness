@@ -22,6 +22,6 @@ A contract change must update applicable schemas, current truth/ADRs, migration 
 
 Follow the [public-surface policy](.agentic/docs/project/public-surface.md) in source, examples, diagrams, issue bodies, comments and PR descriptions. Public fixtures must be synthetic or explicitly approved; do not identify internal consumers. Review public allowlist changes rather than weakening the check to make it pass.
 
-Agent procedures belong in `agentic-harness-agents`; deterministic application mechanics belong in `agentic-harness-cli`. The public remediation roadmap prioritizes complete, tested workflows over inventory growth. No new workflow infrastructure is required for these checks.
+Agent procedures belong in `skills`; deterministic application mechanics belong in `agentic-harness-cli`. The public remediation roadmap prioritizes complete, tested workflows over inventory growth. No new workflow infrastructure is required for these checks.
 
 Submit contributions under MIT and retain third-party attribution.

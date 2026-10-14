@@ -5,7 +5,7 @@
     "revision": "self"
   },
   "agents_source": {
-    "repository": "powerpuff-kitty/agentic-harness-agents",
+    "repository": "powerpuff-kitty/skills",
     "revision": "7c8a4584a2ed6dd65754071f7296f522b2dd0a7b"
   },
   "variant": "base",

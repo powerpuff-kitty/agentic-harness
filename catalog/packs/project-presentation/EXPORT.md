@@ -4,7 +4,7 @@
 
 Catalog: reusable requirements, layout vocabulary and schemas.
 Project: accepted presentation requirements, canonical facts/tokens/assets and
-publication decisions. Agent procedures: agentic-harness-agents. Deterministic
+publication decisions. Agent procedures: skills. Deterministic
 installation/import/diff checking: agentic-harness-cli. Renderer: the consuming
 portfolio/docs application. Do not move every responsibility into the catalog.
 

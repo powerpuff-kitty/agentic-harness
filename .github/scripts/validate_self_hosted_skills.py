@@ -10,7 +10,7 @@ import stat
 
 ROOT = Path(__file__).resolve().parents[2]
 REVISION = '7c8a4584a2ed6dd65754071f7296f522b2dd0a7b'
-SOURCE = 'powerpuff-kitty/agentic-harness-agents'
+SOURCE = 'powerpuff-kitty/skills'
 VERSION = '0.5.0-beta.1'
 PREFIX = '.agents/skills/'
 # Reviewed upstream Git blobs. Source paths are skills/<relative>, except LICENSE

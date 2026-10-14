@@ -1,6 +1,6 @@
 # Skills-first delivery and evidence gates
 
-Applies to the P0 decision-guidance and context-efficiency workstreams (#105/#114). This is an acceptance guide, not a new manifest, mandatory per-task artifact or runtime dependency. Procedures and evaluator implementation remain owned by `agentic-harness-agents`; canonical Decision Kernel schemas are unchanged.
+Applies to the P0 decision-guidance and context-efficiency workstreams (#105/#114). This is an acceptance guide, not a new manifest, mandatory per-task artifact or runtime dependency. Procedures and evaluator implementation remain owned by `skills`; canonical Decision Kernel schemas are unchanged.
 
 ## Gate 1: usable standalone guidance
 

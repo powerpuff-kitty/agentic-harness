@@ -221,6 +221,6 @@ A replay must resolve the exact historical state and provider/spec/policy identi
 
 This repository owns the canonical schemas and architectural semantics.
 
-`agentic-harness-cli` owns deterministic validation, provider mechanics, replay/cache/fan-out and executable policy checks. `agentic-harness-agents` owns reusable agent guidance. Neither may silently redefine the contracts here.
+`agentic-harness-cli` owns deterministic validation, provider mechanics, replay/cache/fan-out and executable policy checks. `skills` owns reusable agent guidance. Neither may silently redefine the contracts here.
 
 The canonical repository does not claim that publishing these schemas makes provider execution, calibration or host enforcement operational.

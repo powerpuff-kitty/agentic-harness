@@ -16,7 +16,7 @@ def example():
     d = 'sha256:' + 'a'*64
     return {'format_version':1,'kind':'adapter-sync','operation':'preview','host':'claude',
             'profile':'base','target':'/synthetic/project',
-            'source':{'repository':'powerpuff-kitty/agentic-harness-agents','commit':'b'*40},
+            'source':{'repository':'powerpuff-kitty/skills','commit':'b'*40},
             'inventory_sha256':d,'router_sha256':d,'plan_digest':d,
             'entries':[{'source':'claude/files/CLAUDE.md','target':'CLAUDE.md','profile':'base',
                         'desired_sha256':d,'existing_sha256':None,'action':'create'}],
@@ -28,6 +28,13 @@ def example():
 class AdapterContracts(unittest.TestCase):
     def test_ready_preview(self):
         VALIDATOR.validate(example())
+
+    def test_repository_rename_preserves_historical_provenance(self):
+        value = example()
+        value['source']['repository'] = 'powerpuff-kitty/agentic-harness-agents'
+        VALIDATOR.validate(value)
+        value['source']['repository'] = 'synthetic/skills'
+        self.assertFalse(VALIDATOR.is_valid(value))
 
     def test_applied_is_not_host_evidence(self):
         value = example()

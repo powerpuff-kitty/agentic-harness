@@ -60,7 +60,7 @@ See `docs/architecture/context-checkpoints.md` for the canonical contract bounda
 
 ## Provenance and read-only verification
 
-Authoring remains in `agentic-harness-agents`. Imported paths normally map to
+Authoring remains in `skills`. Imported paths normally map to
 `skills/<skill>/<file>` at the locked revision; MIT notices map to its root LICENSE.
 The retained older lifecycle references have explicit shared-source mappings in the
 verifier. They are preserved assets, not mandatory initial reads. Updating a source

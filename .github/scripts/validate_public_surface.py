@@ -15,7 +15,8 @@ from pathlib import Path
 from urllib.parse import unquote
 
 PUBLIC_REPOSITORIES = frozenset({
-    "agentic-harness", "agentic-harness-agents", "agentic-harness-cli",
+    "agentic-harness", "skills", "agentic-harness-cli",
+    "agentic-harness-agents",  # Legacy name retained in historical provenance.
 })
 REPOSITORY_NAME = re.compile(
     r"(?<![a-z0-9_-])agentic-harness(?:-[a-z0-9]+)*(?![a-z0-9_-])",

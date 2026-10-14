@@ -7,7 +7,7 @@ substantial portions of the Harness material. Third-party materials retain their
 own licenses and attribution requirements.
 
 Sources: https://github.com/powerpuff-kitty/agentic-harness and
-https://github.com/powerpuff-kitty/agentic-harness-agents.
+https://github.com/powerpuff-kitty/skills.
 
 MIT License
 
