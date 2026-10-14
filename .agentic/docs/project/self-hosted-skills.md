@@ -95,3 +95,12 @@ P0 #133; earlier changes are recorded in canonical PRs #122-#132 and agents issu
 Actual host use, representative outcomes and complete token accounting remain open
 under agents #26/#32/#36. No runtime deployment, provider call or global update is
 implied by this repository-local delivery.
+
+## Source layout after the collection cleanup
+
+Current `skills` source contains only `skills/<name>/` directories. Each skill owns
+its `LICENSE` and any needed references, helpers, assets or tests; there is no root
+plugin or collection manifest. The reviewed self-hosted installation above remains
+pinned to its recorded pre-cleanup revision and byte inventory. It is not silently
+refreshed by this layout change. Any future import must review the selected folder,
+its own license and resources, then update exact source identities and hashes.

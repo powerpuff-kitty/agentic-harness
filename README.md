@@ -96,7 +96,7 @@ Permission declarations express intended policy. They do not by themselves confi
 | Public repository | Owns |
 | --- | --- |
 | `agentic-harness` | Project contracts, context templates, packs, policies, profiles, presets and schemas |
-| [`skills`](https://github.com/powerpuff-kitty/skills) | Reusable skills, prompts and host integration procedures |
+| [`skills`](https://github.com/powerpuff-kitty/skills) | Self-contained skills with local references, helpers and assets |
 | [`agentic-harness-cli`](https://github.com/powerpuff-kitty/agentic-harness-cli) | Deterministic composition, analysis, artifact validation and explicit checks |
 
 `.agentic/` is project-owned truth. `.agents/` holds reusable procedures. Skills may guide work but cannot silently redefine accepted architecture or policy.

@@ -7,7 +7,7 @@ agentic-harness
 canonical project contract + catalog + schemas + registries
         ↓ pinned source
 skills
-skills, prompts, host adapters and procedures
+self-contained skills with local references, helpers and assets
         ↓ pinned source
 agentic-harness-cli
 native composition, analysis, validation and explicit artifact gates

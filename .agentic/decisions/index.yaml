@@ -52,3 +52,7 @@ decisions:
     title: Rename the procedure repository to skills
     status: accepted
     file: ADR-013-skills-repository-name.md
+  - id: ADR-014
+    title: Keep the skills source limited to skill folders
+    status: accepted
+    file: ADR-014-skill-folders-only.md
